@@ -1,7 +1,7 @@
 import { useId } from "react";
 
 import { Icon } from "@/components/ui/Icon";
-import { calculateLine, formatMoney, getLineError, parseMarkupBasisPoints, parsePriceCents, parseQuantity } from "@/features/quotes/calculations";
+import { calculateLine, formatMoney, getLineError, parseDiscountBasisPoints, parseMarkupBasisPoints, parsePriceCents, parseQuantity } from "@/features/quotes/calculations";
 import { BillingSelect } from "./BillingSelect";
 import type { QuoteLine } from "@/features/quotes/types";
 import { useI18n } from "@/shared/i18n/context";
@@ -9,7 +9,7 @@ import styles from "@/features/quotes/components/QuoteLineEditor.module.scss";
 
 interface Props {
   line: QuoteLine;
-  onChange: (patch: Partial<Pick<QuoteLine, "quantity" | "unitPrice" | "billing" | "markupPercent">>) => void;
+  onChange: (patch: Partial<Pick<QuoteLine, "quantity" | "unitPrice" | "billing" | "markupPercent" | "discountPercent">>) => void;
   onRemove: () => void;
 }
 
@@ -19,14 +19,18 @@ export function QuoteLineEditor({ line, onChange, onRemove }: Props) {
   const priceLabelId = useId();
   const priceUnitId = useId();
   const markupLabelId = useId();
+  const discountLabelId = useId();
   const total = calculateLine(line);
   const error = getLineError(line);
   const yearly = line.billing === "annual-upfront";
   const markup = line.markupPercent ?? "0";
-  const showError = error && (line.unitPrice !== "" || line.quantity !== "1" || markup !== "0");
+  const discount = line.discountPercent ?? "0";
+  const showError = error && (line.unitPrice !== "" || line.quantity !== "1" || markup !== "0" || discount !== "0");
   const basePrice = total.valid ? formatMoney(total.baseUnitCents) : "—";
-  const profit = total.valid ? formatMoney(total.markupUnitCents) : "—";
-  const formula = total.valid ? `${basePrice} × ${Number(markup)}% =` : "—";
+  const profit = total.valid ? `${total.markupUnitCents < 0 ? "−" : ""}${formatMoney(Math.abs(total.markupUnitCents))}` : "—";
+  const formula = !total.valid ? "—" : Number(discount) > 0
+    ? `${formatMoney(total.customerUnitCents)} − ${basePrice} =`
+    : `${basePrice} × ${Number(markup)}% =`;
 
   return (
     <fieldset className={styles.item} aria-label={line.licenseName} data-testid="quote-line">
@@ -71,11 +75,22 @@ export function QuoteLineEditor({ line, onChange, onRemove }: Props) {
                 onChange={(event) => onChange({ unitPrice: event.target.value })} />
             </span>
           </label>
+          <label><span id={discountLabelId}>{t("Discount")}</span>
+            <span className={styles.percentage} dir="ltr">
+              <input type="text" inputMode="decimal" value={discount} maxLength={6} size={Math.max(1, discount.length)}
+                aria-labelledby={discountLabelId}
+                aria-invalid={parseDiscountBasisPoints(discount) === null}
+                aria-describedby={showError ? errorId : undefined}
+                onChange={(event) => onChange({ discountPercent: event.target.value })} />
+              <span aria-hidden="true">%</span>
+            </span>
+          </label>
         </div>
         <div className={styles.pricing} dir="ltr" role="group" aria-label={t("Internal price calculation")}
           data-compact={formula.length + profit.length > 30}>
           <span>{formula}</span>
-          <output aria-label={t("{name} profit per license", { name: line.licenseName })}>{profit}</output>
+          <output data-loss={total.valid && total.markupUnitCents < 0}
+            aria-label={t("{name} profit per license", { name: line.licenseName })}>{profit}</output>
         </div>
         <div className={styles.total}>
           <output dir="ltr" aria-label={t("{name} line total", { name: line.licenseName })}>{total.valid ? formatMoney(total.subtotalCents) : "—"}</output>

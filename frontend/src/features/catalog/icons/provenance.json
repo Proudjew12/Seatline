@@ -530,5 +530,27 @@
       "guidelines": "https://logo.acronis.com/",
       "license": "Vendor trademark asset; not covered by the Simple Icons CC0 dedication."
     }
+  },
+  "sentinelone": {
+    "download": "https://www.sentinelone.com/wp-content/themes/sentinelone/carbine/assets/svg/s1-logo-color.svg",
+    "sha256": "09e9f83c65da2a797008b59f46588defa485a51a19168ab7afe2be774240c19d",
+    "upstream": {
+      "title": "SentinelOne",
+      "source": "https://www.sentinelone.com/",
+      "guidelines": "https://www.sentinelone.com/brand/",
+      "license": "Vendor trademark asset; not covered by the Simple Icons CC0 dedication."
+    },
+    "adaptation": "Five shield paths preserved, uniformly scaled and centered in a 24-unit viewBox. Wordmark, gradient fills and clipping wrapper omitted for CSS-mask rendering."
+  },
+  "bittitan": {
+    "download": "https://www.bittitan.com/wp-content/uploads/2022/10/Logo_BitTitan-Icon-on-Light.png",
+    "sha256": "fcad1f6f7ec62e11799036980615e6af61845082d4f9446c02ac9a59bbd46a36",
+    "upstream": {
+      "title": "BitTitan",
+      "source": "https://www.bittitan.com/",
+      "assetMetadata": "https://www.bittitan.com/wp-json/wp/v2/media/3281",
+      "license": "Vendor trademark asset; not covered by the Simple Icons CC0 dedication."
+    },
+    "adaptation": "Unmodified transparent PNG; its alpha channel is used as the CSS mask."
   }
 }

@@ -62,7 +62,7 @@
   display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: center;
   gap: 8px 6px; flex: 1 0 100%; min-width: 0;
 }
-.amounts { column-gap: 24px; }
+.amounts { column-gap: 12px; }
 
 .price {
   display: flex; align-items: center; position: relative; max-width: 100%;
@@ -82,8 +82,11 @@
   border-radius: var(--radius-control); background: var(--color-background);
   color: var(--color-text-muted); font-size: var(--font-size-body);
   font-variant-numeric: tabular-nums; white-space: nowrap;
-  output { color: var(--color-accent); font-size: var(--font-size-card-title); font-weight: 600; }
-  &[data-compact="true"] { font-size: min(var(--font-size-caption), 4.5cqi); output { font-size: inherit; } }
+  output {
+    color: var(--color-accent); font-size: var(--font-size-card-title); font-weight: 600;
+    &[data-loss="true"] { color: var(--color-danger); }
+  }
+  &[data-compact="true"] { font-size: min(var(--font-size-caption), 4cqi); output { font-size: inherit; } }
 }
 
 .total {

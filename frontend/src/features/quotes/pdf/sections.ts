@@ -9,8 +9,8 @@ function quoteDate(value: string, locale: QuotePdfLayout["locale"]): string {
 
 export function writeQuoteHeading(layout: QuotePdfLayout, draft: QuoteDraft): void {
   layout.logoAt(PDF_PAGE.left - 0.75, 16, 54);
-  layout.end(layout.t("QUOTATION"), 102, 26, 90, 21, "bold");
-  layout.end(layout.t("Software licenses"), 102, 33, 90, 9, "normal", PDF_COLORS.muted);
+  layout.headerText(layout.t("QUOTATION"), 102, 26, 90, 21, "bold");
+  layout.headerText(layout.t("Software licenses"), 102, 33, 90, 9, "normal", PDF_COLORS.muted);
   layout.rule(45, PDF_PAGE.left, PDF_PAGE.width, true);
 
   layout.text(layout.t("PREPARED FOR"), PDF_PAGE.left, 57, 92, 7.5, "bold", PDF_COLORS.muted);

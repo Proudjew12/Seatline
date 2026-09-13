@@ -9,10 +9,12 @@ export interface QuoteLine {
   licenseName: string;
   billing: BillingOption;
   quantity: string;
-  // This is the internal base cost; customer prices are calculated with markup.
+  // This is the internal base cost; customer prices include profit and then discount.
   unitPrice: string;
   // Older drafts have no markup and retain their original customer prices.
   markupPercent?: string;
+  // Older drafts have no discount and retain their original selling prices.
+  discountPercent?: string;
 }
 
 export interface QuoteDraft {

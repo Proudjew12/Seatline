@@ -4,8 +4,8 @@ Seatline's React, Vite, TypeScript, and SCSS Modules application builds customer
 quotes. Choose or create catalog entries, drag to add licenses, enter your own USD prices,
 and export a PDF. Add product asks only for its name, short label and icon, then creates an empty
 product. Add its licenses with Add license; product profit defaults remain in Edit product.
-The searchable, locally bundled software-icon library suggests symbols from product names, supports
-manual choices and preserves selections after reload. Icons share theme colors and dimensions across
+The searchable, locally bundled software-icon library includes SentinelOne and BitTitan, suggests
+symbols from product names, supports manual choices and preserves selections after reload. Icons share theme colors and dimensions across
 the picker and product rail. Shared brand artwork appears once, with Google / Workspace and
 Microsoft / Windows searchable under either name; older saved icon choices continue to resolve.
 Sources and licensing are documented in `src/features/catalog/icons/`.
@@ -14,13 +14,17 @@ Each product has a default Profit rate, with optional per-license overrides.
 Rates support 0–1,000,000% with up to two decimal places, including rates above 100%.
 A blank license rate inherits its product, while zero is an explicit override. New quote lines
 copy the effective rate and remain independently editable; existing lines retain their rates.
-The card shows one private base-price × percentage = profit row; customer PDFs contain only final
-selling prices. Customer, Sales Proposal and New Order share a desktop row. Billing controls fit
+Each quote line also has a separately saved Discount from 0–100%, with up to two decimal places.
+It applies after the profit addition, to the cent-rounded selling price, and the discounted unit
+rounds to cents before quantity. Older drafts keep 0% discount. The private row shows base-price ×
+profit percentage when no discount applies, or final customer price minus cost when discounted;
+negative earnings remain visible. Customer PDFs contain only final selling prices.
+Customer, Sales Proposal and New Order share a desktop row. Billing controls fit
 their selected text, and numeric/customer/proposal inputs size around their contents, with bounded
 widths and editable minimums. The subtotal shows its amount and billing period without a caption.
 Notes dock above payments while cards scroll.
 Quote cards fit five columns at a 1867px viewport and default text size, with centered product and
-license headings. Billing Option and Profit rate share a row above Quantity and Price, and each
+license headings. Billing Option and Profit rate share a row above Quantity, Price and Discount, and each
 label is centered over its compact control. The formula/result group and subtotal are centered.
 More cards fit per desktop row without
 stretching a single item across the workspace; large text and narrow screens reduce the columns.
@@ -165,8 +169,9 @@ the bilingual message catalogs and locale context, shared with PDF generation. N
 service receives customer data. `health` owns the operational API connection check. Heavy PDF code
 loads only on export; its regular/bold fonts and license are in `public/fonts/`. Customer quotations
 use the original Logi logo in `public/branding/`, with the source recorded beside the asset. The
-PDF has a formal item table, payment summary, repeated headers, and page numbers; it bundles its
-assets locally and does not contact Logi's website during export.
+PDF has a formal item table, payment summary, repeated headers, and page numbers. Its logo always
+stays physically left, with the translated title on the right, while Hebrew content keeps RTL.
+It bundles its assets locally and does not contact Logi's website during export.
 
 ## Styling location
 

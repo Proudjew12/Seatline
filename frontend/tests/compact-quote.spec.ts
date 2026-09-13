@@ -92,7 +92,7 @@ async function expectCenteredLabels(line: Locator): Promise<void> {
       controlCenter: control.x + control.width / 2,
     };
   }));
-  expect(measurements).toHaveLength(4);
+  expect(measurements).toHaveLength(5);
   for (const field of measurements) {
     expect(Math.abs(field.titleCenter - field.controlCenter), `${field.title} must be centered over its control`).toBeLessThanOrEqual(1);
   }
@@ -132,7 +132,7 @@ test("aligns customer, Sales Proposal and New Order while keeping quote controls
   if (!cardBox) throw new Error("The quote card must be visible");
   await expectBillingFitsText(billing);
   await expectCenteredLabels(line);
-  for (const [name, maximum] of [["Quantity", 60], ["Price", 80], ["Profit rate", 85]] as const) {
+  for (const [name, maximum] of [["Quantity", 60], ["Price", 80], ["Profit rate", 85], ["Discount", 85]] as const) {
     const field = line.getByRole("textbox", { name, exact: true });
     const bounds = await field.boundingBox();
     if (!bounds) throw new Error(`${name} must be visible`);
@@ -170,24 +170,26 @@ test("aligns customer, Sales Proposal and New Order while keeping quote controls
     await expect(cardProfit).toHaveText("$6.40");
     await expectSingleProfitRow(card.getByLabel("Internal price calculation", { exact: true }), cardProfit, "$20.00 × 32% =");
     await expectCenteredLabels(card);
-    const [cardBounds, billingBox, rateBox, quantityBox, priceBox] = await Promise.all([
+    const [cardBounds, billingBox, rateBox, quantityBox, priceBox, discountBox] = await Promise.all([
       card,
       card.getByRole("combobox", { name: "Billing Option", exact: true }),
-      ...["Profit rate", "Quantity", "Price"].map((name) => card.getByRole("textbox", { name, exact: true })),
+      ...["Profit rate", "Quantity", "Price", "Discount"].map((name) => card.getByRole("textbox", { name, exact: true })),
     ].map((control) => control.boundingBox()));
-    if (!cardBounds || !billingBox || !rateBox || !quantityBox || !priceBox) throw new Error("All four quote fields must be visible");
+    if (!cardBounds || !billingBox || !rateBox || !quantityBox || !priceBox || !discountBox) throw new Error("All five quote fields must be visible");
     expect(billingBox.y, "Billing Option and Profit rate must share the first row").toBeCloseTo(rateBox.y, 0);
     expect(billingBox.x + billingBox.width).toBeLessThanOrEqual(rateBox.x);
     expect(Math.max(billingBox.y + billingBox.height, rateBox.y + rateBox.height)).toBeLessThan(quantityBox.y);
     expect(quantityBox.y, "Quantity and Price must share the second row").toBeCloseTo(priceBox.y, 0);
     expect(quantityBox.x + quantityBox.width).toBeLessThanOrEqual(priceBox.x);
-    const [quantityField, priceField] = await Promise.all(["Quantity", "Price"].map((name) =>
+    expect(priceBox.y, "Price and Discount must share the second row").toBeCloseTo(discountBox.y, 0);
+    expect(priceBox.x + priceBox.width).toBeLessThanOrEqual(discountBox.x);
+    const [quantityField, discountField] = await Promise.all(["Quantity", "Discount"].map((name) =>
       card.getByRole("textbox", { name, exact: true }).evaluate((element) => {
         const box = element.closest("label")?.getBoundingClientRect();
-        if (!box) throw new Error("Quantity and Price must have visible labels");
+        if (!box) throw new Error("Quantity and Discount must have visible labels");
         return { left: box.left, right: box.right };
       })));
-    expect((quantityField.left + priceField.right) / 2, "Quantity and Price must be centered together")
+    expect((quantityField.left + discountField.right) / 2, "Quantity, Price and Discount must be centered together")
       .toBeCloseTo(cardBounds.x + cardBounds.width / 2, 0);
   }
   await expect(page.getByLabel("Monthly payments", { exact: true })).toHaveText("$79.20");

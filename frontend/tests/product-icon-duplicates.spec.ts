@@ -12,11 +12,11 @@ async function openPicker(page: Page): Promise<Locator> {
   return dialog;
 }
 
-test("offers sixty distinct rendered icon silhouettes without duplicate brand choices", async ({ page }, testInfo) => {
+test("offers sixty-two distinct rendered icon silhouettes without duplicate brand choices", async ({ page }, testInfo) => {
   await page.goto("/");
   const dialog = await openPicker(page);
   const choices = dialog.getByRole("group", { name: "Available icons", exact: true });
-  await expect(choices.getByRole("radio")).toHaveCount(60);
+  await expect(choices.getByRole("radio")).toHaveCount(62);
   const audit = await choices.locator("[data-product-icon]").evaluateAll(async (elements) => {
     const silhouettes = await Promise.all(elements.map(async (element) => {
       const mask = getComputedStyle(element).maskImage;
@@ -51,8 +51,8 @@ test("offers sixty distinct rendered icon silhouettes without duplicate brand ch
     }
     return { ids: silhouettes.map(({ id }) => id), pairs: pairs.sort((a, b) => b.similarity - a.similarity) };
   });
-  expect(audit.ids).toHaveLength(60);
-  expect(new Set(audit.ids).size).toBe(60);
+  expect(audit.ids).toHaveLength(62);
+  expect(new Set(audit.ids).size).toBe(62);
   // Alpha overlap catches the original shared Google G and matching Microsoft/Windows squares,
   // including near-identical exports with small antialiasing differences.
   expect(audit.pairs.filter(({ similarity }) => similarity >= 0.98), "Indistinguishable icon silhouettes").toEqual([]);

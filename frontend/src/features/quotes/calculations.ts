@@ -36,6 +36,11 @@ export function parseMarkupBasisPoints(value: string): number | null {
   return parsePriceCents(value);
 }
 
+export function parseDiscountBasisPoints(value: string): number | null {
+  const discount = parsePriceCents(value);
+  return discount !== null && discount <= 10_000 ? discount : null;
+}
+
 export function getLineError(line: QuoteLine): string | null {
   if (!line.productName.trim() || line.productName.length > QUOTE_LIMITS.name) {
     return "Choose a product.";
@@ -55,6 +60,9 @@ export function getLineError(line: QuoteLine): string | null {
   if (parseMarkupBasisPoints(line.markupPercent ?? "0") === null) {
     return "Enter a profit rate from 0 to 1,000,000% with up to two decimal places.";
   }
+  if (parseDiscountBasisPoints(line.discountPercent ?? "0") === null) {
+    return "Enter a discount from 0 to 100% with up to two decimal places.";
+  }
   return null;
 }
 
@@ -62,6 +70,7 @@ export interface LineCalculation {
   valid: boolean;
   baseUnitCents: number;
   customerUnitCents: number;
+  // Net earnings after any discount; may be negative for a sale below cost.
   markupUnitCents: number;
   baseSubtotalCents: number;
   markupSubtotalCents: number;
@@ -79,13 +88,16 @@ export function calculateLine(line: QuoteLine): LineCalculation {
   const quantity = parseQuantity(line.quantity);
   const price = parsePriceCents(line.unitPrice);
   const markup = parseMarkupBasisPoints(line.markupPercent ?? "0");
-  if (getLineError(line) !== null || quantity === null || price === null || markup === null) {
+  const discount = parseDiscountBasisPoints(line.discountPercent ?? "0");
+  if (getLineError(line) !== null || quantity === null || price === null || markup === null || discount === null) {
     return invalidLine();
   }
   // Round each customer unit to cents before quantity so the displayed rate and total agree.
   // Large rates can overflow Number's exact integer range before division, even
   // when the rounded selling price itself is safe. Keep that intermediate exact.
-  const customerUnitCents = Number((BigInt(price) * (10_000n + BigInt(markup)) + 5_000n) / 10_000n);
+  const sellingUnitCents = (BigInt(price) * (10_000n + BigInt(markup)) + 5_000n) / 10_000n;
+  // Apply the discount to the cent-rounded selling price, then round the final unit.
+  const customerUnitCents = Number((sellingUnitCents * (10_000n - BigInt(discount)) + 5_000n) / 10_000n);
   const markupUnitCents = customerUnitCents - price;
   const subtotalCents = quantity * customerUnitCents;
   const baseSubtotalCents = quantity * price;

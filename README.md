@@ -41,6 +41,11 @@ For sellers quoting licenses from multiple companies:
    billing changes. The private one-line calculation shows profit per license, such as
    `$22.00 × 32% = $7.04`, with the earned amount directly beside the formula. Customer totals and PDFs use the
    final selling price ($29.04 in this example), without revealing the profit calculation.
+   Each quote line also has a **Discount** from 0–100%, applied after the profit addition.
+   It starts at 0% and stays independent of other lines and catalog defaults. With a discount,
+   the private strip shows final customer price minus base cost, including a signed loss when
+   the final price is below cost. A $25 base price with 20% profit and 10% discount sells for
+   $27 and earns $2 per license. PDFs and payment totals use the discounted customer price.
 4. Review monthly payments, yearly payments, the amount due at the start, and a 12-month
    estimate; download the customer PDF using the button at the bottom.
 5. Open **Settings → Theme** to browse eighteen visual previews grouped under **Default**,
@@ -75,7 +80,10 @@ places. Profit rate is an addition to the base price and accepts 0–1,000,000% 
 places at product, license and quote-line level. For example, a $25 base price with 150% profit
 adds $37.50 and produces a $62.50 customer price. The customer unit price
 is rounded to the nearest cent before multiplying by quantity, so printed unit prices and totals
-agree. Calculations use integer cents and percentages use integer basis points, with an exact
+agree. Discounts accept up to two decimal places and apply to the cent-rounded selling price;
+the discounted unit is rounded again before quantity. Older drafts without a discount retain
+their prices. Discount edits are saved with the quote and survive billing changes. Calculations
+use integer cents and percentages use integer basis points, with an exact
 integer intermediate for percentage multiplication. Lines and quote totals beyond the safe integer
 range cannot be exported. Quotes support up to 100 lines and exclude taxes. The
 12-month estimate assumes monthly subscriptions continue for all 12 months.
@@ -92,7 +100,7 @@ to a server.
 
 Acceptance checks cover disabled dragging in Edit Mode, desktop mouse drag, immediate tablet drag,
 ignored clicks/taps, keyboard addition, product/license profit inheritance and explicit overrides,
-per-line profit rounding and customer-only PDF amounts, compact header/card controls and docked Notes,
+per-line profit/discount rounding, net earnings and customer-only PDF amounts, compact header/card controls and docked Notes,
 Hebrew/English layout and PDF text/coordinates/pagination, theme gallery selection and persistence,
 Default-only Light/Dark controls, nested-dialog keyboard focus, readable narrow-screen previews,
 all three billing schedules, invalid input, local persistence, PDF download and retry, responsive
@@ -209,7 +217,7 @@ list. Narrower order cards fit five per row at a 1867px desktop width, three at 
 1180px at the default text size, adapting to fewer columns as text grows. Empty grid tracks retain
 the same card width when an order has only one item. Compact fields retain larger touch targets
 on tablets. Each card centers a smaller product caption above its prominent license title.
-Billing Option and Profit rate share the first row, with Quantity and Price centered underneath.
+Billing Option and Profit rate share the first row, with Quantity, Price and Discount centered underneath.
 Every label is centered above its content-sized control; rows wrap when larger text needs more room.
 The billing period sits beside the centered line total. Catalog cards compare Monthly, Annual · Monthly, and
 Annual · Yearly rates, distinguishing unset prices from zero. The drag instruction appears only
@@ -245,9 +253,10 @@ Artwork also appears on supporting routes, while PDF print styling stays indepen
 and Color themes reset artwork to none and retain their original palettes. No remote image service is
 needed at runtime; Vite bundles the assets with deployment-safe URLs. Scenic artwork and theme
 names are original to Seatline; no vendor wallpapers are bundled with these themes.
-Catalog symbols are separate local SVG assets under `frontend/src/features/catalog/icons/`, with
+Catalog symbols are separate local assets under `frontend/src/features/catalog/icons/`, with
 sources and licensing documented there. They identify catalog products without implying affiliation.
 Their CSS masks use theme colors, keep consistent dimensions and make no external image requests.
+The library includes SentinelOne and BitTitan alongside the existing software brands.
 Brand and product names stay in English; icon search also supports aliases and translated general
 symbols. Shared artwork appears once in the gallery: Google / Workspace and Microsoft / Windows
 each have one searchable choice. Previous icon IDs still resolve to their matching artwork.
@@ -289,7 +298,9 @@ summary, and numbered pages. Long names and notes wrap across pages, and monthly
 prices remain explicit. The document language follows settings; its print theme stays light.
 Hebrew customer names in English documents remain aligned with the left customer block. Hebrew
 documents mirror the sections and columns while preserving English product/license names and
-USD amounts. Markup percentages, base prices, and company uplift are never written to the PDF.
+USD amounts. The Logi logo stays physically left on every page in both languages, with the
+translated document heading and continuation reference on the right. Markup percentages, base
+prices, and company earnings are never written to the PDF; discounted final prices remain customer-facing.
 PDF filenames use `Logi-<reference>.pdf`; the app itself remains Seatline.
 
 ## GitHub Pages

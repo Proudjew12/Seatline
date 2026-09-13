@@ -31,11 +31,12 @@ export function useQuoteDraft(products: readonly CatalogProduct[]) {
       ...(licenseId === undefined ? {} : { licenseId }),
       quantity: "1", unitPrice: parsePriceCents(initialPrice) === null ? "" : initialPrice,
       markupPercent: parseMarkupBasisPoints(markup) === null ? "0" : markup,
+      discountPercent: "0",
     }] }));
     return true;
   }
 
-  function editLine(id: string, patch: Partial<Pick<QuoteLine, "quantity" | "unitPrice" | "billing" | "markupPercent">>) {
+  function editLine(id: string, patch: Partial<Pick<QuoteLine, "quantity" | "unitPrice" | "billing" | "markupPercent" | "discountPercent">>) {
     commit((draft) => ({ ...draft, lines: draft.lines.map((line) => {
       if (line.id !== id) return line;
       let price = line.unitPrice;

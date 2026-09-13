@@ -121,7 +121,7 @@ test("keeps every billing option beside profit rates below and above 100% in fiv
           return { left: bounds.left, right: bounds.right, width: bounds.width, fields };
         });
         expect(geometry.width).toBeLessThan(280);
-        expect(geometry.fields).toHaveLength(4);
+        expect(geometry.fields).toHaveLength(5);
         const [billingBox, profitBox] = geometry.fields;
         expect(billingBox.y, `${option} and ${rate}% must share a row at ${width}px`).toBeCloseTo(profitBox.y, 0);
         expect(billingBox.right).toBeLessThanOrEqual(profitBox.x);

@@ -46,6 +46,8 @@ import iconSalesforce from "./salesforce.svg?no-inline";
 import iconHubspot from "./hubspot.svg?no-inline";
 import iconVeeam from "./veeam.svg?no-inline";
 import iconVmware from "./vmware.svg?no-inline";
+import iconSentinelone from "./sentinelone.svg?no-inline";
+import iconBittitan from "./bittitan.png?no-inline";
 import iconBitdefender from "./bitdefender.svg?no-inline";
 import iconFortinet from "./fortinet.svg?no-inline";
 import iconAutodesk from "./autodesk.svg?no-inline";
@@ -116,6 +118,8 @@ export const PRODUCT_ICONS = [
   { id: "hubspot", name: "HubSpot", keywords: "hubspot crm sales marketing האבספוט", src: iconHubspot },
   { id: "veeam", name: "Veeam", keywords: "veeam backup recovery וים ויאם", src: iconVeeam, wordmark: true },
   { id: "vmware", name: "VMware", keywords: "vmware virtualization vsphere וימוור", src: iconVmware, wordmark: true },
+  { id: "sentinelone", name: "SentinelOne", keywords: "sentinelone sentinel one sentinel1 endpoint security xdr edr סנטינלוואן סנטינל וואן", src: iconSentinelone },
+  { id: "bittitan", name: "BitTitan", keywords: "bittitan bit titan migrationwiz migration wiz cloud migration ביטטיטאן ביט טיטאן ביטטיטן", src: iconBittitan },
   { id: "bitdefender", name: "Bitdefender", keywords: "bitdefender antivirus endpoint security ביטדיפנדר", src: iconBitdefender },
   { id: "fortinet", name: "Fortinet", keywords: "fortinet fortigate firewall security פורטינט פורטיגייט", src: iconFortinet },
   { id: "autodesk", name: "Autodesk", keywords: "autodesk autocad cad design אוטודסק אוטוקאד", src: iconAutodesk },
@@ -167,6 +171,13 @@ const SUGGESTIONS: ReadonlyArray<readonly [string, ProductIconId]> = [
   ["google cloud", "google-cloud"],
   ["google drive", "google-drive"],
   ["malwarebytes", "malwarebytes"],
+  ["sentinel one", "sentinelone"],
+  ["sentinelone", "sentinelone"],
+  ["סנטינל וואן", "sentinelone"],
+  ["סנטינלוואן", "sentinelone"],
+  ["migrationwiz", "bittitan"],
+  ["migration wiz", "bittitan"],
+  ["ביט טיטאן", "bittitan"],
   ["microsoft365", "microsoft-365"],
   ["bitdefender", "bitdefender"],
   ["google docs", "google-docs"],
@@ -180,6 +191,11 @@ const SUGGESTIONS: ReadonlyArray<readonly [string, ProductIconId]> = [
   ["teamviewer", "teamviewer"],
   ["1password", "1password"],
   ["atlassian", "atlassian"],
+  ["sentinel1", "sentinelone"],
+  ["bit titan", "bittitan"],
+  ["bittitan", "bittitan"],
+  ["ביטטיטאן", "bittitan"],
+  ["ביטטיטן", "bittitan"],
   ["fortigate", "fortinet"],
   ["microsoft", "microsoft"],
   ["office365", "microsoft-365"],

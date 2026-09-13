@@ -25,7 +25,8 @@ function isStoredLine(value: unknown): value is QuoteLine {
     BILLING_OPTIONS.some((option) => option.id === value.billing) &&
     isText(value.quantity, QUOTE_LIMITS.numericInput) &&
     isText(value.unitPrice, QUOTE_LIMITS.numericInput) &&
-    (value.markupPercent === undefined || isText(value.markupPercent, QUOTE_LIMITS.numericInput))
+    (value.markupPercent === undefined || isText(value.markupPercent, QUOTE_LIMITS.numericInput)) &&
+    (value.discountPercent === undefined || isText(value.discountPercent, QUOTE_LIMITS.numericInput))
   );
 }
 

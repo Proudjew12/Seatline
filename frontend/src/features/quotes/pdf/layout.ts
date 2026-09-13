@@ -73,17 +73,25 @@ export class QuotePdfLayout {
     this.drawText(value, x, y, width, size, weight, color, this.locale === "he" ? "left" : "right");
   }
 
+  // The brand header has fixed physical sides in both document languages.
+  headerText(value: string, x: number, y: number, width: number, size = 9,
+    weight: PdfWeight = "normal", color: PdfColor = PDF_COLORS.ink): void {
+    this.drawText(value, x, y, width, size, weight, color, "right", { mirror: false });
+  }
+
   private drawText(value: string, x: number, y: number, width: number, size: number,
-    weight: PdfWeight, color: PdfColor, align: "left" | "right", rtl?: boolean): void {
+    weight: PdfWeight, color: PdfColor, align: "left" | "right",
+    options: { rtl?: boolean; mirror?: boolean } = {}): void {
     const text = cleanPdfText(value);
     this.font(size, weight, color);
     const textWidth = this.document.getTextWidth(text);
     if (textWidth > width) this.document.setFontSize(size * width / textWidth);
     // Content direction controls bidi only. A Hebrew customer in an English quote still
     // begins at the left edge of the customer block; mixed English/numbers are not reversed.
-    this.document.text(text, this.blockX(x, width) + (align === "right" ? width : 0), y, {
+    const start = options.mirror === false ? x : this.blockX(x, width);
+    this.document.text(text, start + (align === "right" ? width : 0), y, {
       align,
-      isInputVisual: false, isOutputVisual: true, isInputRtl: rtl ?? isRtl(text), isOutputRtl: false,
+      isInputVisual: false, isOutputVisual: true, isInputRtl: options.rtl ?? isRtl(text), isOutputRtl: false,
       isSymmetricSwapping: true,
     });
   }
@@ -98,7 +106,7 @@ export class QuotePdfLayout {
   }
 
   logoAt(x: number, y: number, width: number): void {
-    this.document.addImage(this.logo, "PNG", this.blockX(x, width), y, width, width * 300 / 800, "logi-logo", "FAST");
+    this.document.addImage(this.logo, "PNG", x, y, width, width * 300 / 800, "logi-logo", "FAST");
   }
 
   rule(y = this.y, x = PDF_PAGE.left, width = PDF_PAGE.width, accent = false): void {
@@ -117,9 +125,9 @@ export class QuotePdfLayout {
     if (this.y + height <= PDF_PAGE.bottom) return false;
     this.document.addPage();
     this.logoAt(PDF_PAGE.left - 0.5, 12, 34);
-    this.end(this.t("SOFTWARE LICENSE QUOTATION"), 97, 17, 95, 8, "bold");
+    this.headerText(this.t("SOFTWARE LICENSE QUOTATION"), 97, 17, 95, 8, "bold");
     const references = this.wrap(this.reference, 85, 7.5);
-    references.forEach((line, index) => this.end(line, 107, 23 + index * 4, 85, 7.5, "normal", PDF_COLORS.muted));
+    references.forEach((line, index) => this.headerText(line, 107, 23 + index * 4, 85, 7.5, "normal", PDF_COLORS.muted));
     this.y = Math.max(34, 29 + references.length * 4);
     this.rule(this.y - 4);
     return true;
@@ -133,7 +141,7 @@ export class QuotePdfLayout {
         this.ensureSpace(height);
         // Wrapping beside an English name must not change the paragraph's bidi base.
         this.drawText(line, PDF_PAGE.left, this.y, PDF_PAGE.width, size, "normal", color,
-          this.locale === "he" ? "right" : "left", rtl);
+          this.locale === "he" ? "right" : "left", { rtl });
         this.y += height;
       }
     }

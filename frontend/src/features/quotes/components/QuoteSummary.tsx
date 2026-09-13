@@ -20,7 +20,7 @@ export function QuoteSummary({ draft, exporting, onExport }: Props) {
   let hint = "Your quote is ready to download.";
   if (draft.lines.length === 0) hint = "Add a license to start your quote.";
   else if (totalsOverflow) hint = "The quote total is too large. Reduce the quantity, price, or profit rate.";
-  else if (!totals.valid) hint = "Enter a valid quantity, price, and profit rate for each license.";
+  else if (!totals.valid) hint = "Enter a valid quantity, price, profit rate, and discount for each license.";
   else if (!draft.customer.trim()) hint = "Add a customer to export this quote.";
   else if (!draft.reference.trim()) hint = "Add a sales proposal number to export.";
 

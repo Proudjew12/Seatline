@@ -12,9 +12,22 @@ interface PdfText {
   page: number;
 }
 
+interface PdfLogo {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  page: number;
+}
+
+interface PdfContent {
+  text: PdfText[];
+  logos: PdfLogo[];
+}
+
 // Decode the actual embedded Unicode glyphs and page coordinates with Node's built-in
 // zlib. This keeps PDF assertions portable without a system PDF reader or test dependency.
-function readPdfText(pdf: Buffer): PdfText[] {
+function readPdfContent(pdf: Buffer): PdfContent {
   const objects = new Map<number, string>();
   for (const match of pdf.toString("latin1").matchAll(/(\d+) 0 obj\s*([\s\S]*?)\s*endobj/g)) {
     objects.set(Number(match[1]), match[2]);
@@ -44,12 +57,17 @@ function readPdfText(pdf: Buffer): PdfText[] {
     }
   }
   const texts: PdfText[] = [];
+  const logos: PdfLogo[] = [];
   let page = 0;
   for (const object of objects.values()) {
     if (!/\/Type \/Page\b/.test(object)) continue;
     page += 1;
     const contentId = Number(object.match(/\/Contents (\d+) 0 R/)?.[1]);
-    for (const block of stream(contentId).matchAll(/BT\s*([\s\S]*?)\s*ET/g)) {
+    const content = stream(contentId);
+    for (const image of content.matchAll(/([\d.-]+) 0 0 ([\d.-]+) ([\d.-]+) ([\d.-]+) cm\s*\/I\d+ Do/g)) {
+      logos.push({ width: Number(image[1]), height: Number(image[2]), x: Number(image[3]), y: Number(image[4]), page });
+    }
+    for (const block of content.matchAll(/BT\s*([\s\S]*?)\s*ET/g)) {
       const font = block[1].match(/\/(F\d+) [\d.]+ Tf/)?.[1] ?? "";
       const position = block[1].match(/([\d.-]+) ([\d.-]+) Td/);
       const encoded = block[1].match(/<([\da-f]+)> Tj/i)?.[1];
@@ -60,12 +78,30 @@ function readPdfText(pdf: Buffer): PdfText[] {
   }
   expect(texts.length).toBeGreaterThan(20);
   expect(texts.map((item) => item.text).join("\n")).not.toContain("�");
-  return texts;
+  return { text: texts, logos };
 }
 
-async function renderQuote(page: Page, testInfo: TestInfo, locale: "en" | "he", long = false, markupPercent = "17"): Promise<PdfText[]> {
+function expectLeftLogos({ text, logos }: PdfContent): void {
+  const pointsPerMm = 72 / 25.4;
+  const pageCount = Math.max(...text.map((item) => item.page));
+  expect(logos).toHaveLength(pageCount);
+  for (let page = 1; page <= pageCount; page += 1) {
+    const logo = logos.find((item) => item.page === page);
+    expect(logo, `Page ${page} has its branding image`).toBeDefined();
+    if (!logo) throw new Error(`Missing logo on page ${page}`);
+    expect(logo.x).toBeCloseTo((page === 1 ? 17.25 : 17.5) * pointsPerMm, 3);
+    expect(logo.width).toBeCloseTo((page === 1 ? 54 : 34) * pointsPerMm, 3);
+    const headerText = text.filter((item) => item.page === page && item.y >= logo.y && item.y <= logo.y + logo.height);
+    expect(headerText.length).toBeGreaterThanOrEqual(2);
+    for (const item of headerText) {
+      expect(item.x, `Header "${item.text}" stays clear of the left logo`).toBeGreaterThan(logo.x + logo.width);
+    }
+  }
+}
+
+async function renderQuote(page: Page, testInfo: TestInfo, locale: "en" | "he", long = false, markupPercent = "17", discountPercent = "0"): Promise<PdfContent> {
   await page.goto("/");
-  const encoded = await page.evaluate(async ({ locale, long, markupPercent }) => {
+  const encoded = await page.evaluate(async ({ locale, long, markupPercent, discountPercent }) => {
     const modulePath = "/src/features/quotes/exportPdf.ts";
     const { buildQuotePdf } = await import(modulePath) as {
       buildQuotePdf: (draft: object, locale: "en" | "he") => Promise<{ output: (format: "datauristring") => string }>;
@@ -76,21 +112,21 @@ async function renderQuote(page: Page, testInfo: TestInfo, locale: "en" | "he", 
       lines: Array.from({ length: long ? 24 : 1 }, (_, index) => ({
         id: `line-${index}`, productId: "microsoft-365", productName: "Microsoft 365",
         licenseName: long ? `Business Basic ${index + 1} with a long license description for wrapping across several lines` : "Business Basic",
-        billing: index % 2 ? "annual-upfront" : "annual-monthly", quantity: "2", unitPrice: "25", markupPercent,
+        billing: index % 2 ? "annual-upfront" : "annual-monthly", quantity: "2", unitPrice: "25", markupPercent, discountPercent,
       })),
     }, locale);
     return document.output("datauristring").split(",")[1];
-  }, { locale, long, markupPercent });
+  }, { locale, long, markupPercent, discountPercent });
   const pdf = Buffer.from(encoded, "base64");
   const path = testInfo.outputPath(`quotation-${locale}${long ? "-long" : ""}.pdf`);
   await writeFile(path, pdf);
   await testInfo.attach(`quotation-${locale}`, { path, contentType: "application/pdf" });
-  return readPdfText(pdf);
+  return readPdfContent(pdf);
 }
 
 for (const locale of ["en", "he"] as const) {
   test(`exports ${locale} selling prices above 100% profit without exposing cost or rate`, async ({ page }, testInfo) => {
-    const text = await renderQuote(page, testInfo, locale, false, "150");
+    const { text } = await renderQuote(page, testInfo, locale, false, "150");
     const values = text.map((item) => item.text);
     expect(values).toContain("$62.50");
     expect(values).toContain("$125.00");
@@ -102,8 +138,22 @@ for (const locale of ["en", "he"] as const) {
     expect(values).toContain("Business Basic");
   });
 
-  test(`exports ${locale} customer prices, mixed-script text, and aligned customer details`, async ({ page }, testInfo) => {
-    const text = await renderQuote(page, testInfo, locale);
+  test(`exports ${locale} discounted customer prices without exposing cost or profit`, async ({ page }, testInfo) => {
+    const { text } = await renderQuote(page, testInfo, locale, false, "20", "10");
+    const values = text.map((item) => item.text);
+    expect(values).toContain("$27.00");
+    expect(values).toContain("$54.00");
+    expect(values).toContain("$648.00");
+    expect(values).not.toContain("$25.00");
+    expect(values).not.toContain("$30.00");
+    expect(values).not.toContain("$2.00");
+    expect(values.join("\n")).not.toMatch(/20%|profit rate|base price|שיעור רווח|חוור רועיש/i);
+  });
+
+  test(`exports ${locale} customer prices and mixed-script details with a fixed left logo`, async ({ page }, testInfo) => {
+    const content = await renderQuote(page, testInfo, locale);
+    expectLeftLogos(content);
+    const { text } = content;
     const values = text.map((item) => item.text);
     expect(values).toContain("$29.25");
     expect(values).toContain("$58.50");
@@ -137,20 +187,24 @@ for (const locale of ["en", "he"] as const) {
   });
 }
 
-test("paginates Hebrew license details and mixed-script notes with translated repeated headers and footers", async ({ page }, testInfo) => {
-  const text = await renderQuote(page, testInfo, "he", true);
-  const pageCount = Math.max(...text.map((item) => item.page));
-  expect(pageCount).toBeGreaterThan(2);
-  const detailsPages = new Set(text.filter((item) => item.text.includes("Business Basic")).map((item) => item.page));
-  expect(detailsPages.size).toBeGreaterThan(1);
-  for (const page of detailsPages) {
-    const contents = text.filter((item) => item.page === page).map((item) => item.text);
-    expect(contents).toContain("ןוישיר / רצומ");
-    expect(contents).toContain("בויח לולסמ");
-  }
-  for (let page = 1; page <= pageCount; page += 1) {
-    const contents = text.filter((item) => item.page === page);
-    expect(contents.some((item) => item.text === `${pageCount} ךותמ ${page} דומע`)).toBe(true);
-    expect(contents.every((item) => item.x >= 18 * 72 / 25.4 - 0.1 && item.x < 192 * 72 / 25.4)).toBe(true);
-  }
-});
+for (const locale of ["en", "he"] as const) {
+  test(`paginates ${locale} license details and notes with repeated left logos and localized headers and footers`, async ({ page }, testInfo) => {
+    const content = await renderQuote(page, testInfo, locale, true);
+    expectLeftLogos(content);
+    const { text } = content;
+    const pageCount = Math.max(...text.map((item) => item.page));
+    expect(pageCount).toBeGreaterThan(2);
+    const detailsPages = new Set(text.filter((item) => item.text.includes("Business Basic")).map((item) => item.page));
+    expect(detailsPages.size).toBeGreaterThan(1);
+    for (const page of detailsPages) {
+      const contents = text.filter((item) => item.page === page).map((item) => item.text);
+      expect(contents).toContain(locale === "he" ? "ןוישיר / רצומ" : "PRODUCT / LICENSE");
+      expect(contents).toContain(locale === "he" ? "בויח לולסמ" : "BILLING");
+    }
+    for (let page = 1; page <= pageCount; page += 1) {
+      const contents = text.filter((item) => item.page === page);
+      expect(contents.some((item) => item.text === (locale === "he" ? `${pageCount} ךותמ ${page} דומע` : `Page ${page} of ${pageCount}`))).toBe(true);
+      expect(contents.every((item) => item.x >= 18 * 72 / 25.4 - 0.1 && item.x < 192 * 72 / 25.4)).toBe(true);
+    }
+  });
+}

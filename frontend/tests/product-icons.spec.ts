@@ -273,9 +273,9 @@ for (const group of themeGroups) {
     await setEditMode(page, true);
     const dialog = await addProductDialog(page);
     await dialog.getByRole("button", { name: "Choose icon", exact: true }).click();
-    await expect(dialog.getByRole("radio")).toHaveCount(60);
+    await expect(dialog.getByRole("radio")).toHaveCount(62);
     const icons = dialog.getByRole("group", { name: "Available icons", exact: true }).locator("[data-product-icon]");
-    await expect(icons).toHaveCount(60);
+    await expect(icons).toHaveCount(62);
     await expectLocalIconsLoaded(icons);
     await page.screenshot({ path: testInfo.outputPath("product-icon-library.png") });
     await dialog.getByRole("button", { name: "Cancel", exact: true }).click();

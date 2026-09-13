@@ -1,16 +1,19 @@
 # Product icons
 
-This finite, locally bundled library contains 60 distinct choices and SVG assets: 52 named
+This finite, locally bundled library contains 62 distinct choices: 54 named
 software/vendor choices and eight original general categories. Google / Workspace share one
 choice, as do Microsoft / Windows, avoiding repeated silhouettes in the theme-colored gallery.
 It does not fetch icons, search names, or send catalog data to an external
 service at runtime. Vite's explicit `?no-inline` asset imports keep every URL usable under a
 deployment subpath and emit small, cacheable SVG files instead of embedding their geometry in the
 main JavaScript bundle. The browser requests only locally served icons when they are displayed.
+The library includes 61 SVGs and one unmodified transparent PNG from BitTitan.
 
 `productIcons.ts` owns stable saved IDs, display names, search keywords and asset URLs. Its
 `suggestProductIcon` helper matches whole brand words, preferring longer, specific names; it also
 recognizes common aliases such as M365, Office 365 and Acronix. Unrecognized names return `generic`.
+SentinelOne also matches Sentinel One and Sentinel1; BitTitan also matches Bit Titan and
+MigrationWiz. Both new choices include Hebrew search and product-name aliases.
 `findProductIcon` accepts an unknown value and returns only registered entries. Legacy saved
 `google-workspace` and `windows` IDs resolve to `google` and `microsoft`; catalog loading normalizes
 those IDs while preserving product names, licenses, prices and profit rates. Both names remain
@@ -51,6 +54,21 @@ preserved and uniformly scaled and centered in a 24-unit viewBox. This replaces 
 Icons Zoom wordmark with a recognizable symbol at the catalog's small icon size. It is a Zoom
 vendor asset, outside the Simple Icons CC0 dedication, with its source digest in `provenance.json`.
 
+The SentinelOne shield uses the five symbol paths from the
+[official header logo](https://www.sentinelone.com/wp-content/themes/sentinelone/carbine/assets/svg/s1-logo-color.svg),
+retrieved on 2026-09-13. Those paths retain their geometry and are uniformly scaled and centered
+in a 24-unit viewBox; the wordmark, gradients and clipping wrapper are omitted for mask rendering.
+The source page is [SentinelOne](https://www.sentinelone.com/) and its
+[brand guide](https://www.sentinelone.com/brand/) documents the vendor's usage terms.
+
+The BitTitan cloud/arrow symbol is the unmodified 292 × 209 transparent PNG from the
+[official icon asset](https://www.bittitan.com/wp-content/uploads/2022/10/Logo_BitTitan-Icon-on-Light.png),
+retrieved on 2026-09-13. The vendor's
+[asset metadata](https://www.bittitan.com/wp-json/wp/v2/media/3281) identifies it as the BitTitan icon.
+Its alpha channel works with the same CSS-mask rendering as the vector choices, with no redraw,
+background or embedded remote content. SentinelOne and BitTitan are vendor assets outside the
+Simple Icons CC0 dedication; both original download digests are recorded in `provenance.json`.
+
 The `generic`, `cloud`, `security`, `database`, `server`, `email`, `development` and `design` symbols
 are original geometric SVGs created for Seatline and follow the application's source license.
 All vendor names and marks belong to their respective owners. Inclusion identifies catalog
@@ -58,7 +76,7 @@ products and does not imply endorsement, affiliation or vendor permission for an
 
 ## Rendering and maintenance
 
-Assets contain only SVG paths, with a 24 × 24 viewBox. Simple Icons path geometry is preserved;
+SVG assets contain only paths, with a 24 × 24 viewBox. Simple Icons path geometry is preserved;
 unneeded titles and root presentation attributes are removed. There are no scripts, event handlers,
 external references, fonts or embedded raster images. Their transparent silhouettes support the
 catalog's CSS-mask rendering without a fixed rectangular background.
@@ -67,7 +85,7 @@ scaling within the same 24px-high control, preserving their proportions without 
 
 Keep the same ID when replacing a symbol so saved catalogs continue to resolve. When consolidating
 duplicate artwork, retain the old IDs as lookup aliases and include every name in search keywords.
-Add the local SVG,
+Add the local icon asset,
 registry entry and source metadata together. Preserve upstream license terms and record the source
 version and original digest. Avoid runtime icon URLs or accepting arbitrary SVG/URL values through
 the catalog data boundary.
