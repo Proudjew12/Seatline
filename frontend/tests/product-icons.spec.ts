@@ -3,9 +3,11 @@ import type { Locator, Page } from "@playwright/test";
 import { closeSettings, expect, openSettings, setEditMode, test } from "./fixtures";
 
 const catalogKey = "seatline.catalog.v2";
-const themeNames = [
-  "Default", "Studio", "Midnight", "Dune", "Forest", "Plum", "Aurora", "Solstice", "Orbit", "Harbor", "Meadow", "Alpine",
-  "Aurora Rose", "Aurora Mint", "Aurora Ice", "Aurora Peach", "Aurora Dusk", "Aurora Ocean",
+const themeGroups = [
+  { name: "Default light and dark", themes: ["Default", "Default dark"] },
+  { name: "color themes", themes: ["Studio", "Midnight", "Dune", "Forest", "Plum"] },
+  { name: "original background themes", themes: ["Aurora", "Solstice", "Orbit", "Harbor", "Meadow", "Alpine"] },
+  { name: "Aurora variants", themes: ["Aurora Rose", "Aurora Mint", "Aurora Ice", "Aurora Peach", "Aurora Dusk", "Aurora Ocean"] },
 ];
 
 async function addProductDialog(page: Page): Promise<Locator> {
@@ -256,49 +258,52 @@ test("searches and chooses icons by keyboard in Hebrew at 320px and 150%", async
   await page.screenshot({ path: testInfo.outputPath("product-icons-hebrew-rail.png") });
 });
 
-test("loads the bundled icon library and keeps rail symbols visible across eighteen themes and Default dark", async ({ page }, testInfo) => {
-  await page.setViewportSize({ width: 1440, height: 900 });
-  await page.goto("/");
-  await expect(page).toHaveTitle("Seatline");
-  const banner = page.getByRole("banner");
-  await expect(banner.getByText("Seatline", { exact: true })).toBeVisible();
-  await expect(banner.getByText("S", { exact: true })).toHaveCount(0);
-  await page.getByLabel("Customer", { exact: true }).fill("Icon theme customer");
-  await page.getByRole("button", { name: "Add Business Basic to quote", exact: true }).press("Enter");
-  await page.getByTestId("quote-line").getByRole("textbox", { name: "Price", exact: true }).fill("22");
-  await setEditMode(page, true);
-  const dialog = await addProductDialog(page);
-  await dialog.getByRole("button", { name: "Choose icon", exact: true }).click();
-  expect(await dialog.getByRole("radio").count()).toBeGreaterThan(40);
-  const icons = dialog.locator("[data-product-icon]");
-  expect(await icons.count()).toBeGreaterThan(40);
-  await expectLocalIconsLoaded(icons);
-  await page.screenshot({ path: testInfo.outputPath("product-icon-library.png") });
-  await dialog.getByRole("button", { name: "Cancel", exact: true }).click();
-  const rail = page.getByRole("navigation", { name: "Products", exact: true });
-  for (const name of [...themeNames, "Default dark"]) {
-    await openSettings(page);
-    await page.getByRole("button", { name: "Browse themes", exact: true }).click();
-    const gallery = page.getByRole("dialog", { name: "Choose your theme", exact: true });
-    await gallery.getByRole("button", { name: name === "Default dark" ? "Default" : name, exact: true }).click();
-    await gallery.getByRole("button", { name: "Done", exact: true }).click();
-    if (name === "Default dark") await page.getByRole("combobox", { name: "Appearance", exact: true }).selectOption("dark");
-    await closeSettings(page);
-    await page.mouse.move(0, 0);
-    for (const icon of await rail.locator("[data-product-icon]").all()) {
-      await expect(icon).toBeVisible();
-      expect(await iconContrast(icon), `${name}: each product symbol must contrast with its surface`).toBeGreaterThanOrEqual(3);
-    }
-    await expect(page.getByLabel("Customer", { exact: true })).toHaveValue("Icon theme customer");
-    await expect(page.getByLabel("Monthly payments", { exact: true })).toHaveText("$22.00");
+// Bound each workflow so all palettes retain the normal timeout on slower CI workers.
+for (const group of themeGroups) {
+  test(`loads the bundled icon library and keeps rail symbols visible in ${group.name}`, async ({ page }, testInfo) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto("/");
+    await expect(page).toHaveTitle("Seatline");
+    const banner = page.getByRole("banner");
     await expect(banner.getByText("Seatline", { exact: true })).toBeVisible();
-    await page.screenshot({ path: testInfo.outputPath(`product-icons-${name.toLowerCase().replaceAll(" ", "-")}.png`) });
-    if (name === "Aurora Ocean") {
-      const creation = await addProductDialog(page);
-      await page.screenshot({ path: testInfo.outputPath("add-product-ocean-collapsed.png") });
-      await creation.getByRole("button", { name: "Choose icon", exact: true }).click();
-      await page.screenshot({ path: testInfo.outputPath("add-product-ocean-library.png") });
-      await creation.getByRole("button", { name: "Cancel", exact: true }).click();
+    await expect(banner.getByText("S", { exact: true })).toHaveCount(0);
+    await page.getByLabel("Customer", { exact: true }).fill("Icon theme customer");
+    await page.getByRole("button", { name: "Add Business Basic to quote", exact: true }).press("Enter");
+    await page.getByTestId("quote-line").getByRole("textbox", { name: "Price", exact: true }).fill("22");
+    await setEditMode(page, true);
+    const dialog = await addProductDialog(page);
+    await dialog.getByRole("button", { name: "Choose icon", exact: true }).click();
+    await expect(dialog.getByRole("radio")).toHaveCount(60);
+    const icons = dialog.getByRole("group", { name: "Available icons", exact: true }).locator("[data-product-icon]");
+    await expect(icons).toHaveCount(60);
+    await expectLocalIconsLoaded(icons);
+    await page.screenshot({ path: testInfo.outputPath("product-icon-library.png") });
+    await dialog.getByRole("button", { name: "Cancel", exact: true }).click();
+    const rail = page.getByRole("navigation", { name: "Products", exact: true });
+    for (const name of group.themes) {
+      await openSettings(page);
+      await page.getByRole("button", { name: "Browse themes", exact: true }).click();
+      const gallery = page.getByRole("dialog", { name: "Choose your theme", exact: true });
+      await gallery.getByRole("button", { name: name === "Default dark" ? "Default" : name, exact: true }).click();
+      await gallery.getByRole("button", { name: "Done", exact: true }).click();
+      if (name === "Default dark") await page.getByRole("combobox", { name: "Appearance", exact: true }).selectOption("dark");
+      await closeSettings(page);
+      await page.mouse.move(0, 0);
+      for (const icon of await rail.locator("[data-product-icon]").all()) {
+        await expect(icon).toBeVisible();
+        expect(await iconContrast(icon), `${name}: each product symbol must contrast with its surface`).toBeGreaterThanOrEqual(3);
+      }
+      await expect(page.getByLabel("Customer", { exact: true })).toHaveValue("Icon theme customer");
+      await expect(page.getByLabel("Monthly payments", { exact: true })).toHaveText("$22.00");
+      await expect(banner.getByText("Seatline", { exact: true })).toBeVisible();
+      await page.screenshot({ path: testInfo.outputPath(`product-icons-${name.toLowerCase().replaceAll(" ", "-")}.png`) });
+      if (name === "Aurora Ocean") {
+        const creation = await addProductDialog(page);
+        await page.screenshot({ path: testInfo.outputPath("add-product-ocean-collapsed.png") });
+        await creation.getByRole("button", { name: "Choose icon", exact: true }).click();
+        await page.screenshot({ path: testInfo.outputPath("add-product-ocean-library.png") });
+        await creation.getByRole("button", { name: "Cancel", exact: true }).click();
+      }
     }
-  }
-});
+  });
+}
