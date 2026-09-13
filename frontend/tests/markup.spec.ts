@@ -1,7 +1,7 @@
 import { calculateLine, calculateQuote, parseMarkupBasisPoints } from "../src/features/quotes/calculations";
 import type { QuoteLine } from "../src/features/quotes/types";
 
-import { expect, test } from "./fixtures";
+import { closeSettings, expect, openSettings, test } from "./fixtures";
 
 const baseLine: QuoteLine = {
   id: "line-1", productId: "microsoft-365", productName: "Microsoft 365",
@@ -178,6 +178,54 @@ test("accepts and persists profit above 100% while blocking unsafe quote totals"
   await quantity.fill("1");
   await expect(exportButton).toBeEnabled();
   await expect(page.getByLabel("Monthly payments", { exact: true })).toHaveText("$10,001,000,000.00");
+});
+
+test("keeps percentage suffix clear of every digit at 320px and 150% in English and Hebrew", async ({ page }) => {
+  await page.setViewportSize({ width: 320, height: 740 });
+  await page.addInitScript(() => localStorage.setItem("seatline.display.v1", JSON.stringify({
+    textSize: 150, theme: "light", locale: "en",
+  })));
+  await page.goto("/");
+  await page.getByRole("button", { name: "Add Business Basic to quote", exact: true }).press("Enter");
+  const line = page.getByRole("group", { name: "Business Basic", exact: true });
+  await line.getByRole("textbox", { name: "Price", exact: true }).fill("25");
+  for (const [locale, label] of [["en", "Profit rate"], ["he", "שיעור רווח"]]) {
+    if (locale === "he") {
+      await openSettings(page);
+      await page.getByRole("combobox", { name: "Language", exact: true }).selectOption("he");
+      await closeSettings(page);
+    }
+    await page.evaluate(() => document.fonts.ready);
+    const input = line.getByRole("textbox", { name: label, exact: true });
+    for (const rate of ["32", "250.25", "1000000.00"]) {
+      await input.fill(rate);
+      await input.press("Tab");
+      await expect(input).toHaveValue(rate);
+      await expect(input).toHaveAttribute("aria-invalid", "false");
+      const geometry = await input.evaluate((element) => {
+        if (!(element instanceof HTMLInputElement)) throw new Error("Profit rate must be an input");
+        const suffix = element.closest("label")?.querySelector<HTMLElement>('[aria-hidden="true"]');
+        if (!suffix || suffix.textContent !== "%") throw new Error("Profit rate must show its percentage suffix");
+        const context = document.createElement("canvas").getContext("2d");
+        if (!context) throw new Error("Text measurement requires a canvas context");
+        const style = getComputedStyle(element);
+        context.font = `${style.fontWeight} ${style.fontSize} ${style.fontFamily}`;
+        const width = context.measureText(element.value).width;
+        const bounds = element.getBoundingClientRect();
+        const textStart = bounds.left + parseFloat(style.borderLeftWidth) + parseFloat(style.paddingLeft);
+        const contentEnd = bounds.right - parseFloat(style.borderRightWidth) - parseFloat(style.paddingRight);
+        return {
+          textEnd: textStart + width, contentEnd, suffixStart: suffix.getBoundingClientRect().left,
+          scrollLeft: element.scrollLeft,
+          contained: document.documentElement.scrollWidth <= window.innerWidth,
+        };
+      });
+      expect(geometry.textEnd, `${locale}: ${rate} digits must precede %`).toBeLessThanOrEqual(geometry.suffixStart);
+      expect(geometry.textEnd, `${locale}: ${rate} must fit the input content area`).toBeLessThanOrEqual(geometry.contentEnd + 1);
+      expect(geometry.scrollLeft, `${locale}: ${rate} must remain fully visible`).toBeLessThanOrEqual(1);
+      expect(geometry.contained, `${locale}: ${rate} must not overflow the page`).toBe(true);
+    }
+  }
 });
 
 test("migrates legacy drafts without repricing or deleting their original browser storage", async ({ page }) => {

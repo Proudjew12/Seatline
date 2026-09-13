@@ -73,7 +73,7 @@
 .percentage {
   display: flex; align-items: center; position: relative; max-width: 100%;
   > span { position: absolute; right: 5px; color: var(--color-text-muted); pointer-events: none; }
-  input { padding-right: 18px; }
+  input { padding-right: max(18px, calc(1em + 4px)); }
 }
 
 .pricing {
