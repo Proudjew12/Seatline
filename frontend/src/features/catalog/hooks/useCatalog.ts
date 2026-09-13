@@ -17,8 +17,8 @@ function normalizedPrices(prices: LicensePrices): LicensePrices {
 }
 
 const PRICE_ERROR = "Enter USD prices from 0 to 1,000,000 with up to two decimal places, or leave them blank.";
-const PROFIT_ERROR = "Enter a profit rate from 0 to 100% with up to two decimal places.";
-const OPTIONAL_PROFIT_ERROR = "Enter a profit rate from 0 to 100% with up to two decimal places, or leave it blank.";
+const PROFIT_ERROR = "Enter a profit rate from 0 to 1,000,000% with up to two decimal places.";
+const OPTIONAL_PROFIT_ERROR = "Enter a profit rate from 0 to 1,000,000% with up to two decimal places, or leave it blank.";
 
 export function useCatalog() {
   const [state, setState] = useState(loadCatalog);

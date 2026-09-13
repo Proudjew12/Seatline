@@ -91,7 +91,7 @@ export const uiMessages: Readonly<Record<string, string>> = {
   "Design": "עיצוב",
   "Applied to new quote items. Existing items keep their rates.": "חל על פריטים חדשים בהצעה. שיעורי הרווח בפריטים קיימים נשמרים.",
   "Leave blank to use the product rate:": "השאירו ריק כדי להשתמש בשיעור הרווח של המוצר:",
-  "Enter a profit rate from 0 to 100% with up to two decimal places, or leave it blank.": "הזינו שיעור רווח בין 0 ל־100%, עם עד שתי ספרות אחרי הנקודה, או השאירו ריק.",
+  "Enter a profit rate from 0 to 1,000,000% with up to two decimal places, or leave it blank.": "הזינו שיעור רווח בין 0 ל־1,000,000%, עם עד שתי ספרות אחרי הנקודה, או השאירו ריק.",
   "Default prices · USD": "מחירי בסיס ברירת מחדל · USD",
   "Leave a price blank to enter it in each order.": "השאירו מחיר ריק כדי להזין אותו בכל הזמנה.",
   "Monthly price": "מחיר חודשי",

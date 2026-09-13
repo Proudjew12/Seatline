@@ -63,9 +63,9 @@ function readPdfText(pdf: Buffer): PdfText[] {
   return texts;
 }
 
-async function renderQuote(page: Page, testInfo: TestInfo, locale: "en" | "he", long = false): Promise<PdfText[]> {
+async function renderQuote(page: Page, testInfo: TestInfo, locale: "en" | "he", long = false, markupPercent = "17"): Promise<PdfText[]> {
   await page.goto("/");
-  const encoded = await page.evaluate(async ({ locale, long }) => {
+  const encoded = await page.evaluate(async ({ locale, long, markupPercent }) => {
     const modulePath = "/src/features/quotes/exportPdf.ts";
     const { buildQuotePdf } = await import(modulePath) as {
       buildQuotePdf: (draft: object, locale: "en" | "he") => Promise<{ output: (format: "datauristring") => string }>;
@@ -76,11 +76,11 @@ async function renderQuote(page: Page, testInfo: TestInfo, locale: "en" | "he", 
       lines: Array.from({ length: long ? 24 : 1 }, (_, index) => ({
         id: `line-${index}`, productId: "microsoft-365", productName: "Microsoft 365",
         licenseName: long ? `Business Basic ${index + 1} with a long license description for wrapping across several lines` : "Business Basic",
-        billing: index % 2 ? "annual-upfront" : "annual-monthly", quantity: "2", unitPrice: "25", markupPercent: "17",
+        billing: index % 2 ? "annual-upfront" : "annual-monthly", quantity: "2", unitPrice: "25", markupPercent,
       })),
     }, locale);
     return document.output("datauristring").split(",")[1];
-  }, { locale, long });
+  }, { locale, long, markupPercent });
   const pdf = Buffer.from(encoded, "base64");
   const path = testInfo.outputPath(`quotation-${locale}${long ? "-long" : ""}.pdf`);
   await writeFile(path, pdf);
@@ -89,6 +89,19 @@ async function renderQuote(page: Page, testInfo: TestInfo, locale: "en" | "he", 
 }
 
 for (const locale of ["en", "he"] as const) {
+  test(`exports ${locale} selling prices above 100% profit without exposing cost or rate`, async ({ page }, testInfo) => {
+    const text = await renderQuote(page, testInfo, locale, false, "150");
+    const values = text.map((item) => item.text);
+    expect(values).toContain("$62.50");
+    expect(values).toContain("$125.00");
+    expect(values).toContain("$1,500.00");
+    expect(values).not.toContain("$25.00");
+    expect(values).not.toContain("$37.50");
+    expect(values.join("\n")).not.toMatch(/150%|markup|profit rate|profit per license|base price|company earnings|שיעור רווח|חוור רועיש/i);
+    expect(values).toContain("Microsoft 365");
+    expect(values).toContain("Business Basic");
+  });
+
   test(`exports ${locale} customer prices, mixed-script text, and aligned customer details`, async ({ page }, testInfo) => {
     const text = await renderQuote(page, testInfo, locale);
     const values = text.map((item) => item.text);

@@ -46,7 +46,7 @@ export function QuoteLineEditor({ line, onChange, onRemove }: Props) {
           </label>
           <label><span id={markupLabelId}>{t("Profit rate")}</span>
             <span className={styles.percentage} dir="ltr">
-              <input type="text" inputMode="decimal" value={markup} maxLength={8} size={Math.max(1, markup.length)}
+              <input type="text" inputMode="decimal" value={markup} maxLength={10} size={Math.max(1, markup.length)}
                 aria-labelledby={markupLabelId}
                 aria-invalid={parseMarkupBasisPoints(markup) === null}
                 aria-describedby={showError ? errorId : undefined}

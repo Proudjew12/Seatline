@@ -332,7 +332,7 @@ test("fits English and Hebrew controls and the profit formula at 320px and 150% 
       await expectCenteredLabels(line);
     }
     await expect(line.getByText(locale.oldLabel, { exact: true })).toHaveCount(0);
-    for (const [name, invalid, valid] of [[locale.quantity, "99999", "1"], [locale.price, "1000001", "22"], [locale.rate, "101", "32"]]) {
+    for (const [name, invalid, valid] of [[locale.quantity, "99999", "1"], [locale.price, "1000001", "22"], [locale.rate, "1000001", "32"]]) {
       const field = line.getByRole("textbox", { name, exact: true });
       for (const value of ["", invalid]) {
         await field.fill(value);

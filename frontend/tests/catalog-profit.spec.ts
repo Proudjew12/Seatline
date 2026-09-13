@@ -49,10 +49,10 @@ test("inherits product profit, preserves an explicit zero, and never reprices ex
 
   await setEditMode(page, true);
   product = await editProduct(page);
-  await profitRate(product).fill("25");
+  await profitRate(product).fill("250.25");
   await save(product);
   license = await editLicense(page, "Business Basic");
-  await expect(license.getByText("25%", { exact: true })).toBeVisible();
+  await expect(license.getByText("250.25%", { exact: true })).toBeVisible();
   await profitRate(license).fill("0");
   await save(license);
   await expect(profitRate(original)).toHaveValue("13");
@@ -75,10 +75,10 @@ test("inherits product profit, preserves an explicit zero, and never reprices ex
   await save(license);
   await setEditMode(page, false);
   const inherited = await addLine(page, "Business Basic");
-  await expect(profitRate(inherited)).toHaveValue("25");
+  await expect(profitRate(inherited)).toHaveValue("250.25");
   await expect(profitRate(lines.nth(0))).toHaveValue("13");
   await expect(profitRate(lines.nth(1))).toHaveValue("0");
-  await expect(page.getByLabel("Monthly payments", { exact: true })).toHaveText("$84.50");
+  await expect(page.getByLabel("Monthly payments", { exact: true })).toHaveText("$140.81");
   const savedLicense: unknown = await page.evaluate((key) => {
     const catalog = JSON.parse(localStorage.getItem(key) ?? "null") as {
       products: { id: string; licenses: { id: string; markupPercent?: string }[] }[];
@@ -89,13 +89,13 @@ test("inherits product profit, preserves an explicit zero, and never reprices ex
   expect(savedLicense).toMatchObject({ id: "m365-business-basic" });
   expect(savedLicense).not.toHaveProperty("markupPercent");
   await page.reload();
-  await expect(profitRate(lines.nth(2))).toHaveValue("25");
+  await expect(profitRate(lines.nth(2))).toHaveValue("250.25");
 });
 
-test("sets product defaults separately and saves inherited or overridden rates on new licenses", async ({ page }) => {
+test("saves product defaults above 100% and inherited or overridden rates on new licenses", async ({ page }) => {
   await page.goto("/");
   await setEditMode(page, true);
-  for (const [name, rate, firstRate] of [["Inherited Tools", "8.5", ""], ["Override Tools", "17", "0"]]) {
+  for (const [name, rate, firstRate] of [["Inherited Tools", "150", ""], ["Override Tools", "200", "0"]]) {
     await page.getByRole("button", { name: "Add product", exact: true }).click();
     const product = page.getByRole("dialog", { name: "Add product", exact: true });
     await product.getByLabel("Product name", { exact: true }).fill(name);
@@ -114,10 +114,10 @@ test("sets product defaults separately and saves inherited or overridden rates o
     await firstLicense.getByLabel("Annual paid monthly price", { exact: true }).fill("10");
     await firstLicense.getByRole("button", { name: "Add license", exact: true }).click();
   }
-  for (const [name, rate] of [["Inherited add-on", ""], ["Override add-on", "12.75"]]) {
+  for (const [name, rate] of [["Inherited add-on", ""], ["Override add-on", "250.25"]]) {
     await page.getByRole("button", { name: "Add license", exact: true }).click();
     const license = page.getByRole("dialog", { name: "Add license", exact: true });
-    await expect(license.getByText("17%", { exact: true })).toBeVisible();
+    await expect(license.getByText("200%", { exact: true })).toBeVisible();
     await license.getByLabel("License name", { exact: true }).fill(name);
     await profitRate(license).fill(rate);
     await license.getByLabel("Annual paid monthly price", { exact: true }).fill("10");
@@ -126,44 +126,44 @@ test("sets product defaults separately and saves inherited or overridden rates o
   }
   await page.reload();
   await page.getByRole("button", { name: "Inherited Tools", exact: true }).click();
-  await expect(profitRate(await addLine(page, "Inherited Tools seat"))).toHaveValue("8.5");
+  await expect(profitRate(await addLine(page, "Inherited Tools seat"))).toHaveValue("150");
   await page.getByRole("button", { name: "Override Tools", exact: true }).click();
-  for (const [name, rate] of [["Override Tools seat", "0"], ["Inherited add-on", "17"], ["Override add-on", "12.75"]]) {
+  for (const [name, rate] of [["Override Tools seat", "0"], ["Inherited add-on", "200"], ["Override add-on", "250.25"]]) {
     await expect(profitRate(await addLine(page, name))).toHaveValue(rate);
   }
-  await expect(page.getByLabel("Monthly payments", { exact: true })).toHaveText("$43.83");
+  await expect(page.getByLabel("Monthly payments", { exact: true })).toHaveText("$100.03");
 });
 
 test("validates profit defaults without replacing saved rates and accepts both boundaries", async ({ page }) => {
   await page.goto("/");
   await setEditMode(page, true);
   const product = await editProduct(page);
-  for (const value of ["-1", "100.01", "1.234", "1e1", "invalid"]) {
+  for (const value of ["-1", "1000000.01", "1.234", "1e1", "invalid"]) {
     await profitRate(product).fill(value);
     await product.getByRole("button", { name: "Save changes", exact: true }).click();
-    await expect(product.getByRole("alert")).toHaveText("Enter a profit rate from 0 to 100% with up to two decimal places.");
+    await expect(product.getByRole("alert")).toHaveText("Enter a profit rate from 0 to 1,000,000% with up to two decimal places.");
   }
-  await profitRate(product).fill("100");
+  await profitRate(product).fill("1000000.00");
   await save(product);
   const license = await editLicense(page, "Business Basic");
-  for (const value of ["-0.01", "101", "17.255", "NaN"]) {
+  for (const value of ["-0.01", "1000001", "17.255", "NaN"]) {
     await profitRate(license).fill(value);
     await license.getByRole("button", { name: "Save changes", exact: true }).click();
-    await expect(license.getByRole("alert")).toHaveText("Enter a profit rate from 0 to 100% with up to two decimal places, or leave it blank.");
+    await expect(license.getByRole("alert")).toHaveText("Enter a profit rate from 0 to 1,000,000% with up to two decimal places, or leave it blank.");
   }
   await profitRate(license).fill("0");
   await save(license);
   await page.reload();
   await expect(profitRate(await addLine(page, "Business Basic"))).toHaveValue("0");
-  await expect(profitRate(await addLine(page, "Business Standard"))).toHaveValue("100");
+  await expect(profitRate(await addLine(page, "Business Standard"))).toHaveValue("1000000.00");
   await setEditMode(page, true);
   const unchanged = await editProduct(page);
-  await profitRate(unchanged).fill("100.01");
+  await profitRate(unchanged).fill("1000000.01");
   await unchanged.getByRole("button", { name: "Save changes", exact: true }).click();
   await unchanged.getByRole("button", { name: "Cancel", exact: true }).click();
   await page.reload();
   await setEditMode(page, true);
-  await expect(profitRate(await editProduct(page))).toHaveValue("100");
+  await expect(profitRate(await editProduct(page))).toHaveValue("1000000.00");
 });
 
 for (const key of ["saleprice.catalog.v1", "saleprice.catalog.v2", catalogKey]) {
@@ -195,7 +195,11 @@ for (const key of ["saleprice.catalog.v1", "saleprice.catalog.v2", catalogKey]) 
   });
 }
 
-for (const invalid of [{ productRate: "100.01", licenseRate: "0" }, { productRate: "17", licenseRate: "NaN" }]) {
+for (const invalid of [
+  { productRate: "1000000.01", licenseRate: "0" },
+  { productRate: "200", licenseRate: "1000000.01" },
+  { productRate: "17", licenseRate: "NaN" },
+]) {
   test(`rejects invalid saved profit defaults ${invalid.productRate}/${invalid.licenseRate}`, async ({ page }) => {
     const stored = JSON.stringify({ version: 2, seedRevision: 1, products: [{
       id: "invalid", name: "Invalid product", shortName: "Bad", markupPercent: invalid.productRate,
@@ -231,14 +235,14 @@ test("keeps Hebrew profit defaults usable at 320px and 150% text size", async ({
   const product = page.getByRole("dialog", { name: "עריכת מוצר", exact: true });
   await expect(product.getByLabel("שם המוצר", { exact: true })).toBeFocused();
   const productRate = product.getByLabel("שיעור רווח", { exact: true });
-  await productRate.fill("17");
+  await productRate.fill("150");
   await expect(productRate).toHaveCSS("direction", "ltr");
   await expect(product.getByText("חל על פריטים חדשים בהצעה. שיעורי הרווח בפריטים קיימים נשמרים.", { exact: true })).toBeVisible();
   await capture("catalog-profit-he-product-320-150");
-  await productRate.fill("100.01");
+  await productRate.fill("1000000.01");
   await product.getByRole("button", { name: "שמירת שינויים", exact: true }).click();
-  await expect(product.getByRole("alert")).toHaveText("יש להזין שיעור רווח בין 0 ל־100%, עם עד שתי ספרות אחרי הנקודה.");
-  await productRate.fill("17");
+  await expect(product.getByRole("alert")).toHaveText("יש להזין שיעור רווח בין 0 ל־1,000,000%, עם עד שתי ספרות אחרי הנקודה.");
+  await productRate.fill("150");
   await product.getByRole("button", { name: "שמירת שינויים", exact: true }).click();
   await expect(product).toHaveCount(0);
   await expect(productTrigger).toBeFocused();
@@ -250,12 +254,12 @@ test("keeps Hebrew profit defaults usable at 320px and 150% text size", async ({
   const licenseRate = license.getByLabel("שיעור רווח", { exact: true });
   await expect(licenseRate).toHaveValue("");
   await expect(license.getByText("השאירו ריק כדי להשתמש בשיעור הרווח של המוצר:", { exact: false })).toBeVisible();
-  await expect(license.getByText("17%", { exact: true })).toHaveCSS("direction", "ltr");
+  await expect(license.getByText("150%", { exact: true })).toHaveCSS("direction", "ltr");
   await licenseRate.focus();
   await capture("catalog-profit-he-license-320-150");
-  await licenseRate.fill("101");
+  await licenseRate.fill("1000001");
   await license.getByRole("button", { name: "שמירת שינויים", exact: true }).click();
-  await expect(license.getByRole("alert")).toHaveText("הזינו שיעור רווח בין 0 ל־100%, עם עד שתי ספרות אחרי הנקודה, או השאירו ריק.");
+  await expect(license.getByRole("alert")).toHaveText("הזינו שיעור רווח בין 0 ל־1,000,000%, עם עד שתי ספרות אחרי הנקודה, או השאירו ריק.");
   await licenseRate.fill("0");
   await license.getByLabel("מחיר שנתי בתשלום חודשי", { exact: true }).fill("25");
   await license.getByRole("button", { name: "שמירת שינויים", exact: true }).click();
@@ -266,14 +270,14 @@ test("keeps Hebrew profit defaults usable at 320px and 150% text size", async ({
   await expect(basicLines.first().getByLabel("שיעור רווח", { exact: true })).toHaveValue("0");
   await licenseTrigger.click();
   await licenseRate.clear();
-  await expect(license.getByText("17%", { exact: true })).toBeVisible();
+  await expect(license.getByText("150%", { exact: true })).toBeVisible();
   await license.getByRole("button", { name: "שמירת שינויים", exact: true }).click();
   await page.reload();
   await expect(page.locator("html")).toHaveAttribute("lang", "he");
   await page.getByRole("button", { name: "הוספת Business Basic להצעה", exact: true }).press("Enter");
   await expect(basicLines.nth(0).getByLabel("שיעור רווח", { exact: true })).toHaveValue("0");
-  await expect(basicLines.nth(1).getByLabel("שיעור רווח", { exact: true })).toHaveValue("17");
-  await expect(page.getByLabel("תשלומים חודשיים", { exact: true })).toHaveText("$54.25");
+  await expect(basicLines.nth(1).getByLabel("שיעור רווח", { exact: true })).toHaveValue("150");
+  await expect(page.getByLabel("תשלומים חודשיים", { exact: true })).toHaveText("$87.50");
 
   await openSettings(page);
   await page.getByRole("switch", { name: "מצב עריכה", exact: true }).check();
@@ -322,6 +326,6 @@ test("keeps Hebrew profit defaults usable at 320px and 150% text size", async ({
   await page.getByRole("button", { name: "RTL Tools", exact: true }).click();
   await page.getByRole("button", { name: "הוספת RTL seat להצעה", exact: true }).press("Enter");
   await expect(page.getByRole("group", { name: "RTL seat", exact: true }).getByLabel("שיעור רווח", { exact: true })).toHaveValue("0");
-  await expect(page.getByLabel("תשלומים חודשיים", { exact: true })).toHaveText("$64.25");
+  await expect(page.getByLabel("תשלומים חודשיים", { exact: true })).toHaveText("$97.50");
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
 });

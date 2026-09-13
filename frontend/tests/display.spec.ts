@@ -80,7 +80,7 @@ test("fits five, three and two cards across wide, desktop and tablet screens wit
   }
 });
 
-test("keeps every billing option beside two-digit and decimal profit rates in five-card rows", async ({ page }) => {
+test("keeps every billing option beside profit rates below and above 100% in five-card rows", async ({ page }) => {
   await page.setViewportSize({ width: 1854, height: 1000 });
   await page.goto("/");
   for (let index = 0; index < 5; index += 1) {
@@ -103,9 +103,9 @@ test("keeps every billing option beside two-digit and decimal profit rates in fi
       await expect(billing).toHaveValue(option);
       await expect(price).toHaveValue("");
       await price.fill("20");
-      for (const rate of ["32", "99.99"]) {
+      for (const [rate, total] of [["32", "$26.40"], ["99.99", "$40.00"], ["250.25", "$70.05"]]) {
         await profit.fill(rate);
-        await expect(line.getByLabel("Business Basic line total", { exact: true })).toHaveText(rate === "32" ? "$26.40" : "$40.00");
+        await expect(line.getByLabel("Business Basic line total", { exact: true })).toHaveText(total);
         const geometry = await line.evaluate((element) => {
           const bounds = element.getBoundingClientRect();
           const fields = Array.from(element.querySelectorAll("label")).map((label) => {

@@ -19,7 +19,11 @@ test("calculates company markup per unit before quantity using exact cent roundi
     { unitPrice: "25", markupPercent: "17.25", expected: 2931 },
     { unitPrice: "25", markupPercent: "0", expected: 2500 },
     { unitPrice: "25", markupPercent: "100", expected: 5000 },
+    { unitPrice: "25", markupPercent: "150", expected: 6250 },
+    { unitPrice: "25", markupPercent: "200", expected: 7500 },
+    { unitPrice: "25", markupPercent: "250.25", expected: 8756 },
     { unitPrice: "0", markupPercent: "100", expected: 0 },
+    { unitPrice: "0", markupPercent: "1000000.00", expected: 0 },
   ]) {
     const result = calculateLine({ ...baseLine, ...input, quantity: "3" });
     expect(result.valid).toBe(true);
@@ -41,10 +45,33 @@ test("calculates company markup per unit before quantity using exact cent roundi
   expect(maximum.valid).toBe(true);
   expect(maximum.yearEstimateCents).toBe(2_399_760_000_000_000);
   expect(Number.isSafeInteger(maximum.yearEstimateCents)).toBe(true);
-  for (const value of ["", "-1", "100.01", "101", "1.234", "1e1", "Infinity"]) {
+  for (const [value, expected] of [["100.01", 10001], ["101", 10100], ["1000000.00", 100000000]] as const) {
+    expect(parseMarkupBasisPoints(value), value).toBe(expected);
+  }
+  for (const value of ["", "-1", "1000000.01", "1000001", "1.234", "1e1", "Infinity"]) {
     expect(parseMarkupBasisPoints(value), value).toBeNull();
     expect(calculateLine({ ...baseLine, markupPercent: value }).valid, value).toBe(false);
   }
+});
+
+test("rounds large profit rates exactly and rejects unsafe line or aggregate totals", () => {
+  // The multiplication exceeds safe Number precision even though the rounded result is safe.
+  const rounded = calculateLine({
+    ...baseLine, unitPrice: "999949.99", markupPercent: "999800.01", quantity: "3",
+  });
+  expect(rounded).toMatchObject({
+    valid: true, customerUnitCents: 999_850_005_000, markupUnitCents: 999_750_010_001,
+    subtotalCents: 2_999_550_015_000,
+  });
+  const maximumRate = { ...baseLine, unitPrice: "1000000", markupPercent: "1000000" };
+  expect(calculateLine(maximumRate)).toMatchObject({ valid: true, customerUnitCents: 1_000_100_000_000 });
+  expect(calculateLine({ ...maximumRate, quantity: "9999" }).valid).toBe(false);
+  const annualLine: QuoteLine = { ...maximumRate, quantity: "5000", billing: "annual-upfront" };
+  expect(calculateLine(annualLine).valid).toBe(true);
+  expect(calculateQuote([annualLine]).valid).toBe(true);
+  const invalidTotals = { valid: false, monthlyCents: 0, annualUpfrontCents: 0, dueNowCents: 0, yearEstimateCents: 0 };
+  expect(calculateQuote([annualLine, { ...annualLine, id: "second" }])).toEqual(invalidTotals);
+  expect(calculateQuote([{ ...maximumRate, quantity: "1000" }])).toEqual(invalidTotals);
 });
 
 test("shows profit per license separately from customer totals and persists each line's percentage", async ({ page }) => {
@@ -91,11 +118,11 @@ test("blocks invalid profit rates and supports zero, fractional percentages, and
   const price = line.getByRole("textbox", { name: "Price", exact: true });
   const exportButton = page.getByRole("button", { name: "Export PDF", exact: true });
   await price.fill("25");
-  for (const value of ["", "-1", "101", "100.01", "1.234", "1e1"]) {
+  for (const value of ["", "-1", "1000001", "1000000.01", "1.234", "1e1"]) {
     await markup.fill(value);
     await expect(markup).toHaveAttribute("aria-invalid", "true");
     await expect(exportButton, value).toBeDisabled();
-    await expect(line.getByText("Enter a profit rate from 0 to 100% with up to two decimal places.", { exact: true })).toBeVisible();
+    await expect(line.getByText("Enter a profit rate from 0 to 1,000,000% with up to two decimal places.", { exact: true })).toBeVisible();
     await expect(page.getByLabel("Monthly payments", { exact: true })).toHaveText("—");
   }
   await markup.fill("17.25");
@@ -113,6 +140,44 @@ test("blocks invalid profit rates and supports zero, fractional percentages, and
   await markup.fill("100");
   await expect(page.getByLabel("Monthly payments", { exact: true })).toHaveText("$0.00");
   await expect(exportButton).toBeEnabled();
+});
+
+test("accepts and persists profit above 100% while blocking unsafe quote totals", async ({ page }) => {
+  await page.goto("/");
+  await page.getByLabel("Customer", { exact: true }).fill("High profit customer");
+  await page.getByRole("button", { name: "Add Business Basic to quote", exact: true }).press("Enter");
+  const line = page.getByRole("group", { name: "Business Basic", exact: true });
+  const markup = line.getByRole("textbox", { name: "Profit rate", exact: true });
+  const price = line.getByRole("textbox", { name: "Price", exact: true });
+  const quantity = line.getByLabel("Quantity", { exact: true });
+  const exportButton = page.getByRole("button", { name: "Export PDF", exact: true });
+  await price.fill("25");
+  for (const [rate, profit, total] of [
+    ["150", "$37.50", "$62.50"], ["200", "$50.00", "$75.00"], ["250.25", "$62.56", "$87.56"],
+  ]) {
+    await markup.fill(rate);
+    await expect(line.getByLabel("Business Basic profit per license", { exact: true })).toHaveText(profit);
+    await expect(line.getByLabel("Business Basic line total", { exact: true })).toHaveText(total);
+    await expect(exportButton).toBeEnabled();
+  }
+  await quantity.fill("3");
+  await expect(page.getByLabel("Monthly payments", { exact: true })).toHaveText("$262.68");
+  await page.reload();
+  await expect(markup).toHaveValue("250.25");
+  await expect(quantity).toHaveValue("3");
+  await expect(page.getByLabel("Monthly payments", { exact: true })).toHaveText("$262.68");
+  await markup.fill("1000000.00");
+  await expect(markup).toHaveValue("1000000.00");
+  await price.fill("1000000");
+  await quantity.fill("1000");
+  await expect(exportButton).toBeDisabled();
+  for (const name of ["Monthly payments", "Yearly payments", "Due at start", "12-month estimate"]) {
+    await expect(page.getByLabel(name, { exact: true })).toHaveText("—");
+  }
+  await expect(page.getByText("The quote total is too large. Reduce the quantity, price, or profit rate.", { exact: true })).toBeVisible();
+  await quantity.fill("1");
+  await expect(exportButton).toBeEnabled();
+  await expect(page.getByLabel("Monthly payments", { exact: true })).toHaveText("$10,001,000,000.00");
 });
 
 test("migrates legacy drafts without repricing or deleting their original browser storage", async ({ page }) => {

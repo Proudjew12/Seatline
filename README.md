@@ -71,10 +71,13 @@ the matching saved catalog price, or clears the price for manual entry when none
 Existing drafts without a catalog
 license link also clear their price on a billing change. Catalog edits do not reprice existing lines.
 Quantities are whole numbers from 1–9,999; prices allow zero through $1,000,000 with up to two decimal
-places. Profit rate is an addition to the base price and accepts 0–100% with up to two decimal places
-at product, license and quote-line level. The customer unit price
+places. Profit rate is an addition to the base price and accepts 0–1,000,000% with up to two decimal
+places at product, license and quote-line level. For example, a $25 base price with 150% profit
+adds $37.50 and produces a $62.50 customer price. The customer unit price
 is rounded to the nearest cent before multiplying by quantity, so printed unit prices and totals
-agree. Calculations use integer cents and percentages use integer basis points. Quotes support up to 100 lines and exclude taxes. The
+agree. Calculations use integer cents and percentages use integer basis points, with an exact
+integer intermediate for percentage multiplication. Lines and quote totals beyond the safe integer
+range cannot be exported. Quotes support up to 100 lines and exclude taxes. The
 12-month estimate assumes monthly subscriptions continue for all 12 months.
 
 One active draft is saved in this browser on this device. There are no accounts, cross-device sync,

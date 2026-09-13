@@ -11,6 +11,7 @@ Microsoft / Windows searchable under either name; older saved icon choices conti
 Sources and licensing are documented in `src/features/catalog/icons/`.
 The top-left header and theme previews show only the Seatline name.
 Each product has a default Profit rate, with optional per-license overrides.
+Rates support 0–1,000,000% with up to two decimal places, including rates above 100%.
 A blank license rate inherits its product, while zero is an explicit override. New quote lines
 copy the effective rate and remain independently editable; existing lines retain their rates.
 The card shows one private base-price × percentage = profit row; customer PDFs contain only final

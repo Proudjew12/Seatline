@@ -32,8 +32,8 @@ export function parseQuantity(value: string): number | null {
 }
 
 export function parseMarkupBasisPoints(value: string): number | null {
-  const basisPoints = parsePriceCents(value);
-  return basisPoints !== null && basisPoints <= 10_000 ? basisPoints : null;
+  // Percentages share the price parser's two-decimal precision and 1,000,000 limit.
+  return parsePriceCents(value);
 }
 
 export function getLineError(line: QuoteLine): string | null {
@@ -53,7 +53,7 @@ export function getLineError(line: QuoteLine): string | null {
     return "Enter a USD price from 0 to 1,000,000 with up to two decimal places.";
   }
   if (parseMarkupBasisPoints(line.markupPercent ?? "0") === null) {
-    return "Enter a profit rate from 0 to 100% with up to two decimal places.";
+    return "Enter a profit rate from 0 to 1,000,000% with up to two decimal places.";
   }
   return null;
 }
@@ -83,7 +83,9 @@ export function calculateLine(line: QuoteLine): LineCalculation {
     return invalidLine();
   }
   // Round each customer unit to cents before quantity so the displayed rate and total agree.
-  const customerUnitCents = Math.floor((price * (10_000 + markup) + 5_000) / 10_000);
+  // Large rates can overflow Number's exact integer range before division, even
+  // when the rounded selling price itself is safe. Keep that intermediate exact.
+  const customerUnitCents = Number((BigInt(price) * (10_000n + BigInt(markup)) + 5_000n) / 10_000n);
   const markupUnitCents = customerUnitCents - price;
   const subtotalCents = quantity * customerUnitCents;
   const baseSubtotalCents = quantity * price;
