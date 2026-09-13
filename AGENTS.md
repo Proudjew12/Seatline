@@ -1,6 +1,6 @@
 # Repository instructions
 
-This repository contains SalePrice, with a React frontend and FastAPI backend. All work here
+This repository contains Seatline, with a React frontend and FastAPI backend. All work here
 develops this application. Keep it understandable, verifiable, safe, and maintainable.
 Read the product scope in `README.md`; confirm undefined product requirements before implementing
 business behavior. Keep both applications independently runnable and deployable.

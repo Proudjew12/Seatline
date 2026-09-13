@@ -4,11 +4,13 @@
   align-items: center;
   color: var(--color-text-muted);
   display: flex;
-  flex-shrink: 0;
+  flex-wrap: wrap;
   // Keep the recovery control readable even when the content is set to 50%.
   font-size: 14px;
   gap: 8px;
-  position: relative;
+  justify-content: space-between;
+
+  label { color: var(--color-text); }
 
   select {
     background: var(--color-surface);
@@ -17,22 +19,10 @@
     color: var(--color-text);
     cursor: pointer;
     min-height: 44px;
+    min-width: 120px;
     padding: 6px 8px;
 
     &:hover { border-color: var(--color-border-strong); }
     &:focus-visible { @include mixins.focus-ring; }
   }
-}
-
-.notice {
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-control);
-  box-shadow: var(--shadow-card);
-  font-size: var(--font-size-caption);
-  padding: 8px 12px;
-  position: absolute;
-  right: 0;
-  top: 100%;
-  width: 210px;
 }

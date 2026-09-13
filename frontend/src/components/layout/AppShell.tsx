@@ -1,3 +1,4 @@
+import { useI18n } from "@/shared/i18n/context";
 import type { MouseEvent, ReactNode } from "react";
 
 import { env } from "@/shared/config/env";
@@ -15,10 +16,11 @@ function skipToMainContent(event: MouseEvent<HTMLAnchorElement>): void {
 }
 
 export function AppShell({ children }: AppShellProps) {
+  const { t } = useI18n();
   return (
     <div className={styles.shell}>
       <a className={styles.skipLink} href="#main-content" onClick={skipToMainContent}>
-        Skip to main content
+        {t("Skip to main content")}
       </a>
       <header className={styles.header}>
         <span className={styles.brand}>

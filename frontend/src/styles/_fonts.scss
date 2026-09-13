@@ -1,4 +1,23 @@
 // Source Sans 3 from Google Fonts, self-hosted under fonts/OFL.txt.
+// Hebrew-only DejaVu Sans subsets; license and source are under public/fonts/.
+@font-face {
+  font-family: 'Seatline Hebrew';
+  font-style: normal;
+  font-weight: 400 500;
+  font-display: swap;
+  src: url(./fonts/seatline-hebrew-regular.woff2) format('woff2');
+  unicode-range: U+0590-05FF, U+FB1D-FB4F;
+}
+
+@font-face {
+  font-family: 'Seatline Hebrew';
+  font-style: normal;
+  font-weight: 600 700;
+  font-display: swap;
+  src: url(./fonts/seatline-hebrew-bold.woff2) format('woff2');
+  unicode-range: U+0590-05FF, U+FB1D-FB4F;
+}
+
 @font-face {
   font-family: 'Source Sans 3';
   font-style: normal;

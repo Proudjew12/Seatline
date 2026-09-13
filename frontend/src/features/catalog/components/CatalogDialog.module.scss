@@ -42,17 +42,20 @@
 .field { display: grid; gap: 6px; min-width: 0; }
 .hint { color: var(--color-text-muted); font-size: var(--font-size-caption); line-height: 1.45; margin: 0; }
 .prices { border: 0; border-top: 1px solid var(--color-border); display: grid; gap: 12px; margin: 0; min-width: 0; padding: 12px 0 0; }
-.prices legend { font-size: var(--font-size-body); font-weight: 600; padding: 0 8px 0 0; }
+.prices legend { font-size: var(--font-size-body); font-weight: 600; padding: 0; padding-inline-end: 8px; }
 .priceHelp { color: var(--color-text-muted); font-size: var(--font-size-caption); margin: 0; }
 .priceField { align-items: center; display: grid; gap: 12px; grid-template-columns: minmax(0, 1fr) minmax(0, 140px); }
 .priceInput { min-width: 0; position: relative; }
-.priceInput span { color: var(--color-text-muted); left: 10px; pointer-events: none; position: absolute; top: 50%; transform: translateY(-50%); }
-.priceInput input { padding-left: 28px; }
+.priceInput span { color: var(--color-text-muted); inset-inline-start: 10px; pointer-events: none; position: absolute; top: 50%; transform: translateY(-50%); }
+.priceInput input { padding-inline-start: 28px; }
+.profitInput { max-width: 140px; min-width: 0; position: relative; }
+.profitInput input { padding-inline-end: 28px; }
+.profitInput span { color: var(--color-text-muted); inset-inline-end: 10px; pointer-events: none; position: absolute; top: 50%; transform: translateY(-50%); }
 .error { color: var(--color-danger); font-size: var(--font-size-body); margin: 0; }
 .actions { display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end; margin-top: 4px; }
 .actions button { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-control); box-shadow: var(--shadow-control); color: var(--color-text); cursor: pointer; font: inherit; min-height: 44px; padding: 8px 12px; }
 .actions button:hover { background: var(--color-accent-soft); border-color: var(--color-accent); }
-.actions .delete { border-color: transparent; box-shadow: none; color: var(--color-danger); margin-right: auto; }
+.actions .delete { border-color: transparent; box-shadow: none; color: var(--color-danger); margin-inline-end: auto; }
 .actions .delete:hover { background: color-mix(in srgb, var(--color-danger) 7%, var(--color-surface)); border-color: var(--color-danger); }
 .actions .submit { background: var(--gradient-action); border-color: transparent; color: var(--color-accent-contrast); }
 .actions .submit:hover { background: var(--color-accent-strong); border-color: var(--color-accent-strong); }

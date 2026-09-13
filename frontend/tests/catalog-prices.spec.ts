@@ -1,19 +1,19 @@
-import { expect, test } from "./fixtures";
+import { expect, test, setEditMode, setTextSize } from "./fixtures";
 
 test("shows every saved catalog price after reload and distinguishes zero from an unset schedule", async ({ page }) => {
   await page.setViewportSize({ width: 834, height: 1194 });
   await page.goto("/");
-  await page.getByRole("combobox", { name: "Text size", exact: true }).selectOption("150");
+  await setTextSize(page, "150");
   const card = page.getByRole("article", { name: "Business Basic", exact: true });
   await expect(card.getByText("Not set", { exact: true })).toHaveCount(3);
-  await page.getByRole("button", { name: "Normal Mode", exact: true }).click();
+  await setEditMode(page, true);
   await page.getByRole("button", { name: "Edit Business Basic", exact: true }).click();
   const editor = page.getByRole("dialog", { name: "Edit license", exact: true });
   await editor.getByLabel("Monthly price", { exact: true }).fill("21");
   await editor.getByLabel("Annual paid monthly price", { exact: true }).fill("22");
   await editor.getByLabel("Annual paid yearly price", { exact: true }).fill("23");
   await editor.getByRole("button", { name: "Save changes", exact: true }).click();
-  await page.getByRole("button", { name: "Edit Mode", exact: true }).click();
+  await setEditMode(page, false);
   for (const label of ["Monthly", "Annual · Monthly", "Annual · Yearly"]) {
     await expect(card.getByText(label, { exact: true })).toBeVisible();
   }
@@ -31,7 +31,7 @@ test("shows every saved catalog price after reload and distinguishes zero from a
   }
   await expect(card.getByText("/ mo", { exact: true })).toHaveCount(2);
   await expect(card.getByText("/ yr", { exact: true })).toBeVisible();
-  await page.getByRole("combobox", { name: "Text size", exact: true }).selectOption("100");
+  await setTextSize(page, "100");
   for (const width of [1867, 1440]) {
     await page.setViewportSize({ width, height: 1000 });
     const label = card.getByText("Annual · Monthly", { exact: true });
@@ -45,7 +45,7 @@ test("shows every saved catalog price after reload and distinguishes zero from a
     }), `Annual · Monthly must fit on one line at ${width}px and 100%`).toBe(true);
   }
   await page.setViewportSize({ width: 834, height: 1194 });
-  await page.getByRole("combobox", { name: "Text size", exact: true }).selectOption("150");
+  await setTextSize(page, "150");
   await page.reload();
   await card.getByRole("button", { name: "Add Business Basic to quote", exact: true }).press("Enter");
   const line = page.getByRole("group", { name: "Business Basic", exact: true });
@@ -60,7 +60,7 @@ test("shows every saved catalog price after reload and distinguishes zero from a
     }
   }
 
-  await page.getByRole("button", { name: "Normal Mode", exact: true }).click();
+  await setEditMode(page, true);
   await page.getByRole("button", { name: "Edit Business Basic", exact: true }).click();
   await editor.getByLabel("Monthly price", { exact: true }).fill("0");
   await editor.getByLabel("Annual paid monthly price", { exact: true }).clear();

@@ -1,8 +1,8 @@
 {
-  "name": "saleprice",
+  "name": "seatline",
   "version": "0.3.0",
   "private": true,
-  "description": "SalePrice application with a React frontend and FastAPI backend.",
+  "description": "Seatline application with a React frontend and FastAPI backend.",
   "engines": {
     "node": ">=22.22.2",
     "npm": ">=10.0.0"

@@ -7,10 +7,10 @@
 }
 .metrics {
   display: grid; grid-template-columns: repeat(3, minmax(0, 1fr));
-  > div { padding: 0 14px; border-right: 1px solid var(--color-border); min-width: 0; }
-  > div:first-child { padding-left: 0; }
+  > div { padding: 0 14px; border-inline-end: 1px solid var(--color-border); min-width: 0; }
+  > div:first-child { padding-inline-start: 0; }
   span { display: block; font-size: var(--font-size-caption); margin-bottom: 8px; }
-  output { font-size: var(--font-size-metric); letter-spacing: -.03em; font-weight: 500; overflow-wrap: anywhere; font-variant-numeric: tabular-nums; }
+  output { display: inline-block; max-width: 100%; font-size: var(--font-size-metric); letter-spacing: -.03em; font-weight: 500; overflow-wrap: anywhere; font-variant-numeric: tabular-nums; }
 }
 .action {
   display: flex; align-items: center; gap: 18px;
@@ -26,9 +26,9 @@
   }
 }
 .caption {
-  grid-column: 1 / -1; display: flex; gap: 12px; flex-wrap: wrap; justify-content: space-between;
+  grid-column: 1 / -1; display: flex; gap: 12px; flex-wrap: wrap; justify-content: flex-end;
   color: var(--color-text-muted); font-size: var(--font-size-caption);
-  output { margin-left: 8px; color: var(--color-text); font-variant-numeric: tabular-nums; }
+  output { display: inline-block; margin-inline-start: 8px; color: var(--color-text); font-variant-numeric: tabular-nums; }
 }
 .assumption { grid-column: 1 / -1; margin: -6px 0 0; color: var(--color-text-muted); font-size: var(--font-size-caption); }
 @media (max-width: 1400px) { .action { flex-direction: column; align-items: stretch; gap: 8px; p { max-width: 170px; } } }
@@ -40,7 +40,7 @@
 @media (max-width: 900px) { .summary { padding: 16px; } }
 @media (max-width: 360px) {
   .metrics { grid-template-columns: minmax(0, 1fr); gap: 12px; }
-  .metrics > div { display: flex; align-items: baseline; gap: 12px; justify-content: space-between; padding: 0; border: 0; }
-  .metrics span { margin: 0; }
-  .metrics output { text-align: right; }
+  .metrics > div { display: flex; flex-wrap: wrap; align-items: baseline; gap: 12px; justify-content: space-between; padding: 0; border: 0; }
+  .metrics span { margin: 0; flex: 1 1 auto; min-width: min-content; }
+  .metrics output { flex-shrink: 0; text-align: end; }
 }

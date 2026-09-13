@@ -1,6 +1,6 @@
 import type { Locator } from "@playwright/test";
 
-import { expect, test } from "./fixtures";
+import { expect, test, setEditMode, setTextSize } from "./fixtures";
 
 async function press(control: Locator, hasTouch: boolean): Promise<void> {
   if (hasTouch) await control.tap();
@@ -9,15 +9,15 @@ async function press(control: Locator, hasTouch: boolean): Promise<void> {
 
 test("chooses every billing schedule from the open picker with mouse or touch at 150%", async ({ page, hasTouch }) => {
   await page.goto("/");
-  await page.getByRole("button", { name: "Normal Mode", exact: true }).click();
+  await setEditMode(page, true);
   await page.getByRole("button", { name: "Edit Business Basic", exact: true }).click();
   const dialog = page.getByRole("dialog", { name: "Edit license", exact: true });
   await dialog.getByLabel("Monthly price", { exact: true }).fill("12.50");
   await dialog.getByLabel("Annual paid monthly price", { exact: true }).fill("10");
   await dialog.getByLabel("Annual paid yearly price", { exact: true }).fill("120");
   await dialog.getByRole("button", { name: "Save changes", exact: true }).click();
-  await page.getByRole("button", { name: "Edit Mode", exact: true }).click();
-  await page.getByRole("combobox", { name: "Text size", exact: true }).selectOption("150");
+  await setEditMode(page, false);
+  await setTextSize(page, "150");
   await expect(page.getByRole("region", { name: "Licenses", exact: true }).getByRole("combobox")).toHaveCount(0);
 
   for (const option of [

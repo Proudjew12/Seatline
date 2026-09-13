@@ -5,6 +5,7 @@ import { useId } from "react";
 import { Icon } from "@/components/ui/Icon";
 import { formatMoney, parsePriceCents } from "@/features/quotes/calculations";
 import { classNames } from "@/shared/utils/classNames";
+import { useI18n } from "@/shared/i18n/context";
 import type { CatalogLicense, CatalogProduct } from "../types";
 import styles from "./LicenseCard.module.scss";
 
@@ -32,7 +33,8 @@ const cardPointerSensor = PointerSensor.configure({
 });
 
 export function LicenseCard({ product, license, onAdd, editing, onEdit }: LicenseCardProps) {
-  const { ref, isDragging, isDropping } = useDraggable({ id: license.id, type: "license", sensors: [cardPointerSensor] });
+  const { t } = useI18n();
+  const { ref, isDragging, isDropping } = useDraggable({ id: license.id, type: "license", sensors: [cardPointerSensor], disabled: editing });
   const pricesId = useId();
   const rates = PRICE_OPTIONS.map((option) => {
     const price = parsePriceCents(license.prices?.[option.id] ?? "");
@@ -44,27 +46,27 @@ export function LicenseCard({ product, license, onAdd, editing, onEdit }: Licens
   return (
     <article className={classNames(styles.card, hasLongPrices && styles.widePrices)} aria-label={license.name}>
       <button ref={ref} type="button"
-        className={classNames(styles.content, isDragging && styles.dragging)}
-        aria-label={`Add ${license.name} to quote`}
+        className={classNames(styles.content, isDragging && styles.dragging, editing && styles.readOnly)}
+        aria-label={t("Add {name} to quote", { name: license.name })}
         aria-describedby={pricesId}
         onClick={(event) => {
           // Pointer gestures add by dropping only; native keyboard/assistive activation stays available.
           if (event.defaultPrevented || event.detail !== 0 || isDragging || isDropping) return;
           onAdd(product, license);
         }}>
-        <span className={classNames(styles.name, editing && styles.editableName)}>{license.name}</span>
+        <span className={classNames(styles.name, editing && styles.editableName)}><bdi dir="ltr">{license.name}</bdi></span>
         <span id={pricesId} className={styles.prices}>
           {rates.map(({ id, label, unit, amount }) => (
             <span key={id} className={styles.rate}>
-              <span className={styles.rateLabel}>{label}</span>
+              <span className={styles.rateLabel}>{t(label)}</span>
               <span className={classNames(styles.price, amount === null && styles.unpriced)}>
-                {amount === null ? "Not set" : <><span>{amount}</span><span className={styles.unit}>{unit}</span></>}
+                {amount === null ? t("Not set") : <><bdi dir="ltr">{amount}</bdi><span className={styles.unit}>{t(unit)}</span></>}
               </span>
             </span>
           ))}
         </span>
       </button>
-      {editing ? <button type="button" className={styles.edit} aria-label={`Edit ${license.name}`} title="Edit license" onClick={onEdit}><Icon name="edit" size={17} /></button> : null}
+      {editing ? <button type="button" className={styles.edit} aria-label={t("Edit {name}", { name: license.name })} title={t("Edit license")} onClick={onEdit}><Icon name="edit" size={17} /></button> : null}
     </article>
   );
 }

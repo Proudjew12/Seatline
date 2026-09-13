@@ -195,7 +195,7 @@ class Settings:
             )
 
         return cls(
-            app_name=os.getenv("APP_NAME", "SalePrice API"),
+            app_name=os.getenv("APP_NAME", "Seatline API"),
             environment=environment,
             version=os.getenv("APP_VERSION", "0.1.0"),
             host=os.getenv("APP_HOST", "127.0.0.1"),

@@ -1,12 +1,12 @@
 import type { Locator, Page } from "@playwright/test";
 
-import { expect, test } from "./fixtures";
+import { expect, test, setEditMode, openSettings, closeSettings } from "./fixtures";
 
-const catalogKey = "saleprice.catalog.v2";
+const catalogKey = "seatline.catalog.v2";
 
 async function enterEditMode(page: Page): Promise<void> {
-  await page.getByRole("button", { name: "Normal Mode", exact: true }).click();
-  await expect(page.getByRole("button", { name: "Edit Mode", exact: true })).toHaveAttribute("aria-pressed", "true");
+  await setEditMode(page, true);
+  await expect(page.getByRole("button", { name: "Add product", exact: true })).toBeVisible();
 }
 
 async function editLicense(page: Page, name: string): Promise<Locator> {
@@ -32,15 +32,18 @@ async function expectPrice(line: Locator, value: number): Promise<void> {
 
 test("keeps catalog management in Edit Mode and returns to Normal Mode after reload", async ({ page }) => {
   await page.goto("/");
-  const mode = page.getByRole("button", { name: "Normal Mode", exact: true });
-  await expect(mode).toHaveAttribute("aria-pressed", "false");
+  await openSettings(page);
+  await expect(page.getByRole("switch", { name: "Edit Mode", exact: true })).not.toBeChecked();
+  await closeSettings(page);
   await expect(page.getByRole("button", { name: "Add product", exact: true })).toHaveCount(0);
   await expect(page.getByRole("button", { name: "Add license", exact: true })).toHaveCount(0);
   await expect(page.getByRole("button", { name: "Edit product", exact: true })).toHaveCount(0);
   await expect(page.getByRole("button", { name: "Edit Business Basic", exact: true })).toHaveCount(0);
-  await mode.focus();
-  await page.keyboard.press("Enter");
-  await expect(page.getByRole("button", { name: "Edit Mode", exact: true })).toHaveAttribute("aria-pressed", "true");
+  await openSettings(page);
+  await page.getByRole("switch", { name: "Edit Mode", exact: true }).focus();
+  await page.keyboard.press("Space");
+  await closeSettings(page);
+  await expect(page.getByRole("button", { name: "Edit product", exact: true })).toBeVisible();
   await expect(page.getByRole("button", { name: "Add product", exact: true })).toBeVisible();
   await expect(page.getByRole("button", { name: "Add license", exact: true })).toBeVisible();
   const dialog = await editProduct(page);
@@ -51,7 +54,9 @@ test("keeps catalog management in Edit Mode and returns to Normal Mode after rel
   await expect(page.getByRole("button", { name: "Microsoft 365", exact: true })).toBeVisible();
   await expect(page.getByRole("button", { name: "Edit product", exact: true })).toBeFocused();
   await page.reload();
-  await expect(mode).toHaveAttribute("aria-pressed", "false");
+  await openSettings(page);
+  await expect(page.getByRole("switch", { name: "Edit Mode", exact: true })).not.toBeChecked();
+  await closeSettings(page);
   await expect(page.getByRole("button", { name: "Add product", exact: true })).toHaveCount(0);
   await expect(page.getByRole("button", { name: "Add Business Basic to quote", exact: true })).toBeVisible();
 });
@@ -75,7 +80,7 @@ test("edits built-in names and billing prices without changing existing order li
   await saveChanges(licenseDialog);
   await expect(original.getByText("Microsoft 365", { exact: true })).toBeVisible();
   await expectPrice(original, 8.25);
-  await page.getByRole("button", { name: "Edit Mode", exact: true }).click();
+  await setEditMode(page, false);
 
   for (const [schedule, price] of [["monthly", 18.75], ["annual-monthly", 12.5], ["annual-upfront", 130]] as const) {
     await page.getByRole("button", { name: "Add Core seat to quote", exact: true }).press("Enter");
@@ -119,17 +124,21 @@ test("edits built-in names and billing prices without changing existing order li
   await expect(page.getByLabel("12-month estimate", { exact: true })).toHaveText("$703.00");
 });
 
-test("saves default prices on new products and licenses, including zero and the maximum price", async ({ page }) => {
+test("saves license prices after creating an empty product, including zero and the maximum price", async ({ page }) => {
   await page.goto("/");
   await page.getByLabel("Customer", { exact: true }).fill("Saved prices customer");
   await enterEditMode(page);
   await page.getByRole("button", { name: "Add product", exact: true }).click();
   const product = page.getByRole("dialog", { name: "Add product", exact: true });
   await product.getByLabel("Product name", { exact: true }).fill("Support Tools");
-  await product.getByLabel("First license name", { exact: true }).fill("Support seat");
-  await product.getByLabel("Monthly price", { exact: true }).fill("0");
-  await product.getByLabel("Annual paid yearly price", { exact: true }).fill("1000000");
   await product.getByRole("button", { name: "Add product", exact: true }).click();
+  await expect(page.getByText("No licenses yet", { exact: true })).toBeVisible();
+  await page.getByRole("button", { name: "Add license", exact: true }).click();
+  const firstLicense = page.getByRole("dialog", { name: "Add license", exact: true });
+  await firstLicense.getByLabel("License name", { exact: true }).fill("Support seat");
+  await firstLicense.getByLabel("Monthly price", { exact: true }).fill("0");
+  await firstLicense.getByLabel("Annual paid yearly price", { exact: true }).fill("1000000");
+  await firstLicense.getByRole("button", { name: "Add license", exact: true }).click();
   await page.getByRole("button", { name: "Add license", exact: true }).click();
   const license = page.getByRole("dialog", { name: "Add license", exact: true });
   await license.getByLabel("License name", { exact: true }).fill("Support Pro");
@@ -184,7 +193,7 @@ test("rejects duplicate names and invalid default prices without overwriting sav
 test("migrates the previous custom catalog and keeps subsequent edits after reload", async ({ page }) => {
   await page.goto("/");
   await page.evaluate(() => {
-    localStorage.removeItem("saleprice.catalog.v2");
+    localStorage.removeItem("seatline.catalog.v2");
     localStorage.setItem("saleprice.catalog.v1", JSON.stringify({
       version: 1,
       products: [{ id: "custom-legacy", name: "Legacy Tools", shortName: "LT", licenses: [{ id: "custom-seat", name: "Legacy seat" }] }],
@@ -237,8 +246,12 @@ test("persists an empty catalog and can add a product again without losing the o
   await page.getByRole("button", { name: "Add product", exact: true }).click();
   const replacement = page.getByRole("dialog", { name: "Add product", exact: true });
   await replacement.getByLabel("Product name", { exact: true }).fill("My catalog");
-  await replacement.getByLabel("First license name", { exact: true }).fill("My license");
   await replacement.getByRole("button", { name: "Add product", exact: true }).click();
+  await expect(page.getByText("No licenses yet", { exact: true })).toBeVisible();
+  await page.getByRole("button", { name: "Add license", exact: true }).click();
+  const newLicense = page.getByRole("dialog", { name: "Add license", exact: true });
+  await newLicense.getByLabel("License name", { exact: true }).fill("My license");
+  await newLicense.getByRole("button", { name: "Add license", exact: true }).click();
   await expect(page.getByRole("button", { name: "Add My license to quote", exact: true })).toBeVisible();
   await expect(page.getByRole("group", { name: "Business Basic", exact: true })).toBeVisible();
 });
@@ -253,7 +266,7 @@ test("allows catalog edits for the current visit when storage cannot be written"
   await license.getByLabel("Annual paid monthly price", { exact: true }).fill("14.25");
   await saveChanges(license);
   await expect(page.getByText(/Your catalog.*could not be saved/)).toBeVisible();
-  await page.getByRole("button", { name: "Edit Mode", exact: true }).click();
+  await setEditMode(page, false);
   await page.getByRole("button", { name: "Add Business Basic to quote", exact: true }).press("Enter");
   await expectPrice(page.getByRole("group", { name: "Business Basic", exact: true }), 14.25);
   await expect(page.getByLabel("Monthly payments", { exact: true })).toHaveText("$14.25");

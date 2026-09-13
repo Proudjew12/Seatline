@@ -15,7 +15,7 @@ export default defineConfig({
   retries: 0,
   workers: 2,
   reporter: "list",
-  outputDir: mkdtempSync(join(tmpdir(), "frontend-tests-")),
+  outputDir: process.env.PLAYWRIGHT_OUTPUT_DIR ?? mkdtempSync(join(tmpdir(), "frontend-tests-")),
   use: {
     baseURL,
     screenshot: "only-on-failure",
@@ -41,7 +41,7 @@ export default defineConfig({
     url: baseURL,
     reuseExistingServer: false,
     env: {
-      VITE_APP_NAME: "SalePrice",
+      VITE_APP_NAME: "Seatline",
       VITE_API_BASE_URL: "/api",
       VITE_STATIC_DEPLOYMENT: "false",
       VITE_DEV_API_PROXY_TARGET: "http://127.0.0.1:8000",

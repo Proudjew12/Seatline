@@ -14,8 +14,8 @@ test("shows loading, then a validated health response without horizontal overflo
 
   try {
     await page.goto("/#/status");
-    await expect(page).toHaveTitle("SalePrice");
-    await expect(page.getByRole("banner").getByText("SalePrice", { exact: true })).toBeVisible();
+    await expect(page).toHaveTitle("Seatline");
+    await expect(page.getByRole("banner").getByText("Seatline", { exact: true })).toBeVisible();
     await expect(page.getByRole("banner").getByRole("link")).toHaveCount(0);
     await expect(page.getByRole("heading", { name: "Checking the API" })).toBeVisible();
     await expect(page.locator('[aria-busy="true"]')).toBeVisible();

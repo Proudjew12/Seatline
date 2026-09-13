@@ -1,9 +1,10 @@
 @use "../../../styles/abstracts/mixins" as mixins;
 
 .item {
+  container-type: inline-size;
   min-width: 0;
   margin: 0;
-  padding: 10px 12px;
+  padding: 12px 14px;
   align-self: start;
   border: 1px solid var(--color-border);
   border-radius: var(--radius-card);
@@ -15,12 +16,14 @@
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  gap: 6px;
-  margin-bottom: 8px;
+  gap: 10px;
+  margin-bottom: 12px;
 
-  h2 { margin: 0; min-width: 0; font-size: var(--font-size-body); font-weight: 400; line-height: 1.4; overflow-wrap: anywhere; }
-  strong { font-weight: 700; }
+  h2 { display: grid; gap: 2px; margin: 0; min-width: 0; font-size: var(--font-size-body); line-height: 1.35; overflow-wrap: anywhere; }
 }
+
+.productName { color: var(--color-text-muted); font-size: var(--font-size-caption); font-weight: 600; }
+.licenseName { font-size: var(--font-size-card-title); font-weight: 600; }
 
 .remove {
   display: grid;
@@ -28,7 +31,8 @@
   flex-shrink: 0;
   width: 28px;
   height: 28px;
-  margin: -4px -4px 0 0;
+  margin-top: -4px;
+  margin-inline-end: -4px;
   background: transparent;
   border: 0;
   color: var(--color-text-muted);
@@ -41,12 +45,13 @@
 .fields {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px 8px;
+  gap: 10px;
   align-items: start;
 
   label { min-width: 0; max-width: 100%; display: grid; gap: 3px; font-size: var(--font-size-body); }
   input {
-    width: 100%; min-width: 0; height: max(32px, 2.3rem); padding: 0 6px;
+    field-sizing: content; width: auto; min-width: 32px; max-width: 100%; height: max(32px, 2.3rem); padding: 0 6px;
+    font-variant-numeric: tabular-nums;
     border: 1px solid var(--color-border); border-radius: var(--radius-control);
     background: var(--color-surface); color: var(--color-text); font-size: var(--font-size-body); box-shadow: var(--shadow-control);
     &:hover { border-color: var(--color-border-strong); }
@@ -55,23 +60,39 @@
   }
 }
 
-.billing { flex: 1 0 min(100%, 12rem); }
+.fields .billing { flex: 0 1 auto; }
 .amounts {
-  display: grid; grid-template-columns: minmax(48px, 3.5rem) minmax(90px, 6.75rem);
-  gap: 8px; flex-shrink: 0; max-width: 100%;
+  display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between;
+  gap: 10px 12px; flex: 1 0 100%; min-width: 0;
+  label { justify-items: start; }
 }
 
 .price {
-  display: flex; align-items: center; position: relative;
+  display: flex; align-items: center; position: relative; max-width: 100%;
   > span { position: absolute; left: 7px; color: var(--color-text-muted); pointer-events: none; }
   input { padding-left: 20px; }
+}
+
+.percentage {
+  display: flex; align-items: center; position: relative; max-width: 100%;
+  > span { position: absolute; right: 8px; color: var(--color-text-muted); pointer-events: none; }
+  input { padding-right: 24px; }
+}
+
+.pricing {
+  flex: 1 0 100%; min-width: 0; padding: 8px 10px; margin-top: 3px;
+  display: flex; align-items: baseline; justify-content: center; gap: 8px;
+  border-radius: var(--radius-control); background: var(--color-background);
+  color: var(--color-text-muted); font-size: var(--font-size-body);
+  font-variant-numeric: tabular-nums; white-space: nowrap;
+  output { color: var(--color-accent); font-size: var(--font-size-card-title); font-weight: 600; }
+  &[data-compact="true"] { font-size: min(var(--font-size-caption), 4.5cqi); output { font-size: inherit; } }
 }
 
 .total {
   flex: 1 0 100%; display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 6px;
   padding-top: 6px; margin-top: 2px; border-top: 1px solid var(--color-border); min-width: 0;
-  > span { font-size: var(--font-size-caption); color: var(--color-text-muted); }
-  output { margin-left: auto; max-width: 100%; font-size: var(--font-size-card-title); font-weight: 600; overflow-wrap: anywhere; font-variant-numeric: tabular-nums; }
+  output { margin-inline-start: auto; max-width: 100%; font-size: var(--font-size-card-title); font-weight: 600; overflow-wrap: anywhere; font-variant-numeric: tabular-nums; }
   small { color: var(--color-text-muted); font-size: var(--font-size-caption); }
 }
 
@@ -79,5 +100,5 @@
 
 @media (any-pointer: coarse) {
   .remove { width: 44px; height: 44px; }
-  .fields input { height: max(44px, 2.3rem); }
+  .fields input { min-width: 44px; height: max(44px, 2.3rem); }
 }

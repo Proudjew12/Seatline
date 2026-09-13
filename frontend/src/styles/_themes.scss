@@ -1,0 +1,195 @@
+@use "./abstracts/variables" as variables;
+
+// Every preview starts from the complete default palette, independent of its parent theme.
+:root,
+[data-theme] {
+  color-scheme: light;
+  --theme-background-image: none;
+  --theme-shell-surface: var(--color-background);
+  --theme-header-surface: var(--color-background);
+  --theme-quote-surface: var(--color-background);
+  --theme-panel-filter: none;
+  --theme-preview-height: 180px;
+
+  @each $name, $value in variables.$colors { --color-#{$name}: #{$value}; }
+  @each $name, $value in variables.$gradients { --gradient-#{$name}: #{$value}; }
+  @each $name, $value in variables.$shadows { --shadow-#{$name}: #{$value}; }
+  @each $name, $value in variables.$radii { --radius-#{$name}: #{$value}; }
+}
+
+[data-theme="dark"] {
+  color-scheme: dark;
+  --color-background: #111923;
+  --color-surface: #1b2633;
+  --color-rail: #15202c;
+  --color-catalog: #172330;
+  --color-text: #e7edf5;
+  --color-text-muted: #b6c3d2;
+  --color-border: #3d4e62;
+  --color-border-strong: #7389a2;
+  --color-accent: #83b4ff;
+  --color-accent-strong: #a6caff;
+  --color-accent-contrast: #10233a;
+  --color-accent-soft: #233d5c;
+  --color-focus: #9bc4ff;
+  --color-success: #74d5aa;
+  --color-danger: #ff92a0;
+  --color-warning: #f0c679;
+  --color-overlay: rgb(5 12 22 / 70%);
+  --gradient-action: linear-gradient(110deg, #83b4ff, #6dcee9);
+  --shadow-control: 0 2px 4px rgb(0 0 0 / 18%);
+  --shadow-card: 0 3px 9px rgb(0 0 0 / 20%);
+  --shadow-panel: 0 16px 40px rgb(0 0 0 / 38%);
+  --shadow-header: 0 2px 10px rgb(0 0 0 / 16%);
+  --shadow-footer: 0 -4px 20px rgb(0 0 0 / 16%);
+}
+
+[data-theme="studio"] {
+  color-scheme: light;
+  --color-background: #f3f5f9;
+  --color-surface: #fff;
+  --color-rail: #e9edf5;
+  --color-catalog: #f7f8fb;
+  --color-text: #202c40;
+  --color-text-muted: #536077;
+  --color-border: #ccd3df;
+  --color-border-strong: #8894a8;
+  --color-accent: #4d47c6;
+  --color-accent-strong: #3c359f;
+  --color-accent-contrast: #fff;
+  --color-accent-soft: #e9e8fb;
+  --color-focus: #4943be;
+  --color-success: #15734c;
+  --color-danger: #ab2941;
+  --color-warning: #805b0c;
+  --color-overlay: rgb(22 30 48 / 40%);
+  --gradient-action: linear-gradient(110deg, #4d47c6, #5751bc);
+  --shadow-control: 0 1px 3px rgb(32 44 64 / 4%);
+  --shadow-card: 0 2px 8px rgb(32 44 64 / 5%);
+  --shadow-panel: 0 18px 44px rgb(32 44 64 / 14%);
+  --shadow-header: 0 1px 6px rgb(32 44 64 / 3%);
+  --shadow-footer: 0 -3px 14px rgb(32 44 64 / 4%);
+  --radius-control: 5px;
+  --radius-card: 7px;
+  --radius-panel: 12px;
+}
+
+[data-theme="midnight"] {
+  color-scheme: dark;
+  --color-background: #0d1822;
+  --color-surface: #142632;
+  --color-rail: #0b1d29;
+  --color-catalog: #10212e;
+  --color-text: #e8f2f7;
+  --color-text-muted: #aac1cd;
+  --color-border: #365365;
+  --color-border-strong: #6d899b;
+  --color-accent: #7dddd5;
+  --color-accent-strong: #a2eee7;
+  --color-accent-contrast: #082b2b;
+  --color-accent-soft: #1a4249;
+  --color-focus: #93ebe5;
+  --color-success: #85dbac;
+  --color-danger: #ff9aab;
+  --color-warning: #ecc68a;
+  --color-overlay: rgb(3 11 18 / 74%);
+  --gradient-action: linear-gradient(110deg, #7dddd5, #94d1ec);
+  --shadow-control: 0 2px 4px rgb(0 0 0 / 20%);
+  --shadow-card: 0 4px 12px rgb(0 0 0 / 23%);
+  --shadow-panel: 0 20px 48px rgb(0 0 0 / 42%);
+  --shadow-header: 0 2px 10px rgb(0 0 0 / 18%);
+  --shadow-footer: 0 -4px 20px rgb(0 0 0 / 20%);
+  --radius-control: 6px;
+  --radius-card: 10px;
+  --radius-panel: 14px;
+}
+
+[data-theme="dune"] {
+  color-scheme: light;
+  --color-background: #f3eee5;
+  --color-surface: #fffcf6;
+  --color-rail: #e9e0d3;
+  --color-catalog: #f7f1e8;
+  --color-text: #40352c;
+  --color-text-muted: #715e4b;
+  --color-border: #d6c9b7;
+  --color-border-strong: #99866e;
+  --color-accent: #99502e;
+  --color-accent-strong: #7e3d21;
+  --color-accent-contrast: #fffaf4;
+  --color-accent-soft: #ecdfcc;
+  --color-focus: #95512e;
+  --color-success: #3b6b47;
+  --color-danger: #a63c40;
+  --color-warning: #805913;
+  --color-overlay: rgb(57 41 24 / 40%);
+  --gradient-action: linear-gradient(110deg, #99502e, #a15432);
+  --shadow-control: 0 2px 4px rgb(74 51 31 / 4%);
+  --shadow-card: 0 3px 10px rgb(74 51 31 / 6%);
+  --shadow-panel: 0 18px 44px rgb(74 51 31 / 15%);
+  --shadow-header: 0 2px 8px rgb(74 51 31 / 3%);
+  --shadow-footer: 0 -4px 18px rgb(74 51 31 / 5%);
+  --radius-control: 5px;
+  --radius-card: 9px;
+  --radius-panel: 12px;
+}
+
+[data-theme="forest"] {
+  color-scheme: light;
+  --color-background: #eaf0e9;
+  --color-surface: #f8fbf6;
+  --color-rail: #dce7dd;
+  --color-catalog: #edf3eb;
+  --color-text: #263c2f;
+  --color-text-muted: #506653;
+  --color-border: #c2d1c1;
+  --color-border-strong: #8a9f8c;
+  --color-accent: #246044;
+  --color-accent-strong: #184b34;
+  --color-accent-contrast: #f7fff8;
+  --color-accent-soft: #d8e8d9;
+  --color-focus: #2d694c;
+  --color-success: #25623d;
+  --color-danger: #aa3b42;
+  --color-warning: #7e5d10;
+  --color-overlay: rgb(18 40 27 / 42%);
+  --gradient-action: linear-gradient(110deg, #246044, #35734f);
+  --shadow-control: 0 2px 4px rgb(24 58 35 / 4%);
+  --shadow-card: 0 3px 10px rgb(24 58 35 / 6%);
+  --shadow-panel: 0 18px 44px rgb(24 58 35 / 15%);
+  --shadow-header: 0 2px 8px rgb(24 58 35 / 3%);
+  --shadow-footer: 0 -4px 18px rgb(24 58 35 / 5%);
+  --radius-control: 6px;
+  --radius-card: 10px;
+  --radius-panel: 12px;
+}
+
+[data-theme="plum"] {
+  color-scheme: dark;
+  --color-background: #251e2a;
+  --color-surface: #332938;
+  --color-rail: #211a26;
+  --color-catalog: #2c2231;
+  --color-text: #f2eaf1;
+  --color-text-muted: #cdbac9;
+  --color-border: #604b63;
+  --color-border-strong: #967a96;
+  --color-accent: #dfb0dc;
+  --color-accent-strong: #edc8e9;
+  --color-accent-contrast: #342039;
+  --color-accent-soft: #523a54;
+  --color-focus: #e8c1e7;
+  --color-success: #a4d3b1;
+  --color-danger: #ffa1b5;
+  --color-warning: #e7cc91;
+  --color-overlay: rgb(14 7 20 / 74%);
+  --gradient-action: linear-gradient(110deg, #dfb0dc, #d7b9e9);
+  --shadow-control: 0 2px 4px rgb(0 0 0 / 18%);
+  --shadow-card: 0 4px 12px rgb(0 0 0 / 22%);
+  --shadow-panel: 0 20px 48px rgb(0 0 0 / 40%);
+  --shadow-header: 0 2px 10px rgb(0 0 0 / 16%);
+  --shadow-footer: 0 -4px 20px rgb(0 0 0 / 18%);
+  --radius-control: 6px;
+  --radius-card: 12px;
+  --radius-panel: 14px;
+}

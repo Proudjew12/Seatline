@@ -1,17 +1,17 @@
-import { expect, test } from "./fixtures";
+import { expect, test, setEditMode } from "./fixtures";
 
 test("applies saved billing prices by license identity while preserving overrides and deleted entries", async ({ page }) => {
   await page.goto("/");
   const catalog = page.getByRole("region", { name: "Licenses", exact: true });
   await expect(catalog.getByRole("combobox", { name: "Billing Option", exact: true })).toHaveCount(0);
   await page.getByLabel("Customer", { exact: true }).fill("Saved billing customer");
-  await page.getByRole("button", { name: "Normal Mode", exact: true }).click();
+  await setEditMode(page, true);
   await page.getByRole("button", { name: "Edit Business Basic", exact: true }).click();
   const editor = page.getByRole("dialog", { name: "Edit license", exact: true });
   await editor.getByLabel("Monthly price", { exact: true }).fill("10");
   await editor.getByLabel("Annual paid monthly price", { exact: true }).fill("12");
   await editor.getByRole("button", { name: "Save changes", exact: true }).click();
-  await page.getByRole("button", { name: "Edit Mode", exact: true }).click();
+  await setEditMode(page, false);
   await page.getByRole("button", { name: "Add Business Basic to quote", exact: true }).press("Enter");
   const line = page.getByRole("group", { name: "Business Basic", exact: true }).first();
   const price = line.getByRole("textbox", { name: "Price", exact: true });
@@ -21,7 +21,7 @@ test("applies saved billing prices by license identity while preserving override
   await line.getByLabel("Quantity", { exact: true }).fill("2");
   await expect(price).toHaveValue("99");
 
-  await page.getByRole("button", { name: "Normal Mode", exact: true }).click();
+  await setEditMode(page, true);
   await page.getByRole("button", { name: "Edit Business Basic", exact: true }).click();
   await editor.getByLabel("License name", { exact: true }).fill("Basic Renewed");
   await editor.getByLabel("Monthly price", { exact: true }).fill("11");
@@ -44,7 +44,7 @@ test("applies saved billing prices by license identity while preserving override
   await billing.selectOption("annual-monthly");
   await expect(price).toHaveValue("12");
 
-  await page.getByRole("button", { name: "Normal Mode", exact: true }).click();
+  await setEditMode(page, true);
   await page.getByRole("button", { name: "Edit Basic Renewed", exact: true }).click();
   page.once("dialog", (dialog) => dialog.accept());
   await editor.getByRole("button", { name: "Delete license", exact: true }).click();
@@ -55,7 +55,7 @@ test("applies saved billing prices by license identity while preserving override
   await replacement.getByLabel("Monthly price", { exact: true }).fill("777");
   await replacement.getByLabel("Annual paid monthly price", { exact: true }).fill("888");
   await replacement.getByRole("button", { name: "Add license", exact: true }).click();
-  await page.getByRole("button", { name: "Edit Mode", exact: true }).click();
+  await setEditMode(page, false);
   await billing.selectOption("monthly");
   await expect(price).toHaveValue("");
   await page.getByRole("button", { name: "Add Business Basic to quote", exact: true }).press("Enter");

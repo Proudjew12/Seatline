@@ -2,7 +2,8 @@
 
 .panel {
   background: var(--color-catalog);
-  border-right: 1px solid var(--color-border);
+  backdrop-filter: var(--theme-panel-filter);
+  border-inline-end: 1px solid var(--color-border);
   font-size: var(--font-size-body);
   line-height: 1.5;
   min-height: 0;
@@ -68,7 +69,7 @@
 }
 
 @media (max-width: 700px) {
-  .panel { border-bottom: 1px solid var(--color-border); border-right: 0; overflow: visible; }
+  .panel { border-bottom: 1px solid var(--color-border); border-inline-end: 0; overflow: visible; }
 }
 
 @media (any-pointer: coarse) {

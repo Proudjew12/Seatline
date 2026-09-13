@@ -31,6 +31,11 @@ export function parseQuantity(value: string): number | null {
     : null;
 }
 
+export function parseMarkupBasisPoints(value: string): number | null {
+  const basisPoints = parsePriceCents(value);
+  return basisPoints !== null && basisPoints <= 10_000 ? basisPoints : null;
+}
+
 export function getLineError(line: QuoteLine): string | null {
   if (!line.productName.trim() || line.productName.length > QUOTE_LIMITS.name) {
     return "Choose a product.";
@@ -47,19 +52,46 @@ export function getLineError(line: QuoteLine): string | null {
   if (parsePriceCents(line.unitPrice) === null) {
     return "Enter a USD price from 0 to 1,000,000 with up to two decimal places.";
   }
+  if (parseMarkupBasisPoints(line.markupPercent ?? "0") === null) {
+    return "Enter a profit rate from 0 to 100% with up to two decimal places.";
+  }
   return null;
 }
 
-export function calculateLine(line: QuoteLine): { valid: boolean; subtotalCents: number; } {
+export interface LineCalculation {
+  valid: boolean;
+  baseUnitCents: number;
+  customerUnitCents: number;
+  markupUnitCents: number;
+  baseSubtotalCents: number;
+  markupSubtotalCents: number;
+  subtotalCents: number;
+}
+
+function invalidLine(): LineCalculation {
+  return {
+    valid: false, baseUnitCents: 0, customerUnitCents: 0, markupUnitCents: 0,
+    baseSubtotalCents: 0, markupSubtotalCents: 0, subtotalCents: 0,
+  };
+}
+
+export function calculateLine(line: QuoteLine): LineCalculation {
   const quantity = parseQuantity(line.quantity);
   const price = parsePriceCents(line.unitPrice);
-  if (getLineError(line) !== null || quantity === null || price === null) {
-    return { valid: false, subtotalCents: 0 };
+  const markup = parseMarkupBasisPoints(line.markupPercent ?? "0");
+  if (getLineError(line) !== null || quantity === null || price === null || markup === null) {
+    return invalidLine();
   }
-  const subtotalCents = quantity * price;
-  return Number.isSafeInteger(subtotalCents)
-    ? { valid: true, subtotalCents }
-    : { valid: false, subtotalCents: 0 };
+  // Round each customer unit to cents before quantity so the displayed rate and total agree.
+  const customerUnitCents = Math.floor((price * (10_000 + markup) + 5_000) / 10_000);
+  const markupUnitCents = customerUnitCents - price;
+  const subtotalCents = quantity * customerUnitCents;
+  const baseSubtotalCents = quantity * price;
+  const markupSubtotalCents = subtotalCents - baseSubtotalCents;
+  return [customerUnitCents, subtotalCents, baseSubtotalCents, markupSubtotalCents].every(Number.isSafeInteger)
+    ? { valid: true, baseUnitCents: price, customerUnitCents, markupUnitCents,
+      baseSubtotalCents, markupSubtotalCents, subtotalCents }
+    : invalidLine();
 }
 
 export function calculateQuote(lines: QuoteLine[]): QuoteTotals {

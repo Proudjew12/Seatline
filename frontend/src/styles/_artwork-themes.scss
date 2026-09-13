@@ -1,0 +1,101 @@
+// Background artwork is bundled by Vite; URLs also work below a deployment base path.
+[data-theme="aurora"],
+[data-theme="solstice"],
+[data-theme="orbit"] {
+  --theme-shell-surface: transparent;
+  --theme-panel-filter: blur(16px);
+  --theme-preview-height: 204px;
+  --radius-control: 8px;
+  --radius-card: 12px;
+  --radius-panel: 16px;
+}
+
+[data-theme="aurora"] {
+  color-scheme: light;
+  --theme-background-image: url("./theme-art/aurora.webp");
+  --theme-header-surface: rgb(246 247 255 / 88%);
+  --theme-quote-surface: rgb(243 246 255 / 78%);
+  --color-background: #e9e9ff;
+  --color-surface: #fbfbff;
+  --color-rail: rgb(226 231 255 / 82%);
+  --color-catalog: rgb(244 246 255 / 86%);
+  --color-text: #242349;
+  --color-text-muted: #535475;
+  --color-border: #c9c9e5;
+  --color-border-strong: #8483b2;
+  --color-accent: #5140c4;
+  --color-accent-strong: #3f2da7;
+  --color-accent-contrast: #fff;
+  --color-accent-soft: #e8e4ff;
+  --color-focus: #5441c9;
+  --color-success: #17674e;
+  --color-danger: #b02345;
+  --color-warning: #7c530b;
+  --color-overlay: rgb(28 26 64 / 48%);
+  --gradient-action: linear-gradient(115deg, #4936c4, #7340bb);
+  --shadow-control: 0 2px 5px rgb(59 45 127 / 5%);
+  --shadow-card: 0 5px 18px rgb(59 45 127 / 10%);
+  --shadow-panel: 0 20px 60px rgb(41 27 103 / 24%);
+  --shadow-header: 0 2px 12px rgb(59 45 127 / 4%);
+  --shadow-footer: 0 -4px 18px rgb(59 45 127 / 6%);
+}
+
+[data-theme="solstice"] {
+  color-scheme: light;
+  --theme-background-image: url("./theme-art/solstice.webp");
+  --theme-header-surface: rgb(255 248 242 / 90%);
+  --theme-quote-surface: rgb(255 247 237 / 82%);
+  --color-background: #f9e7dd;
+  --color-surface: #fffaf5;
+  --color-rail: rgb(248 223 209 / 86%);
+  --color-catalog: rgb(255 243 231 / 90%);
+  --color-text: #492b2c;
+  --color-text-muted: #684944;
+  --color-border: #dfc7bd;
+  --color-border-strong: #ac867b;
+  --color-accent: #913331;
+  --color-accent-strong: #842d31;
+  --color-accent-contrast: #fffaf6;
+  --color-accent-soft: #f7e3db;
+  --color-focus: #a13e3d;
+  --color-success: #356644;
+  --color-danger: #a32239;
+  --color-warning: #795113;
+  --color-overlay: rgb(64 28 36 / 48%);
+  --gradient-action: linear-gradient(115deg, #9b373e, #a94d30);
+  --shadow-control: 0 2px 5px rgb(119 52 42 / 5%);
+  --shadow-card: 0 5px 18px rgb(119 52 42 / 10%);
+  --shadow-panel: 0 20px 60px rgb(78 33 34 / 24%);
+  --shadow-header: 0 2px 12px rgb(119 52 42 / 4%);
+  --shadow-footer: 0 -4px 18px rgb(119 52 42 / 6%);
+}
+
+[data-theme="orbit"] {
+  color-scheme: dark;
+  --theme-background-image: url("./theme-art/orbit.webp");
+  --theme-header-surface: rgb(25 23 58 / 90%);
+  --theme-quote-surface: rgb(20 18 48 / 82%);
+  --color-background: #15122f;
+  --color-surface: #252142;
+  --color-rail: rgb(29 23 62 / 88%);
+  --color-catalog: rgb(34 28 69 / 90%);
+  --color-text: #f1edff;
+  --color-text-muted: #c2b9df;
+  --color-border: #514670;
+  --color-border-strong: #9483b6;
+  --color-accent: #c3a9ff;
+  --color-accent-strong: #dfcfff;
+  --color-accent-contrast: #251344;
+  --color-accent-soft: #423260;
+  --color-focus: #d4bfff;
+  --color-success: #8fddbb;
+  --color-danger: #ffa0bb;
+  --color-warning: #ebcb92;
+  --color-overlay: rgb(7 4 22 / 74%);
+  --gradient-action: linear-gradient(115deg, #c9abff, #afaefa);
+  --shadow-control: 0 2px 5px rgb(0 0 0 / 15%);
+  --shadow-card: 0 5px 20px rgb(6 3 28 / 24%);
+  --shadow-panel: 0 20px 60px rgb(6 3 28 / 60%);
+  --shadow-header: 0 2px 12px rgb(6 3 28 / 14%);
+  --shadow-footer: 0 -4px 18px rgb(6 3 28 / 18%);
+}

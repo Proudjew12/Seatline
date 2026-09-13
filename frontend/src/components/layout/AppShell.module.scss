@@ -3,7 +3,8 @@
 .shell {
   display: grid;
   grid-template-rows: auto 1fr auto;
-  min-height: 100vh;
+  min-height: 100dvh;
+  background: var(--theme-quote-surface);
 }
 
 .skipLink {
@@ -11,7 +12,7 @@
   border-radius: var(--radius-control);
   color: var(--color-surface);
   font-weight: 700;
-  left: var(--page-gutter);
+  inset-inline-start: var(--page-gutter);
   padding: var(--space-3) var(--space-4);
   position: fixed;
   top: var(--space-3);

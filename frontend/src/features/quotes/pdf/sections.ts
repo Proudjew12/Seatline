@@ -2,26 +2,26 @@ import { calculateQuote, formatMoney } from "../calculations";
 import type { QuoteDraft } from "../types";
 import { cleanPdfField, PDF_COLORS, PDF_PAGE, QuotePdfLayout } from "./layout";
 
-function quoteDate(value: string): string {
-  return new Intl.DateTimeFormat("en-GB", { day: "2-digit", month: "long", year: "numeric", timeZone: "UTC" })
+function quoteDate(value: string, locale: QuotePdfLayout["locale"]): string {
+  return new Intl.DateTimeFormat(locale === "he" ? "he-IL" : "en-GB", { day: "2-digit", month: "long", year: "numeric", timeZone: "UTC" })
     .format(new Date(`${value}T00:00:00Z`));
 }
 
 export function writeQuoteHeading(layout: QuotePdfLayout, draft: QuoteDraft): void {
   layout.logoAt(PDF_PAGE.left - 0.75, 16, 54);
-  layout.right("QUOTATION", 102, 26, 90, 21, "bold");
-  layout.right("Software licenses", 102, 33, 90, 9, "normal", PDF_COLORS.muted);
+  layout.end(layout.t("QUOTATION"), 102, 26, 90, 21, "bold");
+  layout.end(layout.t("Software licenses"), 102, 33, 90, 9, "normal", PDF_COLORS.muted);
   layout.rule(45, PDF_PAGE.left, PDF_PAGE.width, true);
 
-  layout.text("PREPARED FOR", PDF_PAGE.left, 57, 92, 7.5, "bold", PDF_COLORS.muted);
+  layout.text(layout.t("PREPARED FOR"), PDF_PAGE.left, 57, 92, 7.5, "bold", PDF_COLORS.muted);
   const customers = layout.wrap(cleanPdfField(draft.customer), 95, 12, "bold");
   customers.forEach((name, index) => layout.text(name, PDF_PAGE.left, 65 + index * 5.8, 95, 12, "bold"));
-  layout.text("QUOTE REFERENCE", 126, 57, 66, 7, "bold", PDF_COLORS.muted);
+  layout.text(layout.t("SALES PROPOSAL"), 126, 57, 66, 7, "bold", PDF_COLORS.muted);
   const references = layout.wrap(cleanPdfField(draft.reference), 66, 9.5);
   references.forEach((reference, index) => layout.text(reference, 126, 64 + index * 4.6, 66, 9.5));
   const dateY = 69 + references.length * 4.6;
-  layout.text("ISSUED", 126, dateY, 66, 7, "bold", PDF_COLORS.muted);
-  layout.text(quoteDate(draft.date), 126, dateY + 6, 66, 9);
+  layout.text(layout.t("ISSUED"), 126, dateY, 66, 7, "bold", PDF_COLORS.muted);
+  layout.text(quoteDate(draft.date, layout.locale), 126, dateY + 6, 66, 9);
   layout.y = Math.max(65 + customers.length * 5.8, dateY + 6) + 14;
 }
 
@@ -29,7 +29,7 @@ export function writeQuoteSummary(layout: QuotePdfLayout, draft: QuoteDraft): vo
   const totals = calculateQuote(draft.lines);
   layout.ensureSpace(65);
   const top = layout.y;
-  layout.text("PAYMENT SUMMARY", PDF_PAGE.left, top + 4, 75, 8, "bold");
+  layout.text(layout.t("PAYMENT SUMMARY"), PDF_PAGE.left, top + 4, 75, 8, "bold");
   const terms = [
     "Prices are in USD and exclude taxes.",
     "Annual subscriptions carry a 12-month commitment.",
@@ -38,22 +38,22 @@ export function writeQuoteSummary(layout: QuotePdfLayout, draft: QuoteDraft): vo
   ];
   let termsY = top + 12;
   for (const term of terms) {
-    const lines = layout.wrap(term, 70, 7.5);
+    const lines = layout.wrap(layout.t(term), 70, 7.5);
     lines.forEach((line, index) => layout.text(line, PDF_PAGE.left, termsY + index * 3.8, 70, 7.5, "normal", PDF_COLORS.muted));
     termsY += lines.length * 3.8 + 2.5;
   }
 
   const summaryX = 101;
-  layout.text("Monthly payments", summaryX, top + 4, 51, 8);
+  layout.text(layout.t("Monthly payments"), summaryX, top + 4, 51, 8);
   layout.right(formatMoney(totals.monthlyCents), 153, top + 4, 39, 9, "bold");
-  layout.text("Yearly payments", summaryX, top + 12, 51, 8);
+  layout.text(layout.t("Yearly payments"), summaryX, top + 12, 51, 8);
   layout.right(formatMoney(totals.annualUpfrontCents), 153, top + 12, 39, 9, "bold");
   layout.rule(top + 17, summaryX, 91);
   layout.fill(summaryX, top + 21, 91, 20);
   layout.fill(summaryX, top + 21, 1, 20, PDF_COLORS.accent);
-  layout.text("DUE AT START", summaryX + 5, top + 27, 81, 7, "bold", PDF_COLORS.muted);
+  layout.text(layout.t("DUE AT START"), summaryX + 5, top + 27, 81, 7, "bold", PDF_COLORS.muted);
   layout.right(formatMoney(totals.dueNowCents), summaryX + 5, top + 36, 81, 16, "bold");
-  layout.text("12-month estimate", summaryX, top + 49, 47, 8);
+  layout.text(layout.t("12-month estimate"), summaryX, top + 49, 47, 8);
   layout.right(formatMoney(totals.yearEstimateCents), 148, top + 49, 44, 9, "bold");
   layout.y = Math.max(top + 57, termsY) + 8;
 }

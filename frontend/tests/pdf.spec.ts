@@ -9,7 +9,7 @@ const reference = "SP-LOGI-001";
 async function prepareQuote(page: Page): Promise<Locator> {
   await page.goto("/");
   await page.getByLabel("Customer", { exact: true }).fill("Logi quotation customer");
-  await page.getByLabel("Quote reference", { exact: true }).fill(reference);
+  await page.getByLabel("Sales Proposal", { exact: true }).fill(reference);
   await page.getByRole("button", { name: "Add Business Basic to quote", exact: true }).press("Enter");
   const line = page.getByRole("group", { name: "Business Basic", exact: true });
   await line.getByLabel("Quantity", { exact: true }).fill("2");
@@ -55,7 +55,7 @@ for (const asset of [
     await expect(page.getByRole("alert")).toContainText("The PDF could not be created.");
     await expect(exportButton).toBeEnabled();
     await expect(page.getByLabel("Customer", { exact: true })).toHaveValue("Logi quotation customer");
-    await expect(page.getByLabel("Quote reference", { exact: true })).toHaveValue(reference);
+    await expect(page.getByLabel("Sales Proposal", { exact: true })).toHaveValue(reference);
     await expect(line.getByLabel("Quantity", { exact: true })).toHaveValue("2");
     await expect(line.getByRole("textbox", { name: "Price", exact: true })).toHaveValue("15.50");
     expect(downloads).toEqual([]);

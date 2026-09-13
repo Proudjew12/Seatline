@@ -1,11 +1,11 @@
 ---
 name: vertical-slice
-description: Implement a complete user-facing SalePrice feature across its React frontend, HTTP contract, and FastAPI backend. Use for product behavior spanning one or both application roots; do not use for documentation-only work.
+description: Implement a complete user-facing Seatline feature across its React frontend, HTTP contract, and FastAPI backend. Use for product behavior spanning one or both application roots; do not use for documentation-only work.
 ---
 
 # Implement a vertical slice
 
-Deliver one observable SalePrice workflow completely, following `README.md` and the applicable
+Deliver one observable Seatline workflow completely, following `README.md` and the applicable
 root, frontend, and backend `AGENTS.md` files.
 
 ## Before implementation

@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+import argparse
 import json
 import os
 import signal
@@ -10,6 +11,7 @@ import socket
 import subprocess
 import sys
 import time
+from collections.abc import Sequence
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
@@ -130,7 +132,9 @@ def backend_address() -> DevelopmentAddress:
     return DevelopmentAddress(host=host, port=port)
 
 
-def start_processes(address: DevelopmentAddress) -> list[subprocess.Popen[bytes]]:
+def start_processes(
+    address: DevelopmentAddress, *, frontend_port: int = 5173
+) -> list[subprocess.Popen[bytes]]:
     npm = "npm.cmd" if os.name == "nt" else "npm"
     options = process_options()
     processes: list[subprocess.Popen[bytes]] = []
@@ -147,7 +151,7 @@ def start_processes(address: DevelopmentAddress) -> list[subprocess.Popen[bytes]
         )
         processes.append(
             subprocess.Popen(
-                [npm, "run", "dev"],
+                [npm, "run", "dev", "--", "--port", str(frontend_port)],
                 cwd=FRONTEND_DIR,
                 env=frontend_environment,
                 **options,
@@ -161,7 +165,29 @@ def start_processes(address: DevelopmentAddress) -> list[subprocess.Popen[bytes]
     return processes
 
 
-def main() -> int:
+def valid_port(value: str) -> int:
+    try:
+        port = int(value)
+    except ValueError as error:
+        raise argparse.ArgumentTypeError("port must be an integer from 1 to 65535") from error
+    if not 1 <= port <= 65_535:
+        raise argparse.ArgumentTypeError("port must be an integer from 1 to 65535")
+    return port
+
+
+def parse_args(arguments: Sequence[str] | None = None) -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument(
+        "--frontend-port",
+        type=valid_port,
+        default=5173,
+        help="Frontend development port (default: 5173).",
+    )
+    return parser.parse_args(arguments)
+
+
+def main(arguments: Sequence[str] | None = None) -> int:
+    args = parse_args(arguments)
     python = backend_python()
     if not python.exists():
         print(
@@ -182,9 +208,9 @@ def main() -> int:
     try:
         address = backend_address()
         ensure_port_available(address.client_host, address.port)
-        ensure_port_available("127.0.0.1", 5173)
-        processes = start_processes(address)
-        print("Frontend: http://127.0.0.1:5173", flush=True)
+        ensure_port_available("127.0.0.1", args.frontend_port)
+        processes = start_processes(address, frontend_port=args.frontend_port)
+        print(f"Frontend: http://127.0.0.1:{args.frontend_port}", flush=True)
         print(f"Backend: {address.base_url}", flush=True)
 
         while not shutdown.requested:

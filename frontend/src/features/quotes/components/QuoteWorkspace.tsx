@@ -1,21 +1,22 @@
 import { DragDropProvider } from "@dnd-kit/react";
 import { useState } from "react";
 
-import { Icon } from "@/components/ui/Icon";
 import { CatalogDialog } from "@/features/catalog/components/CatalogDialog";
 import type { CatalogDialogTarget, CatalogEditorInput } from "@/features/catalog/components/CatalogDialog";
 import { CatalogPanel } from "@/features/catalog/components/CatalogPanel";
 import { ProductRail } from "@/features/catalog/components/ProductRail";
 import { useCatalog } from "@/features/catalog/hooks/useCatalog";
 import type { CatalogLicense, CatalogProduct } from "@/features/catalog/types";
-import { TextSizeControl } from "@/features/display/TextSizeControl";
+import { SettingsControl } from "@/features/display/SettingsControl";
 import { QuoteCanvas } from "@/features/quotes/components/QuoteCanvas";
 import { useQuoteDraft } from "@/features/quotes/useQuoteDraft";
+import { useI18n } from "@/shared/i18n/context";
 import styles from "@/features/quotes/components/QuoteWorkspace.module.scss";
 
 const initialBilling = "annual-monthly";
 
 export function QuoteWorkspace() {
+  const { t, locale } = useI18n();
   const catalog = useCatalog();
   const quote = useQuoteDraft(catalog.products);
   const [selectedId, setSelectedId] = useState("microsoft-365");
@@ -28,7 +29,7 @@ export function QuoteWorkspace() {
 
   function addLicense(selectedProduct: CatalogProduct, license: CatalogLicense) {
     const added = quote.addLine(selectedProduct.id, selectedProduct.name, license.name, initialBilling, license.prices?.[initialBilling] ?? "", license.id);
-    setMessage(added ? `${license.name} added to your quote.` : "A quote can contain up to 100 license lines.");
+    setMessage(added ? t("{name} added to your quote.", { name: license.name }) : t("A quote can contain up to 100 license lines."));
     setExportError("");
   }
 
@@ -37,8 +38,8 @@ export function QuoteWorkspace() {
     setExportError("");
     try {
       const { exportQuotePdf } = await import("@/features/quotes/exportPdf");
-      await exportQuotePdf(quote.draft);
-      setMessage("Your PDF quote has been downloaded.");
+      await exportQuotePdf(quote.draft, locale);
+      setMessage(t("Your PDF quote has been downloaded."));
     } catch {
       setExportError("The PDF could not be created. Your quote is still here. Please try again.");
     } finally {
@@ -47,32 +48,32 @@ export function QuoteWorkspace() {
   }
 
   function newOrder() {
-    if (quote.hasWork && !window.confirm("Start a new order? Export your current order first if you want to keep it.")) return;
+    if (quote.hasWork && !window.confirm(t("Start a new order? Export your current order first if you want to keep it."))) return;
     if (!quote.reset()) return;
-    setMessage("New order started."); setExportError("");
+    setMessage(t("New order started.")); setExportError("");
   }
 
   function submitCatalog(input: CatalogEditorInput): string | null {
-    if (!dialog || !editing) return "Switch to Edit Mode to change your catalog.";
-    const { name, firstLicense, shortName, prices } = input;
-    const result = dialog.kind === "add-product" ? catalog.addProduct(name, firstLicense, shortName, prices)
-      : dialog.kind === "edit-product" ? catalog.updateProduct(dialog.product.id, name, shortName)
-      : dialog.kind === "add-license" ? catalog.addLicense(dialog.product.id, name, prices)
-      : catalog.updateLicense(dialog.product.id, dialog.license.id, name, prices);
-    if (!result.ok) return result.message;
+    if (!dialog || !editing) return t("Switch to Edit Mode to change your catalog.");
+    const { name, shortName, icon, prices, markupPercent } = input;
+    const result = dialog.kind === "add-product" ? catalog.addProduct(name, shortName, icon)
+      : dialog.kind === "edit-product" ? catalog.updateProduct(dialog.product.id, name, shortName, markupPercent, icon)
+      : dialog.kind === "add-license" ? catalog.addLicense(dialog.product.id, name, prices, markupPercent)
+      : catalog.updateLicense(dialog.product.id, dialog.license.id, name, prices, markupPercent);
+    if (!result.ok) return t(result.message);
     setSelectedId(result.productId); setDialog(null);
-    setMessage("Catalog updated.");
+    setMessage(t("Catalog updated."));
     return null;
   }
 
   function deleteCatalog(): string | null {
-    if (!editing || !dialog || (dialog.kind !== "edit-product" && dialog.kind !== "edit-license")) return "Select an item to delete.";
+    if (!editing || !dialog || (dialog.kind !== "edit-product" && dialog.kind !== "edit-license")) return t("Select an item to delete.");
     const name = dialog.kind === "edit-product" ? dialog.product.name : dialog.license.name;
-    if (!window.confirm(`Delete ${name} from your catalog? Existing order items will be kept.`)) return null;
+    if (!window.confirm(t("Delete {name} from your catalog? Existing order items will be kept.", { name }))) return null;
     const result = dialog.kind === "edit-product" ? catalog.removeProduct(dialog.product.id)
       : catalog.removeLicense(dialog.product.id, dialog.license.id);
-    if (!result.ok) return result.message;
-    setDialog(null); setMessage("Item removed from the catalog.");
+    if (!result.ok) return t(result.message);
+    setDialog(null); setMessage(t("Item removed from the catalog."));
     return null;
   }
 
@@ -80,18 +81,15 @@ export function QuoteWorkspace() {
     <div className={styles.workspace}>
       <a className={styles.skip} href="#quote-content" onClick={(event) => {
         event.preventDefault(); document.getElementById("quote-content")?.focus();
-      }}>Skip to main content</a>
+      }}>{t("Skip to main content")}</a>
       <header className={styles.header}>
-        <div className={styles.brand}><span aria-hidden="true">S</span>SalePrice</div>
+        <div className={styles.brand} dir="ltr">Seatline</div>
         <div className={styles.toolbar}>
-          <TextSizeControl />
-          <button type="button" className={styles.mode} aria-pressed={editing} title={editing ? "Switch to Normal Mode" : "Switch to Edit Mode"} onClick={() => setEditing(!editing)}>
-            <Icon name={editing ? "edit" : "check"} size={16} />{editing ? "Edit Mode" : "Normal Mode"}
-          </button>
+          <SettingsControl editing={editing} onEditingChange={setEditing} />
         </div>
       </header>
       <DragDropProvider onDragEnd={(event) => {
-        if (event.canceled || event.operation.target?.id !== "quote-items") return;
+        if (editing || event.canceled || event.operation.target?.id !== "quote-items") return;
         const licenseId = event.operation.source?.id;
         for (const item of catalog.products) {
           const license = item.licenses.find((candidate) => candidate.id === licenseId);
@@ -103,9 +101,9 @@ export function QuoteWorkspace() {
           {product ? <CatalogPanel key={product.id} product={product} onAdd={addLicense} editing={editing}
             onAddLicense={() => setDialog({ kind: "add-license", product })} onEditProduct={() => setDialog({ kind: "edit-product", product })}
             onEditLicense={(license) => setDialog({ kind: "edit-license", product, license })} />
-            : <section className={styles.emptyCatalog} aria-label="Licenses"><h2>No products yet</h2><p>{editing ? "Use + on the left to add your first product." : "Switch to Edit Mode to add a product."}</p></section>}
+            : <section className={styles.emptyCatalog} aria-label={t("Licenses")}><h2>{t("No products yet")}</h2><p>{t(editing ? "Use + on the left to add your first product." : "Switch to Edit Mode to add a product.")}</p></section>}
           <QuoteCanvas quote={quote} exporting={exporting} onExport={() => { void exportPdf(); }}
-            catalogWarning={catalog.warning} exportError={exportError} onNewOrder={newOrder} />
+            catalogWarning={catalog.warning} exportError={exportError} onNewOrder={newOrder} editing={editing} />
         </div>
       </DragDropProvider>
       <div className={styles.announcement} role="status" aria-live="polite" aria-atomic="true">{message}</div>

@@ -1,0 +1,13 @@
+.icon {
+  background-color: currentColor;
+  display: inline-block;
+  flex: 0 0 24px;
+  height: 24px;
+  width: 24px;
+  mask-position: center;
+  mask-repeat: no-repeat;
+  mask-size: contain;
+}
+
+// Wide vendor wordmarks use the rail's spare width without stretching their geometry.
+.wordmark { flex-basis: 36px; width: 36px; mask-size: 36px 36px; }

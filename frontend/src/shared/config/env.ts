@@ -42,7 +42,7 @@ const configuredApiBaseUrl = import.meta.env.VITE_API_BASE_URL?.trim();
 const isStaticDeployment = import.meta.env.VITE_STATIC_DEPLOYMENT === "true";
 
 export const env = Object.freeze({
-  appName: readText(import.meta.env.VITE_APP_NAME, "SalePrice"),
+  appName: readText(import.meta.env.VITE_APP_NAME, "Seatline"),
   apiBaseUrl: normalizeApiBaseUrl(readText(configuredApiBaseUrl, "/api")),
   apiEnabled: !isStaticDeployment || Boolean(configuredApiBaseUrl),
 });

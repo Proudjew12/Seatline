@@ -6,12 +6,18 @@ export interface CatalogLicense {
   id: string;
   name: string;
   prices?: LicensePrices;
+  // Omitted values inherit the product rate; an explicit zero remains an override.
+  markupPercent?: string;
 }
 
 export interface CatalogProduct {
   id: string;
   name: string;
   shortName: string;
+  // Bundled icon identifier. Older snapshots infer a symbol when loaded.
+  icon?: string;
+  // Older catalog snapshots omit this field and are normalized to zero when loaded.
+  markupPercent?: string;
   licenses: CatalogLicense[];
 }
 

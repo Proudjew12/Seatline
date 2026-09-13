@@ -6,9 +6,13 @@
 
 html {
   background: var(--color-background);
+  background-image: var(--theme-background-image);
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
   color: var(--color-text);
   font-family:
-    "Source Sans 3", "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+    "Source Sans 3", "Seatline Hebrew", "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
   line-height: 1.5;
   font-size: calc(87.5% * var(--text-scale, 1));
   min-width: 320px;
@@ -16,9 +20,11 @@ html {
 }
 
 body {
+  display: flow-root;
   margin: 0;
   min-height: 100vh;
   min-width: 320px;
+  text-align: start;
 }
 
 button,

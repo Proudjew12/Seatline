@@ -1,6 +1,6 @@
-# SalePrice backend
+# Seatline backend
 
-The SalePrice API uses FastAPI, a Python `src` layout, and domain feature modules.
+The Seatline API uses FastAPI, a Python `src` layout, and domain feature modules.
 
 This folder is intentionally independent from `frontend/`. It can be copied into its own repository
 and run without the full-stack root tooling.

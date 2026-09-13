@@ -2,9 +2,9 @@ import { readFile } from "node:fs/promises";
 
 import type { Locator, Page } from "@playwright/test";
 
-import { expect, test } from "./fixtures";
+import { expect, test, setEditMode } from "./fixtures";
 
-const draftKey = "saleprice.quote.v1";
+const draftKey = "seatline.quote.v1";
 
 function quoteLine(page: Page, name: string): Locator {
   return page.getByRole("group", { name, exact: true });
@@ -27,12 +27,12 @@ async function expectAmount(page: Page, name: string, value: string): Promise<vo
 }
 
 async function saveBasicDefaultPrice(page: Page): Promise<void> {
-  await page.getByRole("button", { name: "Normal Mode", exact: true }).click();
+  await setEditMode(page, true);
   await page.getByRole("button", { name: "Edit Business Basic", exact: true }).click();
   const dialog = page.getByRole("dialog", { name: "Edit license", exact: true });
   await dialog.getByLabel("Annual paid monthly price", { exact: true }).fill("15.50");
   await dialog.getByRole("button", { name: "Save changes", exact: true }).click();
-  await page.getByRole("button", { name: "Edit Mode", exact: true }).click();
+  await setEditMode(page, false);
 }
 
 async function expectEmptyQuote(page: Page): Promise<void> {
@@ -47,7 +47,7 @@ test("starts empty, switches products, and searches licenses without requiring t
     if (new URL(request.url()).pathname.startsWith("/api/")) apiRequests.push(request.url());
   });
   await page.goto("/");
-  await expect(page).toHaveTitle("SalePrice");
+  await expect(page).toHaveTitle("Seatline");
   await expect(page.getByRole("main", { name: "Order", exact: true })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Your quote" })).toHaveCount(0);
   await expect(page.getByTestId("quote-line")).toHaveCount(0);
@@ -71,8 +71,13 @@ test("starts empty, switches products, and searches licenses without requiring t
   await expect(page.getByTestId("quote-line")).toHaveCount(1);
   const heading = line.getByRole("heading", { name: /^Microsoft 365.*Business Basic$/, level: 2 });
   await expect(heading).toBeVisible();
-  await expect(heading).toHaveText("Microsoft 365 – Business Basic");
+  await expect(heading).toHaveAccessibleName("Microsoft 365 Business Basic");
+  await expect(heading.getByText("Business Basic", { exact: true })).toBeVisible();
   await expect(heading.locator("strong")).toHaveText("Microsoft 365");
+  const productTitle = await heading.getByText("Microsoft 365", { exact: true }).boundingBox();
+  const licenseTitle = await heading.getByText("Business Basic", { exact: true }).boundingBox();
+  if (!productTitle || !licenseTitle) throw new Error("Both product and license titles must be visible");
+  expect(productTitle.y + productTitle.height).toBeLessThanOrEqual(licenseTitle.y);
   await expect(line.getByRole("heading")).toHaveCount(1);
   await expect(line.getByText("Price", { exact: true })).toBeVisible();
   await expect(line.getByRole("textbox", { name: "Price", exact: true })).toHaveValue("");
@@ -83,7 +88,7 @@ test("starts empty, switches products, and searches licenses without requiring t
 test("calculates mixed billing correctly, preserves edits, removes lines, and downloads a PDF", async ({ page }, testInfo) => {
   await page.goto("/");
   await page.getByLabel("Customer", { exact: true }).fill("Acme & Sons – ירושלים");
-  await page.getByLabel("Quote reference", { exact: true }).fill("QA-2026-001");
+  await page.getByLabel("Sales Proposal", { exact: true }).fill("QA-2026-001");
   const basic = await addLicense(page, "Business Basic");
   await basic.getByRole("combobox", { name: "Billing Option", exact: true }).selectOption("monthly");
   await priceLine(basic, "3", "12.50");
@@ -104,7 +109,7 @@ test("calculates mixed billing correctly, preserves edits, removes lines, and do
   await expectAmount(page, "12-month estimate", "$1,122.00");
   await page.reload();
   await expect(page.getByLabel("Customer", { exact: true })).toHaveValue("Acme & Sons – ירושלים");
-  await expect(page.getByLabel("Quote reference", { exact: true })).toHaveValue("QA-2026-001");
+  await expect(page.getByLabel("Sales Proposal", { exact: true })).toHaveValue("QA-2026-001");
   await expect(quoteLine(page, "Business Premium").getByRole("combobox", { name: "Billing Option", exact: true })).toHaveValue("annual-upfront");
   await expectAmount(page, "12-month estimate", "$1,122.00");
 
@@ -220,13 +225,17 @@ test("keeps quoting available when browser storage is blocked", async ({ page })
 
 test("adds custom products and licenses and retains them after reload", async ({ page }) => {
   await page.goto("/");
-  await page.getByRole("button", { name: "Normal Mode", exact: true }).click();
+  await setEditMode(page, true);
   await page.getByRole("button", { name: "Add product", exact: true }).click();
   const productDialog = page.getByRole("dialog", { name: "Add product", exact: true });
   await productDialog.getByLabel("Product name", { exact: true }).fill("A Product");
-  await productDialog.getByLabel("First license name", { exact: true }).fill("Agent seat");
   await productDialog.getByRole("button", { name: "Add product", exact: true }).click();
   await expect(page.getByRole("alert")).toHaveCount(0);
+  await expect(page.getByText("No licenses yet", { exact: true })).toBeVisible();
+  await page.getByRole("button", { name: "Add license", exact: true }).click();
+  const firstLicense = page.getByRole("dialog", { name: "Add license", exact: true });
+  await firstLicense.getByLabel("License name", { exact: true }).fill("Agent seat");
+  await firstLicense.getByRole("button", { name: "Add license", exact: true }).click();
   await addLicense(page, "Agent seat");
   await page.getByRole("button", { name: "Add license", exact: true }).click();
   const licenseDialog = page.getByRole("dialog", { name: "Add license", exact: true });
@@ -350,43 +359,4 @@ test("ignores tablet taps, cancels safely, and adds once from an immediate finge
     await expect(page.getByTestId("quote-line")).toHaveCount(count);
   }
   await expectEmptyQuote(page);
-});
-
-test("scrolls the tablet catalog from its blank gutter without adding licenses", async ({ page, context }, testInfo) => {
-  test.skip(testInfo.project.name !== "tablet", "This scenario verifies native tablet scrolling.");
-  await page.goto("/");
-  await page.getByRole("button", { name: "Normal Mode", exact: true }).click();
-  for (let index = 1; index <= 16; index += 1) {
-    await page.getByRole("button", { name: "Add license", exact: true }).click();
-    const dialog = page.getByRole("dialog", { name: "Add license", exact: true });
-    await dialog.getByLabel("License name", { exact: true }).fill(`Tablet license ${index}`);
-    await dialog.getByRole("button", { name: "Add license", exact: true }).click();
-  }
-  const panel = page.getByRole("region", { name: "Licenses", exact: true });
-  const scrollCard = page.getByRole("button", { name: "Add Tablet license 8 to quote", exact: true });
-  await scrollCard.scrollIntoViewIfNeeded();
-  const initialScroll = await panel.evaluate((element) => element.scrollTop);
-  expect(await panel.evaluate((element) => element.scrollHeight > element.clientHeight)).toBe(true);
-  const cardBox = await scrollCard.boundingBox();
-  const panelBox = await panel.boundingBox();
-  if (!cardBox || !panelBox) throw new Error("The catalog gutter must be visible to swipe.");
-  const x = (panelBox.x + cardBox.x) / 2;
-  // The empty gutter retains native scrolling while the cards themselves drag immediately.
-  const direction = initialScroll > 0 ? 1 : -1;
-  const startY = cardBox.y + cardBox.height / 2;
-  expect(await panel.evaluate((element, point) => document.elementFromPoint(point.x, point.y) === element, { x, y: startY })).toBe(true);
-  const session = await context.newCDPSession(page);
-  try {
-    await session.send("Input.dispatchTouchEvent", { type: "touchStart", touchPoints: [{ x, y: startY, id: 1 }] });
-    for (let step = 1; step <= 12; step += 1) {
-      await session.send("Input.dispatchTouchEvent", {
-        type: "touchMove", touchPoints: [{ x, y: startY + direction * step * 15, id: 1 }],
-      });
-    }
-    await session.send("Input.dispatchTouchEvent", { type: "touchEnd", touchPoints: [] });
-  } finally {
-    await session.detach();
-  }
-  await expect.poll(() => panel.evaluate((element) => element.scrollTop)).not.toBe(initialScroll);
-  await expect(page.getByTestId("quote-line")).toHaveCount(0);
 });

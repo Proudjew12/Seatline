@@ -5,5 +5,5 @@
 https://static.wixstatic.com/media/cc268c_0ab98d09c3f240cc904bfa09aa458232~mv2.png
 
 The file is bundled unchanged, without upscaling, for the user-requested Logi branding in exported
-quotes. The SalePrice application keeps its own interface branding. No quote data is sent to the
+quotes. The Seatline application keeps its own interface branding. No quote data is sent to the
 source website; PDF exports load the bundled asset from the application's origin.

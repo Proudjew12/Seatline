@@ -1,26 +1,12 @@
 @use "./abstracts/variables" as variables;
+@use "./themes";
+@use "./artwork-themes";
+@use "./scenic-themes";
+@use "./aurora-variants";
 
 :root {
-  color-scheme: light;
-
   @each $name, $value in variables.$font-sizes {
     --font-size-#{$name}: #{$value};
-  }
-
-  @each $name, $value in variables.$gradients {
-    --gradient-#{$name}: #{$value};
-  }
-
-  @each $name, $value in variables.$colors {
-    --color-#{$name}: #{$value};
-  }
-
-  @each $name, $value in variables.$shadows {
-    --shadow-#{$name}: #{$value};
-  }
-
-  @each $name, $value in variables.$radii {
-    --radius-#{$name}: #{$value};
   }
 
   @each $name, $value in variables.$spacing {

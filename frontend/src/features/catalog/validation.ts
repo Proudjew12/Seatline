@@ -1,7 +1,8 @@
-import { parsePriceCents } from "@/features/quotes/calculations";
+import { parseMarkupBasisPoints, parsePriceCents } from "@/features/quotes/calculations";
 import { BILLING_OPTIONS, QUOTE_LIMITS } from "@/features/quotes/types";
 
 import { CATALOG_LIMITS } from "./types";
+import { resolveProductIcon } from "./productIcon";
 import type { CatalogLicense, CatalogProduct, CatalogSnapshot, LicensePrices } from "./types";
 
 export function isRecord(value: unknown): value is Record<string, unknown> {
@@ -30,17 +31,24 @@ export function isLicensePrices(value: unknown): value is LicensePrices {
     });
 }
 
+export function validMarkupPercent(value: unknown): value is string {
+  return typeof value === "string" && value === value.trim() && parseMarkupBasisPoints(value) !== null;
+}
+
 function validId(value: unknown): value is string {
   return typeof value === "string" && /^[a-z0-9][a-z0-9-]{0,86}$/.test(value);
 }
 
 function isLicense(value: unknown): value is CatalogLicense {
   return isRecord(value) && validId(value.id) && validCatalogName(value.name) &&
-    (value.prices === undefined || isLicensePrices(value.prices));
+    (value.prices === undefined || isLicensePrices(value.prices)) &&
+    (value.markupPercent === undefined || validMarkupPercent(value.markupPercent));
 }
 
 function isProduct(value: unknown): value is CatalogProduct {
   return isRecord(value) && validId(value.id) && validCatalogName(value.name) &&
+    (value.icon === undefined || validId(value.icon)) &&
+    (value.markupPercent === undefined || validMarkupPercent(value.markupPercent)) &&
     validShortName(value.shortName) && Array.isArray(value.licenses) &&
     value.licenses.length <= CATALOG_LIMITS.licensesPerProduct && value.licenses.every(isLicense);
 }
@@ -70,10 +78,13 @@ export function copyCatalog(products: CatalogProduct[]): CatalogSnapshot {
       id: product.id,
       name: product.name,
       shortName: product.shortName,
+      icon: resolveProductIcon(product),
+      markupPercent: product.markupPercent ?? "0",
       licenses: product.licenses.map((license) => ({
         id: license.id,
         name: license.name,
         ...(license.prices === undefined ? {} : { prices: { ...license.prices } }),
+        ...(license.markupPercent === undefined ? {} : { markupPercent: license.markupPercent }),
       })),
     })),
   };

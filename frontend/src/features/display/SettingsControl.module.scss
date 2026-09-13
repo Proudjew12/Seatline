@@ -1,0 +1,105 @@
+@use "../../styles/abstracts/mixins" as mixins;
+
+.trigger,
+.close {
+  align-items: center;
+  background: transparent;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-control);
+  color: var(--color-text);
+  cursor: pointer;
+  display: flex;
+  flex-shrink: 0;
+  justify-content: center;
+  min-height: 44px;
+  min-width: 44px;
+  padding: 8px;
+
+  &:hover { background: var(--color-accent-soft); border-color: var(--color-border-strong); }
+  &:focus-visible { @include mixins.focus-ring; }
+}
+
+.close { border-color: transparent; }
+
+.dialog {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-panel);
+  box-shadow: var(--shadow-panel);
+  color: var(--color-text);
+  // Settings stay readable so the user can recover from the smallest content size.
+  font-size: 14px;
+  line-height: 1.5;
+  max-height: calc(100dvh - 32px);
+  max-width: 420px;
+  overflow-wrap: anywhere;
+  padding: 20px;
+  text-align: start;
+  width: calc(100vw - 32px);
+
+  &::backdrop { background: var(--color-overlay); }
+}
+
+.header {
+  align-items: center;
+  display: flex;
+  gap: 16px;
+  justify-content: space-between;
+  margin-bottom: 20px;
+
+  h2 { font-size: 20px; font-weight: 600; margin: 0; }
+}
+
+.settings { display: grid; gap: 20px; }
+.editSetting { border-bottom: 1px solid var(--color-border); padding-bottom: 20px; }
+
+.row {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: space-between;
+
+  select {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-control);
+    color: var(--color-text);
+    cursor: pointer;
+    min-height: 44px;
+    min-width: 120px;
+    padding: 6px 8px;
+  }
+
+  select:hover { border-color: var(--color-border-strong); }
+  select:focus-visible { @include mixins.focus-ring; }
+
+  input {
+    accent-color: var(--color-accent);
+    cursor: pointer;
+    height: 24px;
+    margin: 10px;
+    width: 24px;
+  }
+}
+
+.description { color: var(--color-text-muted); margin: 4px 0 0; }
+.notice { color: var(--color-warning); margin: 20px 0 0; }
+
+.browseThemes {
+  display: flex; align-items: center; justify-content: flex-end; gap: 10px; min-height: 44px; padding: 7px 10px;
+  background: var(--color-surface); color: var(--color-text); border: 1px solid var(--color-border); border-radius: var(--radius-control);
+  font-size: 14px; cursor: pointer;
+  &:hover { background: var(--color-accent-soft); border-color: var(--color-accent); }
+  &:focus-visible { @include mixins.focus-ring; }
+}
+.swatches {
+  display: flex; overflow: hidden; border: 1px solid var(--color-border-strong); border-radius: 4px;
+  i { width: 8px; height: 17px; background: var(--color-background); }
+  i:nth-child(2) { background: var(--color-text); }
+  i:nth-child(3) { background: var(--color-accent); }
+}
+
+@media (max-width: 420px) {
+  .dialog { padding: 16px; }
+}

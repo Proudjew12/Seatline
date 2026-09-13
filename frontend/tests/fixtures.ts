@@ -1,4 +1,32 @@
 import { expect, test as base } from "@playwright/test";
+import type { Page } from "@playwright/test";
+
+export async function openSettings(page: Page): Promise<void> {
+  if (await page.getByRole("dialog", { name: /^(Settings|הגדרות)$/ }).isVisible()) return;
+  await page.getByRole("button", { name: /^(Settings|הגדרות)$/ }).click();
+}
+
+export async function closeSettings(page: Page): Promise<void> {
+  await page.getByRole("button", { name: /^(Close settings|סגירת הגדרות)$/ }).click();
+}
+
+export async function setEditMode(page: Page, enabled: boolean): Promise<void> {
+  await openSettings(page);
+  await page.getByRole("switch", { name: "Edit Mode", exact: true }).setChecked(enabled);
+  await closeSettings(page);
+}
+
+export async function setTextSize(page: Page, size: string): Promise<void> {
+  await openSettings(page);
+  await page.getByRole("combobox", { name: "Text size", exact: true }).selectOption(size);
+  await closeSettings(page);
+}
+
+export async function expectTextSize(page: Page, size: string): Promise<void> {
+  await openSettings(page);
+  await expect(page.getByRole("combobox", { name: "Text size", exact: true })).toHaveValue(size);
+  await closeSettings(page);
+}
 
 interface BrowserChecks {
   allowHealthRequestFailure: boolean;

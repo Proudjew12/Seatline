@@ -1,5 +1,8 @@
 import type { jsPDF } from "jspdf";
 
+import { translate } from "@/shared/i18n/translate";
+import type { Locale } from "@/shared/i18n/types";
+
 export type PdfColor = [number, number, number];
 export type PdfWeight = "normal" | "bold";
 
@@ -36,7 +39,17 @@ export class QuotePdfLayout {
     readonly document: jsPDF,
     private readonly reference: string,
     private readonly logo: Uint8Array,
+    readonly locale: Locale = "en",
   ) {}
+
+  t(message: string, values?: Record<string, string | number>): string {
+    return translate(this.locale, message, values);
+  }
+
+  // Coordinates describe the English document; Hebrew reflects whole blocks, never glyphs.
+  private blockX(x: number, width: number): number {
+    return this.locale === "he" ? PDF_PAGE.left + PDF_PAGE.right - x - width : x;
+  }
 
   font(size: number, weight: PdfWeight = "normal", color: PdfColor = PDF_COLORS.ink): void {
     this.document.setFont("DejaVuSans", weight);
@@ -46,24 +59,32 @@ export class QuotePdfLayout {
 
   text(value: string, x: number, y: number, width: number, size = 9,
     weight: PdfWeight = "normal", color: PdfColor = PDF_COLORS.ink): void {
-    const text = cleanPdfText(value);
-    const rtl = isRtl(text);
-    this.font(size, weight, color);
-    this.document.text(text, rtl ? x + width : x, y, {
-      align: rtl ? "right" : "left",
-      isInputVisual: false, isOutputVisual: true, isInputRtl: rtl, isOutputRtl: false,
-    });
+    this.drawText(value, x, y, width, size, weight, color, this.locale === "he" ? "right" : "left");
   }
 
+  // Amounts stay right aligned inside their reflected column and retain USD/LTR ordering.
   right(value: string, x: number, y: number, width: number, size = 9,
     weight: PdfWeight = "normal", color: PdfColor = PDF_COLORS.ink): void {
+    this.drawText(value, x, y, width, size, weight, color, "right");
+  }
+
+  end(value: string, x: number, y: number, width: number, size = 9,
+    weight: PdfWeight = "normal", color: PdfColor = PDF_COLORS.ink): void {
+    this.drawText(value, x, y, width, size, weight, color, this.locale === "he" ? "left" : "right");
+  }
+
+  private drawText(value: string, x: number, y: number, width: number, size: number,
+    weight: PdfWeight, color: PdfColor, align: "left" | "right", rtl?: boolean): void {
     const text = cleanPdfText(value);
     this.font(size, weight, color);
     const textWidth = this.document.getTextWidth(text);
     if (textWidth > width) this.document.setFontSize(size * width / textWidth);
-    this.document.text(text, x + width, y, {
-      align: "right",
-      isInputVisual: false, isOutputVisual: true, isInputRtl: isRtl(text), isOutputRtl: false,
+    // Content direction controls bidi only. A Hebrew customer in an English quote still
+    // begins at the left edge of the customer block; mixed English/numbers are not reversed.
+    this.document.text(text, this.blockX(x, width) + (align === "right" ? width : 0), y, {
+      align,
+      isInputVisual: false, isOutputVisual: true, isInputRtl: rtl ?? isRtl(text), isOutputRtl: false,
+      isSymmetricSwapping: true,
     });
   }
 
@@ -77,27 +98,28 @@ export class QuotePdfLayout {
   }
 
   logoAt(x: number, y: number, width: number): void {
-    this.document.addImage(this.logo, "PNG", x, y, width, width * 300 / 800, "logi-logo", "FAST");
+    this.document.addImage(this.logo, "PNG", this.blockX(x, width), y, width, width * 300 / 800, "logi-logo", "FAST");
   }
 
   rule(y = this.y, x = PDF_PAGE.left, width = PDF_PAGE.width, accent = false): void {
     this.document.setDrawColor(...(accent ? PDF_COLORS.accent : PDF_COLORS.line));
     this.document.setLineWidth(accent ? 0.55 : 0.2);
-    this.document.line(x, y, x + width, y);
+    const start = this.blockX(x, width);
+    this.document.line(start, y, start + width, y);
   }
 
   fill(x: number, y: number, width: number, height: number, color = PDF_COLORS.soft): void {
     this.document.setFillColor(...color);
-    this.document.rect(x, y, width, height, "F");
+    this.document.rect(this.blockX(x, width), y, width, height, "F");
   }
 
   ensureSpace(height: number): boolean {
     if (this.y + height <= PDF_PAGE.bottom) return false;
     this.document.addPage();
     this.logoAt(PDF_PAGE.left - 0.5, 12, 34);
-    this.right("SOFTWARE LICENSE QUOTATION", 97, 17, 95, 8, "bold");
+    this.end(this.t("SOFTWARE LICENSE QUOTATION"), 97, 17, 95, 8, "bold");
     const references = this.wrap(this.reference, 85, 7.5);
-    references.forEach((line, index) => this.right(line, 107, 23 + index * 4, 85, 7.5, "normal", PDF_COLORS.muted));
+    references.forEach((line, index) => this.end(line, 107, 23 + index * 4, 85, 7.5, "normal", PDF_COLORS.muted));
     this.y = Math.max(34, 29 + references.length * 4);
     this.rule(this.y - 4);
     return true;
@@ -105,16 +127,21 @@ export class QuotePdfLayout {
 
   paragraph(value: string, size = 9, color = PDF_COLORS.ink): void {
     const height = size * 0.3528 * 1.5;
-    for (const line of this.wrap(value, PDF_PAGE.width, size)) {
-      this.ensureSpace(height);
-      this.text(line, PDF_PAGE.left, this.y, PDF_PAGE.width, size, "normal", color);
-      this.y += height;
+    for (const paragraph of cleanPdfText(value).split("\n")) {
+      const rtl = isRtl(paragraph);
+      for (const line of this.wrap(paragraph, PDF_PAGE.width, size)) {
+        this.ensureSpace(height);
+        // Wrapping beside an English name must not change the paragraph's bidi base.
+        this.drawText(line, PDF_PAGE.left, this.y, PDF_PAGE.width, size, "normal", color,
+          this.locale === "he" ? "right" : "left", rtl);
+        this.y += height;
+      }
     }
   }
 
   label(value: string): void {
     this.ensureSpace(13);
-    this.text(value.toUpperCase(), PDF_PAGE.left, this.y, PDF_PAGE.width, 7.5, "bold", PDF_COLORS.muted);
+    this.text(this.t(value).toUpperCase(), PDF_PAGE.left, this.y, PDF_PAGE.width, 7.5, "bold", PDF_COLORS.muted);
     this.y += 7;
   }
 
@@ -125,7 +152,7 @@ export class QuotePdfLayout {
       this.rule(282);
       this.text("Logi", PDF_PAGE.left, 288, 12, 8, "bold");
       this.text("www.logi-ltd.co.il", 33, 288, 70, 7.5, "normal", PDF_COLORS.muted);
-      this.right(`Page ${page} of ${count}`, 147, 288, 45, 7.5, "normal", PDF_COLORS.muted);
+      this.end(this.t("Page {page} of {count}", { page, count }), 147, 288, 45, 7.5, "normal", PDF_COLORS.muted);
     }
   }
 }

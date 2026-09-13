@@ -2,7 +2,8 @@
 
 .rail {
   background: var(--color-rail);
-  border-right: 1px solid var(--color-border);
+  backdrop-filter: var(--theme-panel-filter);
+  border-inline-end: 1px solid var(--color-border);
   display: flex;
   flex-direction: column;
   gap: 4px;
@@ -41,14 +42,14 @@
   background: var(--color-accent-soft);
   color: var(--color-accent);
 
-  &::before { background: var(--color-accent); border-radius: 2px; content: ""; height: 20px; left: -4px; position: absolute; width: 3px; }
+  &::before { background: var(--color-accent); border-radius: 2px; content: ""; height: 20px; inset-inline-start: -4px; position: absolute; width: 3px; }
 }
 
 .add { border-color: var(--color-border); margin-top: 8px; min-height: 44px; }
 
 @media (max-width: 700px) {
-  .rail { border-bottom: 1px solid var(--color-border); border-right: 0; flex-direction: row; overflow-x: auto; overflow-y: hidden; padding: 6px 10px; }
+  .rail { border-bottom: 1px solid var(--color-border); border-inline-end: 0; flex-direction: row; overflow-x: auto; overflow-y: hidden; padding: 6px 10px; }
   .product, .add { flex-basis: 52px; width: 52px; }
-  .selected::before { bottom: 0; height: 3px; left: 16px; width: 20px; }
+  .selected::before { bottom: 0; height: 3px; inset-inline-start: 16px; width: 20px; }
   .add { margin: 0 0 0 6px; }
 }

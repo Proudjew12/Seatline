@@ -1,11 +1,11 @@
-# SalePrice
+# Seatline
 
-SalePrice builds customer quotes for software licenses using your own USD prices. Its React + Vite
+Seatline builds customer quotes for software licenses using your own USD prices. Its React + Vite
 frontend runs independently on GitHub Pages, including PDF export. The separate FastAPI backend
 provides the operational health API and remains available for future server features.
 
 ```text
-SalePrice/
+Seatline/
 ├── frontend/   # standalone browser application
 ├── backend/    # standalone HTTP API
 ├── scripts/    # setup, launch, cleanup, checks/, and tests/
@@ -20,18 +20,41 @@ For sellers quoting licenses from multiple companies:
 
 1. In **Normal Mode**, choose a product from the compact left rail and search its license list.
    Switch to **Edit Mode** to add, rename, or remove products and licenses, including the initial
-   entries. Product short labels can also be changed.
+   entries. Open the top-right gear to switch modes. **Add product** asks only for a product name,
+   optional short label and product icon, then creates an empty product. Use **Add license** afterward.
+   Names suggest a matching icon until you make a manual choice; the searchable icon library includes
+   software brands and general symbols. Edit product can change the name, short label, icon and profit
+   default. Icons use the current theme's foreground colors in the picker and product rail.
+   Pointer dragging is disabled in Edit Mode; deliberate keyboard addition remains available.
 2. Drag a license into the quote. Clicking or tapping a card does not add it.
    New items start with **Annual — Pay Monthly**;
    choose **Monthly — Pay Monthly** or **Annual — Pay Yearly** on the order item when needed.
    On a tablet, move a card to drag immediately, with no long press. Swipe the space beside the cards
    to scroll the catalog. Keyboard users can focus a card and press Enter or Space.
-3. Enter quantities, customer, quote reference, and optional notes. Each license can have a saved
+3. Enter quantities, customer, **Sales Proposal** number, and optional notes. Each license can have a saved
    default USD price for each billing schedule; catalog cards show all three prices together,
    with monthly or yearly units. Adding a license fills in the matching price. Override that
-   price in the order whenever needed.
+   base price in the order whenever needed. In **Edit product**, set a **Profit rate** for each product
+   (0% initially). Each license can inherit that rate or override it; a blank license rate inherits,
+   while an explicit 0% overrides the product. These defaults apply when a new quote line is added,
+   and its rate remains individually editable. Existing lines keep their rates after catalog or
+   billing changes. The private one-line calculation shows profit per license, such as
+   `$22.00 × 32% = $7.04`, with the earned amount directly beside the formula. Customer totals and PDFs use the
+   final selling price ($29.04 in this example), without revealing the profit calculation.
 4. Review monthly payments, yearly payments, the amount due at the start, and a 12-month
    estimate; download the customer PDF using the button at the bottom.
+5. Open **Settings → Theme** to browse eighteen visual previews grouped under **Default**,
+   **Color themes**, and **Background themes**, and apply a theme immediately.
+   **Default** retains the original Light/Dark appearance options. **Studio**, **Midnight**,
+   **Dune**, **Forest**, and **Plum** each have a fixed appearance. **Aurora**, **Solstice**, and
+   **Orbit** add original background artwork, gradients and frosted panels.
+   **Harbor**, **Meadow**, and **Alpine** combine original coastal, meadow and mountain artwork
+   with restrained neutral controls. **Aurora Rose**, **Aurora Mint**, **Aurora Ice**,
+   **Aurora Peach**, **Aurora Dusk**, and **Aurora Ocean** add six distinct silk and glass variants.
+   All twelve background themes have fixed appearances. Every theme fills the browser area
+   edge to edge, without an outer margin or rounded workspace frame.
+   Returning to Default restores the last Light/Dark choice.
+   Theme changes preserve the current quote and catalog.
 
 The initial catalog includes Microsoft 365, Google Workspace, Adobe Acrobat, and Zoom Workplace.
 It also includes Acronis with one unpriced **Example license**, a demonstration entry rather than
@@ -48,7 +71,10 @@ the matching saved catalog price, or clears the price for manual entry when none
 Existing drafts without a catalog
 license link also clear their price on a billing change. Catalog edits do not reprice existing lines.
 Quantities are whole numbers from 1–9,999; prices allow zero through $1,000,000 with up to two decimal
-places. Calculations use integer cents. Quotes support up to 100 lines and exclude taxes. The
+places. Profit rate is an addition to the base price and accepts 0–100% with up to two decimal places
+at product, license and quote-line level. The customer unit price
+is rounded to the nearest cent before multiplying by quantity, so printed unit prices and totals
+agree. Calculations use integer cents and percentages use integer basis points. Quotes support up to 100 lines and exclude taxes. The
 12-month estimate assumes monthly subscriptions continue for all 12 months.
 
 One active draft is saved in this browser on this device. There are no accounts, cross-device sync,
@@ -61,9 +87,14 @@ and custom catalog entries; a new domain has separate browser storage. Customer 
 stay in the browser. PDF generation uses locally bundled code and fonts without sending quote data
 to a server.
 
-Acceptance checks cover desktop mouse drag, immediate tablet drag, ignored clicks/taps, keyboard addition,
+Acceptance checks cover disabled dragging in Edit Mode, desktop mouse drag, immediate tablet drag,
+ignored clicks/taps, keyboard addition, product/license profit inheritance and explicit overrides,
+per-line profit rounding and customer-only PDF amounts, compact header/card controls and docked Notes,
+Hebrew/English layout and PDF text/coordinates/pagination, theme gallery selection and persistence,
+Default-only Light/Dark controls, nested-dialog keyboard focus, readable narrow-screen previews,
 all three billing schedules, invalid input, local persistence, PDF download and retry, responsive
-layout, saved text-size preferences, catalog editing/default prices/migration, and production hosting
+layout, saved text-size preferences, empty-product creation, searchable/persistent icons, catalog
+editing/default prices/migration, and production hosting
 from a repository subpath without an API.
 
 ## Start
@@ -93,7 +124,7 @@ to update. API documentation and the schema endpoint are disabled in production.
 | Command | Purpose |
 | --- | --- |
 | `npm run setup` | Install both applications and create missing local env files. |
-| `npm run dev` | Start both applications with coordinated shutdown. |
+| `npm run dev` | Start both applications with coordinated shutdown (`-- --frontend-port PORT` selects another frontend port). |
 | `npm run check` | Run structure guards, lint/types/build, and all automated tests. |
 | `npm run check:frontend` | Run frontend ESLint, TypeScript checks, and the production build. |
 | `npm run check:backend` | Run backend dependency integrity, Ruff, mypy, and pytest. |
@@ -104,7 +135,7 @@ to update. API documentation and the schema endpoint are disabled in production.
 | `npm run clean -- --dry-run` | Preview the exact generated paths to remove. |
 
 The full gate can also be run with `python3 scripts/check.py`. Repository guards include dependency
-boundaries, SCSS conventions, and deployment configuration. The HTTP smoke path checks the frontend
+boundaries, SCSS conventions, and deployment configuration. The HTTP smoke path uses free local ports and checks the frontend
 proxy and request-ID propagation; exercise changed UI in a browser as well. CI runs checks, smoke
 validation, and separate dependency vulnerability audits.
 
@@ -171,16 +202,70 @@ and tablet requirement without a native app or Expo. Revisit persistence and API
 shared accounts or durable quote history become requirements.
 
 The interface uses soft gray surfaces, navy text, blue accents, and a compact product rail and license
-list. Order cards fit three per row on wide screens and wrap into fewer columns on smaller screens
-or at larger text sizes. Compact fields retain larger touch targets on tablets. Each order card
-shows the bold product name followed by the license name on one line, with a **Price** field and the
+list. Narrower order cards fit four per row at a 1867px desktop width, three at 1440px and two at
+1180px at the default text size, adapting to fewer columns as text grows. Empty grid tracks retain
+the same card width when an order has only one item. Compact fields retain larger touch targets
+on tablets. Each card separates a smaller product caption from its prominent license title,
+with evenly spaced quantity, price and profit controls and the
 billing period beside the line total. Catalog cards compare Monthly, Annual · Monthly, and
 Annual · Yearly rates, distinguishing unset prices from zero. The drag instruction appears only
 while the order has no licenses.
-The header displays the SalePrice logo as plain branding, a percentage-only text-size selector
-from 50% to 150% in 10% steps, and a Normal/Edit Mode button. Source Sans 3 from Google Fonts is bundled locally under
-the SIL Open Font License in `frontend/src/styles/fonts/`; unsupported scripts use the system font.
-The selector scales content text while preserving touch targets and readable header controls; it
+Customer, Sales Proposal and New Order share a desktop row; New Order is a text-only button.
+The row adapts on narrow screens. Billing selectors fit the currently selected text; quantity,
+price, profit, customer and proposal fields grow and shrink with their values. Small minimum sizes
+keep empty fields editable, while maximum widths prevent page overflow. They use native
+[content-based field sizing](https://developer.chrome.com/docs/css-ui/css-field-sizing), with
+character-sized input and native select fallbacks. The line subtotal retains its amount and billing
+period without a visible "Line total" caption.
+The private profit strip centers the formula and result together with a small fixed gap, keeping
+the calculation on one line, with compact typography for unusually long amounts on
+narrow cards. Notes stay docked immediately above payments while desktop/tablet quote cards scroll;
+on narrow screens, notes remain after the cards and before the summary in normal page flow.
+The website summary omits the redundant USD/tax caption; PDF terms and USD formatting remain explicit.
+The header displays only the Seatline name at the top left, with a settings gear at the top right.
+Theme previews use the same wordmark-only header. The accessible settings
+dialog contains the Edit Mode switch, text size from 50% to 150% in 10% steps, a Theme row with a
+gallery button, and English/Hebrew language. Light/Dark appearance is available only for Default.
+The gallery separates Default, five Color themes and twelve Background themes with translated,
+accessible section headings. Default has a wide preview row on desktop; theme grids use three,
+two or one columns as space allows. The gallery offers Studio (white/indigo), Midnight (navy/teal), Dune (sand/terracotta), Forest
+(sage/evergreen), and Plum (aubergine/mauve), plus Aurora (luminous lavender/cyan silk), Solstice
+(peach sunset and sculpted dunes), Orbit (violet planet and orbital light), Harbor (charcoal and
+teal coastal dusk), Meadow (neutral white and green hills), and Alpine (slate and blue mountain
+lake). Aurora's six additional variants are Rose (blush/champagne), Mint (mint/seafoam),
+Ice (silver/glacier blue), Peach (apricot/honey), Dusk (amethyst/orchid), and Ocean (deep teal/aqua).
+The twelve background themes use bundled WebP artwork and translucent panels, with opaque form
+controls for legibility. All workspaces and supporting routes extend to the viewport edges;
+internal spacing keeps controls comfortable to use. Previews mirror this edge-to-edge layout.
+Artwork also appears on supporting routes, while PDF print styling stays independent. Default
+and Color themes reset artwork to none and retain their original palettes. No remote image service is
+needed at runtime; Vite bundles the assets with deployment-safe URLs. Scenic artwork and theme
+names are original to Seatline; no vendor wallpapers are bundled with these themes.
+Catalog symbols are separate local SVG assets under `frontend/src/features/catalog/icons/`, with
+sources and licensing documented there. They identify catalog products without implying affiliation.
+Their CSS masks use theme colors, keep consistent dimensions and make no external image requests.
+Brand and product names stay in English; icon search also supports aliases and translated general
+symbols. Shared artwork appears once in the gallery: Google / Workspace and Microsoft / Windows
+each have one searchable choice. Previous icon IDs still resolve to their matching artwork.
+Unknown saved icon identifiers fall back to the generic symbol. Older catalogs acquire
+appropriate icons while retaining their saved products, licenses, prices and profit defaults.
+These themes set colors,
+borders, radii, and shadows consistently across the workspace; gallery previews use the same
+scoped CSS tokens and artwork. Selecting a
+card applies and saves it immediately; Done or Escape returns to Settings and focuses the gallery
+button. Escape from Settings returns focus to the gear. On narrow screens, gallery cards scroll
+inside the dialog while its title and Done button remain visible. Theme selection and the saved
+Default Light/Dark preference are independent, so an existing dark preference is retained.
+Older saved settings without a theme selection load Default; unsupported selections safely fall
+back to Default. Mode starts in Normal on each visit; theme, appearance, language and size are saved
+independently of the quote.
+Hebrew mirrors the interface with RTL layout and translates controls, validation and PDF labels.
+Product and license names stay in English using isolated LTR spans; prices and references keep
+their numeric order. English retains the LTR layout. Source Sans 3 from Google Fonts is bundled locally under
+the SIL Open Font License in `frontend/src/styles/fonts/`. Small Hebrew-only WOFF2 subsets of the
+existing DejaVu fonts are bundled there too; their original license is in `frontend/public/fonts/`.
+Unsupported scripts use the system font.
+The text-size selector scales content text while preserving touch targets and readable header controls; it
 does not change browser zoom or the PDF's print size. Its setting is saved separately from quote
 data on this device. If browser storage is unavailable, changes still apply for the current visit.
 
@@ -191,13 +276,21 @@ where supported, with a standard native selector as the fallback.
 **New Order** retains the confirmation before clearing an edited draft. Catalog management controls
 are shown only in Edit Mode, and each visit starts in Normal Mode. Catalog storage uses a version 2
 snapshot so removed initial entries stay removed. Existing version 1 custom entries are migrated,
-with the old storage entry retained for recovery. Customer PDFs use Logi branding, an original
+with the old storage entry retained for recovery. The Seatline rename reads previous-brand draft,
+catalog and display keys and writes new `seatline.*` keys, leaving the old values intact for
+recovery. Only those compatibility keys and migration tests retain the previous name.
+Customer PDFs use Logi branding, an original
 transparent logo, embedded regular/bold fonts, a license table with repeated headers, a payment
 summary, and numbered pages. Long names and notes wrap across pages, and monthly versus annual
-prices remain explicit. PDF filenames use `Logi-<reference>.pdf`; the app itself remains SalePrice.
+prices remain explicit. The document language follows settings; its print theme stays light.
+Hebrew customer names in English documents remain aligned with the left customer block. Hebrew
+documents mirror the sections and columns while preserving English product/license names and
+USD amounts. Markup percentages, base prices, and company uplift are never written to the PDF.
+PDF filenames use `Logi-<reference>.pdf`; the app itself remains Seatline.
 
 ## GitHub Pages
 
+The repository is `Proudjew12/Seatline`; the default project-site path is `/Seatline/`.
 The existing `.github/workflows/deploy-pages.yml` deploys `frontend/dist` on pushes to `main`.
 Select **Settings → Pages → Source: GitHub Actions** in the repository. Relative Vite assets and hash
 routing support repository subpaths and custom domains without server-side SPA fallback; routes

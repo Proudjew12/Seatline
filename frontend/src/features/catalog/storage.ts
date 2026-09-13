@@ -4,7 +4,9 @@ import { CATALOG_LIMITS } from "./types";
 import type { CatalogSnapshot } from "./types";
 import { copyCatalog, isCatalogSnapshot } from "./validation";
 
-export const CATALOG_STORAGE_KEY = "saleprice.catalog.v2";
+export const CATALOG_STORAGE_KEY = "seatline.catalog.v2";
+// Migration-only identifier: keep the previous app's saved catalog recoverable.
+const PREVIOUS_CATALOG_STORAGE_KEY = "saleprice.catalog.v2";
 const UNSAVED_WARNING = "Your catalog is available for this visit, but could not be saved on this device.";
 
 interface CatalogState {
@@ -34,14 +36,18 @@ function applyAcronisExample(snapshot: CatalogSnapshot): CatalogState {
 
 export function loadCatalog(): CatalogState {
   try {
-    const stored = localStorage.getItem(CATALOG_STORAGE_KEY);
+    const current = localStorage.getItem(CATALOG_STORAGE_KEY);
+    const stored = current ?? localStorage.getItem(PREVIOUS_CATALOG_STORAGE_KEY);
     if (stored !== null) {
       if (stored.length <= CATALOG_LIMITS.storedCharacters) {
         const parsed: unknown = JSON.parse(stored);
         if (isCatalogSnapshot(parsed)) {
-          return parsed.seedRevision === 1
-            ? { catalog: copyCatalog(parsed.products), warning: null }
-            : applyAcronisExample(parsed);
+          if (parsed.seedRevision !== 1) return applyAcronisExample(parsed);
+          const catalog = copyCatalog(parsed.products);
+          const needsDefaults = parsed.products.some((product, index) =>
+            product.markupPercent === undefined || product.icon !== catalog.products[index]?.icon);
+          const saved = (current !== null && !needsDefaults) || saveCatalog(catalog);
+          return { catalog, warning: saved ? null : UNSAVED_WARNING };
         }
       }
       return fallbackCatalog("Saved products could not be read. The default catalog is available.");

@@ -8,11 +8,14 @@
   color: var(--color-text);
   cursor: pointer;
   font: inherit;
+  field-sizing: content;
   line-height: 1.35;
   min-height: max(32px, 2.3rem);
   min-width: 0;
+  max-width: 100%;
   padding: 4px;
-  width: 100%;
+  width: auto;
+  justify-self: start;
 
   &:hover { border-color: var(--color-border-strong); }
   &:focus-visible { @include mixins.focus-ring; }
@@ -41,27 +44,29 @@
       max-height: min(320px, 60dvh);
       max-width: calc(100vw - 24px);
       padding: 4px;
-      width: anchor-size(width);
+      min-width: anchor-size(width);
+      width: max-content;
     }
 
     option {
       align-items: center;
       border-radius: var(--radius-control);
       cursor: pointer;
-      gap: 10px;
+      gap: 6px;
       line-height: 1.45;
-      min-height: 44px;
-      padding: 10px 12px;
+      min-height: 32px;
+      padding: 6px 8px;
       white-space: normal;
 
       &:checked { background: var(--color-accent-soft); color: var(--color-accent-strong); font-weight: 600; }
       &:hover { background: var(--color-background); }
       &:focus-visible { @include mixins.focus-ring; outline-offset: -2px; }
-      &::checkmark { color: var(--color-accent); margin-left: auto; order: 1; }
+      &::checkmark { color: var(--color-accent); margin-inline-start: auto; order: 1; }
     }
   }
 }
 
 @media (any-pointer: coarse) {
   .select { min-height: max(44px, 2.3rem); }
+  .select option { min-height: 44px; padding-block: 8px; }
 }

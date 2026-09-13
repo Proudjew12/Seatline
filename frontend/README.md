@@ -1,10 +1,44 @@
-# SalePrice frontend
+# Seatline frontend
 
-SalePrice's React, Vite, TypeScript, and SCSS Modules application builds customer software-license
+Seatline's React, Vite, TypeScript, and SCSS Modules application builds customer software-license
 quotes. Choose or create catalog entries, drag to add licenses, enter your own USD prices,
-and export a PDF. The three billing schedules distinguish monthly payments from yearly payments
+and export a PDF. Add product asks only for its name, short label and icon, then creates an empty
+product. Add its licenses with Add license; product profit defaults remain in Edit product.
+The searchable, locally bundled software-icon library suggests symbols from product names, supports
+manual choices and preserves selections after reload. Icons share theme colors and dimensions across
+the picker and product rail. Shared brand artwork appears once, with Google / Workspace and
+Microsoft / Windows searchable under either name; older saved icon choices continue to resolve.
+Sources and licensing are documented in `src/features/catalog/icons/`.
+The top-left header and theme previews show only the Seatline name.
+Each product has a default Profit rate, with optional per-license overrides.
+A blank license rate inherits its product, while zero is an explicit override. New quote lines
+copy the effective rate and remain independently editable; existing lines retain their rates.
+The card shows one private base-price × percentage = profit row; customer PDFs contain only final
+selling prices. Customer, Sales Proposal and New Order share a desktop row. Billing controls fit
+their selected text, and numeric/customer/proposal inputs size around their contents, with bounded
+widths and editable minimums. The subtotal shows its amount and billing period without a caption.
+Notes dock above payments while cards scroll.
+Quote cards use narrower columns, a separate product caption and license title, evenly spaced
+compact inputs, and a centered formula/result group. More cards fit per desktop row without
+stretching a single item across the workspace; large text and narrow screens reduce the columns.
+On narrow screens Notes follow the cards before the payment summary. The settings gear contains Edit Mode, text size, a Theme gallery,
+and Light/Dark appearance for the Default theme. Studio, Midnight, Dune, Forest and Plum each have
+a fixed appearance. Aurora, Solstice and Orbit add generated background artwork, gradients and
+frosted panels. Harbor, Meadow and Alpine add original scenic backgrounds with neutral
+productivity surfaces. Aurora Rose, Mint, Ice, Peach, Dusk and Ocean extend the silk and glass
+family with six original backgrounds. All twelve background themes have fixed appearances.
+Every theme fills the viewport without an outer margin or rounded workspace corners. The gallery
+groups eighteen previews under Default, Color themes and Background themes, including Hebrew
+section headings and an edge-to-edge miniature of each workspace.
+Their local WebP assets and generation prompts live in `src/styles/theme-art/`;
+`_artwork-themes.scss` owns the initial abstract themes, `_scenic-themes.scss` owns the scenic
+themes, and `_aurora-variants.scss` owns the six Aurora variants.
+Theme, Default
+appearance, text size, and English/Hebrew language are saved
+independently. Hebrew uses RTL throughout the interface and PDF, while product/license names
+remain English. The three billing schedules distinguish monthly payments from yearly payments
 made in full at the start of each year, and catalog cards show all three saved prices together.
-Clicking or tapping a card does not add it; keyboard users can focus a card and press Enter or Space.
+Pointer dragging is disabled in Edit Mode. Clicking or tapping a card does not add it; keyboard users can focus a card and press Enter or Space.
 One draft and custom catalog
 entries are saved in this browser on this device. The drag instruction appears only while the
 order has no licenses.
@@ -123,7 +157,9 @@ transport/configuration utilities belong in `src/shared`. Reusable pure function
 purpose-specific `.ts` modules under `src/shared/utils`; use `.tsx` only for files that render JSX.
 Create domain-named feature folders and add only the files their behavior requires. The existing
 `catalog` feature owns products and licenses; `quotes` owns draft editing, validation, integer-cent
-totals, storage, and PDF export. `health` owns the operational API connection check. Heavy PDF code
+totals, storage, and PDF export. `display` owns settings, theme previews/gallery, and saved theme/appearance/language/size. `shared/i18n` owns
+the bilingual message catalogs and locale context, shared with PDF generation. No translation
+service receives customer data. `health` owns the operational API connection check. Heavy PDF code
 loads only on export; its regular/bold fonts and license are in `public/fonts/`. Customer quotations
 use the original Logi logo in `public/branding/`, with the source recorded beside the asset. The
 PDF has a formal item table, payment summary, repeated headers, and page numbers; it bundles its

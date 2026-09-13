@@ -1,6 +1,6 @@
 import { readFile } from "node:fs/promises";
 
-import { expect, test } from "./fixtures";
+import { expect, test, setEditMode } from "./fixtures";
 
 test("creates, saves, and exports an order when randomUUID is unavailable", async ({ page }, testInfo) => {
   await page.addInitScript(() => {
@@ -16,13 +16,17 @@ test("creates, saves, and exports an order when randomUUID is unavailable", asyn
   const builtin = page.getByRole("group", { name: "Business Basic", exact: true });
   await builtin.getByRole("textbox", { name: "Price", exact: true }).fill("10");
 
-  await page.getByRole("button", { name: "Normal Mode", exact: true }).click();
+  await setEditMode(page, true);
   await page.getByRole("button", { name: "Add product", exact: true }).click();
   const productDialog = page.getByRole("dialog", { name: "Add product", exact: true });
   await productDialog.getByLabel("Product name", { exact: true }).fill("LAN Tools");
-  await productDialog.getByLabel("First license name", { exact: true }).fill("Support seat");
-  await productDialog.getByLabel("Annual paid monthly price", { exact: true }).fill("7.50");
   await productDialog.getByRole("button", { name: "Add product", exact: true }).click();
+  await expect(page.getByText("No licenses yet", { exact: true })).toBeVisible();
+  await page.getByRole("button", { name: "Add license", exact: true }).click();
+  const firstLicense = page.getByRole("dialog", { name: "Add license", exact: true });
+  await firstLicense.getByLabel("License name", { exact: true }).fill("Support seat");
+  await firstLicense.getByLabel("Annual paid monthly price", { exact: true }).fill("7.50");
+  await firstLicense.getByRole("button", { name: "Add license", exact: true }).click();
   await page.getByRole("button", { name: "Add Support seat to quote", exact: true }).press("Enter");
   await page.getByRole("button", { name: "Add license", exact: true }).click();
   const licenseDialog = page.getByRole("dialog", { name: "Add license", exact: true });

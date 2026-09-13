@@ -1,6 +1,6 @@
-# SalePrice frontend instructions
+# Seatline frontend instructions
 
-These instructions apply inside the SalePrice `frontend/` application and refine the repository-level rules.
+These instructions apply inside the Seatline `frontend/` application and refine the repository-level rules.
 
 ## Independence
 

@@ -1,4 +1,4 @@
-# SalePrice backend instructions
+# Seatline backend instructions
 
 These instructions apply inside the standalone `backend/` application and refine the repository-level rules.
 

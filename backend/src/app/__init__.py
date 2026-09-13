@@ -1,1 +1,1 @@
-"""SalePrice API package."""
+"""Seatline API package."""

@@ -1,0 +1,169 @@
+// Six fixed palettes built around Aurora's luminous silk and glass surfaces.
+[data-theme="aurora-rose"],
+[data-theme="aurora-mint"],
+[data-theme="aurora-ice"],
+[data-theme="aurora-peach"],
+[data-theme="aurora-dusk"],
+[data-theme="aurora-ocean"] {
+  --theme-shell-surface: transparent;
+  --theme-panel-filter: blur(16px);
+  --theme-preview-height: 204px;
+  --radius-control: 8px;
+  --radius-card: 12px;
+  --radius-panel: 16px;
+  --shadow-control: 0 2px 5px rgb(22 27 44 / 5%);
+  --shadow-card: 0 5px 18px rgb(22 27 44 / 10%);
+  --shadow-panel: 0 20px 60px rgb(22 27 44 / 26%);
+  --shadow-header: 0 2px 12px rgb(22 27 44 / 4%);
+  --shadow-footer: 0 -4px 18px rgb(22 27 44 / 6%);
+}
+
+[data-theme="aurora-rose"] {
+  color-scheme: light;
+  --theme-background-image: url("./theme-art/aurora-rose.webp");
+  --theme-header-surface: rgb(255 246 250 / 92%);
+  --theme-quote-surface: rgb(255 244 249 / 82%);
+  --color-background: #f7e7ee;
+  --color-surface: #fffafd;
+  --color-rail: rgb(244 222 232 / 88%);
+  --color-catalog: rgb(255 243 248 / 90%);
+  --color-text: #452433;
+  --color-text-muted: #6b4858;
+  --color-border: #e0c3d0;
+  --color-border-strong: #a4798d;
+  --color-accent: #9e295a;
+  --color-accent-strong: #801e48;
+  --color-accent-contrast: #fff;
+  --color-accent-soft: #f5dce8;
+  --color-focus: #aa3264;
+  --color-success: #1b6345;
+  --color-danger: #9d203c;
+  --color-warning: #72480b;
+  --color-overlay: rgb(52 19 35 / 52%);
+  --gradient-action: linear-gradient(115deg, #9e295a, #ac355c);
+}
+
+[data-theme="aurora-mint"] {
+  color-scheme: light;
+  --theme-background-image: url("./theme-art/aurora-mint.webp");
+  --theme-header-surface: rgb(240 255 250 / 92%);
+  --theme-quote-surface: rgb(240 255 250 / 82%);
+  --color-background: #e1f2ec;
+  --color-surface: #fafffc;
+  --color-rail: rgb(213 239 228 / 88%);
+  --color-catalog: rgb(238 253 245 / 90%);
+  --color-text: #173c32;
+  --color-text-muted: #3d6257;
+  --color-border: #bddbce;
+  --color-border-strong: #779f8e;
+  --color-accent: #16644c;
+  --color-accent-strong: #0b4d38;
+  --color-accent-contrast: #fff;
+  --color-accent-soft: #d6eee2;
+  --color-focus: #186c52;
+  --color-success: #1b6345;
+  --color-danger: #9d203c;
+  --color-warning: #72480b;
+  --color-overlay: rgb(10 39 31 / 52%);
+  --gradient-action: linear-gradient(115deg, #16644c, #24725b);
+}
+
+[data-theme="aurora-ice"] {
+  color-scheme: light;
+  --theme-background-image: url("./theme-art/aurora-ice.webp");
+  --theme-header-surface: rgb(247 251 255 / 92%);
+  --theme-quote-surface: rgb(240 247 255 / 82%);
+  --color-background: #e3edfa;
+  --color-surface: #fbfdff;
+  --color-rail: rgb(217 231 251 / 88%);
+  --color-catalog: rgb(241 247 255 / 90%);
+  --color-text: #1d3559;
+  --color-text-muted: #425c7b;
+  --color-border: #c0d2ea;
+  --color-border-strong: #7a96b9;
+  --color-accent: #2258ad;
+  --color-accent-strong: #19438a;
+  --color-accent-contrast: #fff;
+  --color-accent-soft: #dceafa;
+  --color-focus: #2a64bb;
+  --color-success: #1b6345;
+  --color-danger: #9d203c;
+  --color-warning: #72480b;
+  --color-overlay: rgb(14 33 61 / 52%);
+  --gradient-action: linear-gradient(115deg, #2258ad, #346aba);
+}
+
+[data-theme="aurora-peach"] {
+  color-scheme: light;
+  --theme-background-image: url("./theme-art/aurora-peach.webp");
+  --theme-header-surface: rgb(255 248 241 / 92%);
+  --theme-quote-surface: rgb(255 244 233 / 82%);
+  --color-background: #f9e8dc;
+  --color-surface: #fffaf5;
+  --color-rail: rgb(248 222 204 / 88%);
+  --color-catalog: rgb(255 244 232 / 90%);
+  --color-text: #4b2c22;
+  --color-text-muted: #6c4c3c;
+  --color-border: #dfc5b4;
+  --color-border-strong: #a58268;
+  --color-accent: #9b411f;
+  --color-accent-strong: #7c3118;
+  --color-accent-contrast: #fff;
+  --color-accent-soft: #f8e0cd;
+  --color-focus: #a54b28;
+  --color-success: #1b6345;
+  --color-danger: #9d203c;
+  --color-warning: #72480b;
+  --color-overlay: rgb(57 31 18 / 52%);
+  --gradient-action: linear-gradient(115deg, #9b411f, #a6532d);
+}
+
+[data-theme="aurora-dusk"] {
+  color-scheme: dark;
+  --theme-background-image: url("./theme-art/aurora-dusk.webp");
+  --theme-header-surface: rgb(37 22 64 / 90%);
+  --theme-quote-surface: rgb(27 17 51 / 80%);
+  --color-background: #20152f;
+  --color-surface: #34244e;
+  --color-rail: rgb(35 22 58 / 90%);
+  --color-catalog: rgb(43 28 71 / 92%);
+  --color-text: #f8efff;
+  --color-text-muted: #d3c2e8;
+  --color-border: #65507f;
+  --color-border-strong: #a78abf;
+  --color-accent: #e1b6ff;
+  --color-accent-strong: #efd2ff;
+  --color-accent-contrast: #301341;
+  --color-accent-soft: #503163;
+  --color-focus: #ebc6ff;
+  --color-success: #a3dfbb;
+  --color-danger: #ffc2d2;
+  --color-warning: #f4d59d;
+  --color-overlay: rgb(13 5 27 / 74%);
+  --gradient-action: linear-gradient(115deg, #d3b4ff, #efb8ed);
+}
+
+[data-theme="aurora-ocean"] {
+  color-scheme: dark;
+  --theme-background-image: url("./theme-art/aurora-ocean.webp");
+  --theme-header-surface: rgb(10 39 57 / 90%);
+  --theme-quote-surface: rgb(7 30 47 / 80%);
+  --color-background: #0a2234;
+  --color-surface: #14384e;
+  --color-rail: rgb(9 34 49 / 90%);
+  --color-catalog: rgb(15 45 64 / 92%);
+  --color-text: #edfbff;
+  --color-text-muted: #b9d7e1;
+  --color-border: #426a80;
+  --color-border-strong: #7aaabd;
+  --color-accent: #89e4ed;
+  --color-accent-strong: #b5f5f9;
+  --color-accent-contrast: #0b2c3e;
+  --color-accent-soft: #1d5268;
+  --color-focus: #a5f0f7;
+  --color-success: #a3dfbb;
+  --color-danger: #ffc2d2;
+  --color-warning: #f4d59d;
+  --color-overlay: rgb(3 17 29 / 74%);
+  --gradient-action: linear-gradient(115deg, #89e4ed, #a1eff0);
+}

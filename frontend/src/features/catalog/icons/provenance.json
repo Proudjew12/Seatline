@@ -1,0 +1,534 @@
+{
+  "microsoftoffice": {
+    "download": "https://raw.githubusercontent.com/simple-icons/simple-icons/7.21.0/icons/microsoftoffice.svg",
+    "sha256": "94efe890e59f4db3ffd79fa0811e30627a9fdbca3d34207abe951456dc22749c",
+    "upstream": {
+      "title": "Microsoft Office",
+      "hex": "D83B01",
+      "source": "https://developer.microsoft.com/en-us/microsoft-365"
+    }
+  },
+  "microsoft": {
+    "download": "https://raw.githubusercontent.com/simple-icons/simple-icons/11.15.0/icons/microsoft.svg",
+    "sha256": "f0fdaef83e59660c4da6e3988ca41fbe907e420cb86b48a94746caefec015bf9",
+    "upstream": {
+      "title": "Microsoft",
+      "hex": "5E5E5E",
+      "source": "https://developer.microsoft.com",
+      "guidelines": "https://www.microsoft.com/en-us/legal/intellectualproperty/trademarks"
+    }
+  },
+  "microsoftazure": {
+    "download": "https://raw.githubusercontent.com/simple-icons/simple-icons/11.15.0/icons/microsoftazure.svg",
+    "sha256": "666f3d9597b7272e61e137bcdc88c99d689d2de7530f4a0a9a56d74d919f51c9",
+    "upstream": {
+      "title": "Microsoft Azure",
+      "hex": "0078D4",
+      "source": "https://github.com/microsoft/vscode-azureresourcegroups/blob/0a06362e82170fd7f8dc2496286825b1a69cc42b/resources/azure.svg",
+      "guidelines": "https://www.microsoft.com/en-us/legal/intellectualproperty/trademarks"
+    }
+  },
+  "microsoftteams": {
+    "download": "https://raw.githubusercontent.com/simple-icons/simple-icons/11.15.0/icons/microsoftteams.svg",
+    "sha256": "9c509b9aea846e4a773d59df7fe3d29843e9e05c3579ce167d1e7e5ba14be1d1",
+    "upstream": {
+      "title": "Microsoft Teams",
+      "hex": "6264A7",
+      "source": "https://developer.microsoft.com/en-us/fluentui#/styles/web/colors/products",
+      "guidelines": "https://www.microsoft.com/en-us/legal/intellectualproperty/trademarks",
+      "license": {
+        "type": "custom",
+        "url": "https://aka.ms/fluentui-assets-license"
+      }
+    }
+  },
+  "microsoftoutlook": {
+    "download": "https://raw.githubusercontent.com/simple-icons/simple-icons/11.15.0/icons/microsoftoutlook.svg",
+    "sha256": "f2fcdd8cbd3be6855935de2ab3fb7010aef607963fb157c64ac308e693a18f87",
+    "upstream": {
+      "title": "Microsoft Outlook",
+      "hex": "0078D4",
+      "source": "https://developer.microsoft.com/en-us/outlook/docs",
+      "guidelines": "https://www.microsoft.com/en-us/legal/intellectualproperty/trademarks"
+    }
+  },
+  "microsoftonedrive": {
+    "download": "https://raw.githubusercontent.com/simple-icons/simple-icons/11.15.0/icons/microsoftonedrive.svg",
+    "sha256": "43320b9321c3face2313ecfbbd741e9bc17b67acfcef488546fac5e09e729965",
+    "upstream": {
+      "title": "Microsoft OneDrive",
+      "hex": "0078D4",
+      "source": "https://developer.microsoft.com/en-us/fluentui#/styles/web/colors/products",
+      "guidelines": "https://www.microsoft.com/en-us/legal/intellectualproperty/trademarks",
+      "license": {
+        "type": "custom",
+        "url": "https://aka.ms/fluentui-assets-license"
+      }
+    }
+  },
+  "microsoftsharepoint": {
+    "download": "https://raw.githubusercontent.com/simple-icons/simple-icons/11.15.0/icons/microsoftsharepoint.svg",
+    "sha256": "bb24f734b05e9a6461ab8cd627a9e88a9cdd50ee7abc7063d54772bb19547e0c",
+    "upstream": {
+      "title": "Microsoft SharePoint",
+      "hex": "0078D4",
+      "source": "https://developer.microsoft.com/en-us/fluentui#/styles/web/colors/products",
+      "guidelines": "https://www.microsoft.com/en-us/legal/intellectualproperty/trademarks",
+      "license": {
+        "type": "custom",
+        "url": "https://aka.ms/fluentui-assets-license"
+      }
+    }
+  },
+  "microsoftexchange": {
+    "download": "https://raw.githubusercontent.com/simple-icons/simple-icons/11.15.0/icons/microsoftexchange.svg",
+    "sha256": "4ec28d3d73faff2e7a18c8dea69c7aaa29bae10a3b191c45764940e73b483f3a",
+    "upstream": {
+      "title": "Microsoft Exchange",
+      "hex": "0078D4",
+      "source": "https://developer.microsoft.com/en-us/fluentui#/styles/web/colors/products",
+      "guidelines": "https://www.microsoft.com/en-us/legal/intellectualproperty/trademarks",
+      "license": {
+        "type": "custom",
+        "url": "https://aka.ms/fluentui-assets-license"
+      }
+    }
+  },
+  "powerbi": {
+    "download": "https://raw.githubusercontent.com/simple-icons/simple-icons/11.15.0/icons/powerbi.svg",
+    "sha256": "d013902e022208ea00acc45c0ed4377699a2913ce1b26267e85e85001603d554",
+    "upstream": {
+      "title": "Power BI",
+      "hex": "F2C811",
+      "source": "https://docs.microsoft.com/en-us/power-platform/guidance/icons",
+      "guidelines": "https://docs.microsoft.com/en-us/power-platform/guidance/icons",
+      "license": {
+        "type": "custom",
+        "url": "https://docs.microsoft.com/en-us/power-platform/guidance/icons"
+      }
+    }
+  },
+  "adobe": {
+    "download": "https://raw.githubusercontent.com/simple-icons/simple-icons/11.15.0/icons/adobe.svg",
+    "sha256": "f52f92ca8caa174286ecd26be270f1667dc800f0a5c23af3defba59a24711688",
+    "upstream": {
+      "title": "Adobe",
+      "hex": "FF0000",
+      "source": "https://www.adobe.com",
+      "guidelines": "https://developer.adobe.com/developer-distribution/creative-cloud/docs/guides/branding_guidelines"
+    }
+  },
+  "adobeacrobatreader": {
+    "download": "https://raw.githubusercontent.com/simple-icons/simple-icons/11.15.0/icons/adobeacrobatreader.svg",
+    "sha256": "71f3b509f37495300663765f2d1ea7cd10ba52a1677e616974e2347499427ff6",
+    "upstream": {
+      "title": "Adobe Acrobat Reader",
+      "hex": "EC1C24",
+      "source": "https://acrobat.adobe.com",
+      "guidelines": "https://developer.adobe.com/developer-distribution/creative-cloud/docs/guides/branding_guidelines"
+    }
+  },
+  "adobecreativecloud": {
+    "download": "https://raw.githubusercontent.com/simple-icons/simple-icons/11.15.0/icons/adobecreativecloud.svg",
+    "sha256": "069e79e54961b1845f7a05e763ce5cec903726c60dad0747310ff88edb133c8e",
+    "upstream": {
+      "title": "Adobe Creative Cloud",
+      "hex": "DA1F26",
+      "source": "https://www.adobe.com/creativecloud.html",
+      "guidelines": "https://developer.adobe.com/developer-distribution/creative-cloud/docs/guides/branding_guidelines"
+    }
+  },
+  "adobephotoshop": {
+    "download": "https://raw.githubusercontent.com/simple-icons/simple-icons/11.15.0/icons/adobephotoshop.svg",
+    "sha256": "11f791a18f274a494148fa2b2b04b81e4cb21561537ce5ac0af38ec8fdce97c1",
+    "upstream": {
+      "title": "Adobe Photoshop",
+      "hex": "31A8FF",
+      "source": "https://www.adobe.com/creativecloud.html",
+      "guidelines": "https://developer.adobe.com/developer-distribution/creative-cloud/docs/guides/branding_guidelines"
+    }
+  },
+  "adobeillustrator": {
+    "download": "https://raw.githubusercontent.com/simple-icons/simple-icons/11.15.0/icons/adobeillustrator.svg",
+    "sha256": "f6bfd1f6662f2db4d8047406fd93ffb8d262b20b74ec83999d0d5c64c122177d",
+    "upstream": {
+      "title": "Adobe Illustrator",
+      "hex": "FF9A00",
+      "source": "https://www.adobe.com/creativecloud.html",
+      "guidelines": "https://developer.adobe.com/developer-distribution/creative-cloud/docs/guides/branding_guidelines"
+    }
+  },
+  "google": {
+    "download": "https://raw.githubusercontent.com/simple-icons/simple-icons/11.15.0/icons/google.svg",
+    "sha256": "d8cf9fb2d5e234e03254f1d6400d8cc8160c309b010d031a64f37084b5a21d01",
+    "upstream": {
+      "title": "Google",
+      "aliases": {
+        "loc": {
+          "ko-KR": "구글"
+        }
+      },
+      "hex": "4285F4",
+      "source": "https://partnermarketinghub.withgoogle.com",
+      "guidelines": "https://about.google/brand-resource-center/brand-elements/"
+    }
+  },
+  "googledrive": {
+    "download": "https://raw.githubusercontent.com/simple-icons/simple-icons/11.15.0/icons/googledrive.svg",
+    "sha256": "7e678aba9e463140ec8603f0e6cc78bb80f6caf9cd3ee73335026a90729a1a40",
+    "upstream": {
+      "title": "Google Drive",
+      "hex": "4285F4",
+      "source": "https://developers.google.com/drive/web/branding"
+    }
+  },
+  "gmail": {
+    "download": "https://raw.githubusercontent.com/simple-icons/simple-icons/11.15.0/icons/gmail.svg",
+    "sha256": "a537f5d85d9a27efa3a5d6086e8df6072ee93f76b4d176639a5e483f74b74b9f",
+    "upstream": {
+      "title": "Gmail",
+      "hex": "EA4335",
+      "source": "https://fonts.gstatic.com/s/i/productlogos/gmail_2020q4/v8/192px.svg"
+    }
+  },
+  "googlecloud": {
+    "download": "https://raw.githubusercontent.com/simple-icons/simple-icons/11.15.0/icons/googlecloud.svg",
+    "sha256": "534a0359c2784e152f5c88ce64a56976036d7336c7831775c995977fd3432713",
+    "upstream": {
+      "title": "Google Cloud",
+      "hex": "4285F4",
+      "source": "https://cloud.google.com"
+    }
+  },
+  "googlemeet": {
+    "download": "https://raw.githubusercontent.com/simple-icons/simple-icons/11.15.0/icons/googlemeet.svg",
+    "sha256": "ae7adb7a21d438caca54f88c2b864975893017eab16f4c0a4746c07b4cf24c74",
+    "upstream": {
+      "title": "Google Meet",
+      "hex": "00897B",
+      "source": "https://about.google/brand-resource-center/logos-list/"
+    }
+  },
+  "googledocs": {
+    "download": "https://raw.githubusercontent.com/simple-icons/simple-icons/11.15.0/icons/googledocs.svg",
+    "sha256": "880b39680b64812e5203f366c08779e86c824e3a6264a8eefca2a56afbf79fa6",
+    "upstream": {
+      "title": "Google Docs",
+      "hex": "4285F4",
+      "source": "https://www.google.com/docs/about"
+    }
+  },
+  "googlesheets": {
+    "download": "https://raw.githubusercontent.com/simple-icons/simple-icons/11.15.0/icons/googlesheets.svg",
+    "sha256": "5f28308c62e37d7d5533f52bbff5b48dc8630189d1c9d9dcbd8d7821f50d877f",
+    "upstream": {
+      "title": "Google Sheets",
+      "hex": "34A853",
+      "source": "https://sheets.google.com"
+    }
+  },
+  "zoom": {
+    "download": "https://media.zoom.com/images/assets/icon-meeting.svg/Zz01ZDBmYTBjMDZjMDgxMWVlOTQ0OTZlZmVjZjIyN2E4NQ==",
+    "sha256": "5bd048d4b802b9ba2d7151d97547a7bd1eccd053054459edb84ac6a1d7346768",
+    "upstream": {
+      "title": "Zoom Meetings camera icon",
+      "source": "https://www.zoom.com/en/products/meetings/",
+      "license": "Vendor trademark asset; not covered by the Simple Icons CC0 dedication."
+    }
+  },
+  "slack": {
+    "download": "https://raw.githubusercontent.com/simple-icons/simple-icons/11.15.0/icons/slack.svg",
+    "sha256": "f23c317b279f53dcd2260a6cd2e279f7a696f87dcb3da259d6201f05bbc45b0d",
+    "upstream": {
+      "title": "Slack",
+      "hex": "4A154B",
+      "source": "https://slack.com/brand-guidelines",
+      "guidelines": "https://slack.com/brand-guidelines"
+    }
+  },
+  "dropbox": {
+    "download": "https://raw.githubusercontent.com/simple-icons/simple-icons/11.15.0/icons/dropbox.svg",
+    "sha256": "1c9ea4ac8e318f3f6a598568df1a38ece03b7bc52a3a72d48c9e760340d7aeec",
+    "upstream": {
+      "title": "Dropbox",
+      "hex": "0061FF",
+      "source": "https://www.dropbox.com/branding"
+    }
+  },
+  "atlassian": {
+    "download": "https://raw.githubusercontent.com/simple-icons/simple-icons/11.15.0/icons/atlassian.svg",
+    "sha256": "88a88e7a09df2ab7d2e6beefc1c6d8393073fdea18616a4bcc25a30145228edf",
+    "upstream": {
+      "title": "Atlassian",
+      "hex": "0052CC",
+      "source": "https://atlassian.design/resources/logo-library",
+      "guidelines": "https://atlassian.design/foundations/logos"
+    }
+  },
+  "jira": {
+    "download": "https://raw.githubusercontent.com/simple-icons/simple-icons/11.15.0/icons/jira.svg",
+    "sha256": "68f8703698538ee7863bf69b72bf9f0d78a72d218e7eb7e0617237ae43ae5ade",
+    "upstream": {
+      "title": "Jira",
+      "hex": "0052CC",
+      "source": "https://atlassian.design/resources/logo-library",
+      "guidelines": "https://atlassian.design/foundations/logos/"
+    }
+  },
+  "confluence": {
+    "download": "https://raw.githubusercontent.com/simple-icons/simple-icons/11.15.0/icons/confluence.svg",
+    "sha256": "b9f1e0ae738e22ca281af813e8cc53e808a4c71d41adfa44bdc1a8d2c8134be3",
+    "upstream": {
+      "title": "Confluence",
+      "hex": "172B4D",
+      "source": "https://www.atlassian.com/company/news/press-kit"
+    }
+  },
+  "notion": {
+    "download": "https://raw.githubusercontent.com/simple-icons/simple-icons/11.15.0/icons/notion.svg",
+    "sha256": "b17d2a2b592a06252efef522d5205f0c7a958f748d40df1011ed081417e42f85",
+    "upstream": {
+      "title": "Notion",
+      "hex": "000000",
+      "source": "https://www.notion.so"
+    }
+  },
+  "figma": {
+    "download": "https://raw.githubusercontent.com/simple-icons/simple-icons/11.15.0/icons/figma.svg",
+    "sha256": "2f86fca501dfed321a62f28743f29d9dd738dac91668eac5260ab746d1ef8840",
+    "upstream": {
+      "title": "Figma",
+      "hex": "F24E1E",
+      "source": "https://www.figma.com/using-the-figma-brand/",
+      "guidelines": "https://www.figma.com/using-the-figma-brand/"
+    }
+  },
+  "canva": {
+    "download": "https://raw.githubusercontent.com/simple-icons/simple-icons/11.15.0/icons/canva.svg",
+    "sha256": "0d90ba2030f2ad642e19234241467280e97034a151905d60e05f0fc9fc41dcff",
+    "upstream": {
+      "title": "Canva",
+      "hex": "00C4CC",
+      "source": "https://www.canva.com"
+    }
+  },
+  "github": {
+    "download": "https://raw.githubusercontent.com/simple-icons/simple-icons/11.15.0/icons/github.svg",
+    "sha256": "3bf8cceead820aec50d4ee825a3fd02c5a1cd6665cc9cf4cbf3d9c8861a204bb",
+    "upstream": {
+      "title": "GitHub",
+      "hex": "181717",
+      "source": "https://github.com/logos",
+      "guidelines": "https://github.com/logos"
+    }
+  },
+  "gitlab": {
+    "download": "https://raw.githubusercontent.com/simple-icons/simple-icons/11.15.0/icons/gitlab.svg",
+    "sha256": "c7c39058bd1b6f9f40334383bd5136bb8c5ba5e6a24200f2d1f18365e2526e28",
+    "upstream": {
+      "title": "GitLab",
+      "hex": "FC6D26",
+      "source": "https://about.gitlab.com/press/press-kit/",
+      "guidelines": "https://about.gitlab.com/handbook/marketing/corporate-marketing/brand-activation/trademark-guidelines/"
+    }
+  },
+  "docker": {
+    "download": "https://raw.githubusercontent.com/simple-icons/simple-icons/11.15.0/icons/docker.svg",
+    "sha256": "65571291c261ef869c31540a38f3ca0f0ee3bb73f179c172211c8860f19a6359",
+    "upstream": {
+      "title": "Docker",
+      "hex": "2496ED",
+      "source": "https://www.docker.com/company/newsroom/media-resources"
+    }
+  },
+  "amazonaws": {
+    "download": "https://raw.githubusercontent.com/simple-icons/simple-icons/11.15.0/icons/amazonaws.svg",
+    "sha256": "79224fcf1ee0030e1ee8974ffb928af867b226f30f2e5817608897aafb45a14e",
+    "upstream": {
+      "title": "Amazon AWS",
+      "hex": "232F3E",
+      "source": "https://commons.wikimedia.org/wiki/File:Amazon_Web_Services_Logo.svg",
+      "aliases": {
+        "aka": [
+          "AWS"
+        ]
+      }
+    }
+  },
+  "cloudflare": {
+    "download": "https://raw.githubusercontent.com/simple-icons/simple-icons/11.15.0/icons/cloudflare.svg",
+    "sha256": "408096d99907fd99e0863cb5d73f77a72537c6a85fd8d5e2704178a83a891f08",
+    "upstream": {
+      "title": "Cloudflare",
+      "hex": "F38020",
+      "source": "https://www.cloudflare.com/logo/",
+      "guidelines": "https://www.cloudflare.com/trademark/"
+    }
+  },
+  "salesforce": {
+    "download": "https://raw.githubusercontent.com/simple-icons/simple-icons/11.15.0/icons/salesforce.svg",
+    "sha256": "9f8adb4f73acb235b2fe1c721f17d915d3559c905d1de9c7b678d76d0687eb08",
+    "upstream": {
+      "title": "Salesforce",
+      "hex": "00A1E0",
+      "source": "https://brand.salesforce.com/content/logo-guidelines",
+      "guidelines": "https://brand.salesforce.com/content/logo-guidelines"
+    }
+  },
+  "hubspot": {
+    "download": "https://raw.githubusercontent.com/simple-icons/simple-icons/11.15.0/icons/hubspot.svg",
+    "sha256": "f96cfb6bba27c8e70a03e782f07d4d649e9f39d2fb8bea7136b370ab2c3f04a9",
+    "upstream": {
+      "title": "HubSpot",
+      "hex": "FF7A59",
+      "source": "https://www.hubspot.com/style-guide",
+      "guidelines": "https://www.hubspot.com/style-guide"
+    }
+  },
+  "veeam": {
+    "download": "https://raw.githubusercontent.com/simple-icons/simple-icons/11.15.0/icons/veeam.svg",
+    "sha256": "337e09a86a01772133352bceba53de9ac6af2f59a23eaed561a7e3eb2007627d",
+    "upstream": {
+      "title": "Veeam",
+      "hex": "00B336",
+      "source": "https://www.veeam.com/newsroom/veeam-graphics.html"
+    }
+  },
+  "vmware": {
+    "download": "https://raw.githubusercontent.com/simple-icons/simple-icons/11.15.0/icons/vmware.svg",
+    "sha256": "4c3970bf3955a3e95c7d9eef7f4f45528c487dffa92092ce9273913f8271029a",
+    "upstream": {
+      "title": "VMware",
+      "hex": "607078",
+      "source": "https://myvmware.workspaceair.com"
+    }
+  },
+  "bitdefender": {
+    "download": "https://raw.githubusercontent.com/simple-icons/simple-icons/11.15.0/icons/bitdefender.svg",
+    "sha256": "4b86a7be3d81cd7484b3a1fdaebe346f99040b6212ebb8ec059e55a8a43ef2b6",
+    "upstream": {
+      "title": "Bitdefender",
+      "hex": "ED1C24",
+      "source": "https://brand.bitdefender.com"
+    }
+  },
+  "fortinet": {
+    "download": "https://raw.githubusercontent.com/simple-icons/simple-icons/11.15.0/icons/fortinet.svg",
+    "sha256": "5feafff8531436630ccd7d5c2e80819ee74c1820fdba23d98057eebe02553b86",
+    "upstream": {
+      "title": "Fortinet",
+      "hex": "EE3124",
+      "source": "https://www.fortinet.com"
+    }
+  },
+  "autodesk": {
+    "download": "https://raw.githubusercontent.com/simple-icons/simple-icons/11.15.0/icons/autodesk.svg",
+    "sha256": "d82da80769055846c38f1b470c2a34636bf60157fd3bec76f2faeed8abbcb2b8",
+    "upstream": {
+      "title": "Autodesk",
+      "hex": "000000",
+      "source": "https://brand.autodesk.com/brand-system/logo",
+      "guidelines": "https://brand.autodesk.com/brand-system/logo"
+    }
+  },
+  "cisco": {
+    "download": "https://raw.githubusercontent.com/simple-icons/simple-icons/11.15.0/icons/cisco.svg",
+    "sha256": "005c240c62355768860ad0bb19820033bc840ee390192c7139f8777d78291391",
+    "upstream": {
+      "title": "Cisco",
+      "hex": "1BA0D7",
+      "source": "https://www.cisco.com"
+    }
+  },
+  "okta": {
+    "download": "https://raw.githubusercontent.com/simple-icons/simple-icons/11.15.0/icons/okta.svg",
+    "sha256": "1e743aa55a6f3ad93fcf49f47fc8c3366f2c23ed0552e613a4e8fd1690c7633b",
+    "upstream": {
+      "title": "Okta",
+      "hex": "007DC1",
+      "source": "https://www.okta.com/press-room/media-assets/",
+      "guidelines": "https://www.okta.com/terms-of-use-for-okta-content/"
+    }
+  },
+  "1password": {
+    "download": "https://raw.githubusercontent.com/simple-icons/simple-icons/11.15.0/icons/1password.svg",
+    "sha256": "ed2dca8910cd1297b5c7442443b26b64775e65cd3ae71995ecbc60225cf40638",
+    "upstream": {
+      "title": "1Password",
+      "hex": "3B66BC",
+      "source": "https://1password.com/press",
+      "guidelines": "https://1password.com/press"
+    }
+  },
+  "teamviewer": {
+    "download": "https://raw.githubusercontent.com/simple-icons/simple-icons/11.15.0/icons/teamviewer.svg",
+    "sha256": "c4db7091adb2d0add272f8ae311db841ae3e050543d0832b2d56c0b1038dd255",
+    "upstream": {
+      "title": "TeamViewer",
+      "hex": "004680",
+      "source": "https://www.teamviewer.com/en-us"
+    }
+  },
+  "webex": {
+    "download": "https://raw.githubusercontent.com/simple-icons/simple-icons/11.15.0/icons/webex.svg",
+    "sha256": "18694581c95a9329dea4d3f5b7dcce29a69e382cc19fad05947b1a6611d074ea",
+    "upstream": {
+      "title": "Webex",
+      "hex": "000000",
+      "source": "https://github.com/momentum-design/momentum-ui/blob/970c5bec962a3f72e17e0b7ed69f2c38d298c405/icons-rebrand/svg/webex-helix-filled.svg",
+      "guidelines": "https://resources.webex.com/webex/brand-exchange-collection",
+      "license": {
+        "type": "custom",
+        "url": "https://www.cisco.com/c/en/us/about/legal/trademarks.html"
+      }
+    }
+  },
+  "docusign": {
+    "download": "https://raw.githubusercontent.com/simple-icons/simple-icons/11.15.0/icons/docusign.svg",
+    "sha256": "aaa5c7b16a496f0d5d21daebf23bdf7bedf5d9041e0d2bc9f301b9957c283aac",
+    "upstream": {
+      "title": "DocuSign",
+      "hex": "FFCC22",
+      "source": "https://www.docusign.com/sites/all/themes/custom/docusign/favicons/mstile-310x310.png"
+    }
+  },
+  "trello": {
+    "download": "https://raw.githubusercontent.com/simple-icons/simple-icons/11.15.0/icons/trello.svg",
+    "sha256": "d1069cc5fc0174978356b5deb34c732dda5812875ea79d90d4a834169db55f04",
+    "upstream": {
+      "title": "Trello",
+      "hex": "0052CC",
+      "source": "https://atlassian.design/resources/logo-library",
+      "guidelines": "https://atlassian.design/foundations/logos"
+    }
+  },
+  "asana": {
+    "download": "https://raw.githubusercontent.com/simple-icons/simple-icons/11.15.0/icons/asana.svg",
+    "sha256": "ecdcda759ad672b2f4c90a872ba69ed0071e019741e01308f4bbbf8d4c54be0c",
+    "upstream": {
+      "title": "Asana",
+      "hex": "F06A6A",
+      "source": "https://asana.com/brand",
+      "guidelines": "https://asana.com/brand"
+    }
+  },
+  "malwarebytes": {
+    "download": "https://raw.githubusercontent.com/simple-icons/simple-icons/11.15.0/icons/malwarebytes.svg",
+    "sha256": "15e31892dd33b2a53fb1e2c9a003012a8976352f64dfe494e045e7113f534457",
+    "upstream": {
+      "title": "Malwarebytes",
+      "hex": "0D3ECC",
+      "source": "https://www.malwarebytes.com"
+    }
+  },
+  "acronis": {
+    "download": "https://www.acronis.com/public/favicon/favicon.svg",
+    "sha256": "8173b3083c6e6af2118523089c145a44f6f3dcffaaf5ebc8f9b2b2ea645a97a8",
+    "upstream": {
+      "title": "Acronis",
+      "source": "https://www.acronis.com/en-us/",
+      "guidelines": "https://logo.acronis.com/",
+      "license": "Vendor trademark asset; not covered by the Simple Icons CC0 dedication."
+    }
+  }
+}
