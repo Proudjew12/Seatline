@@ -73,6 +73,31 @@ async function inputWidth(input: Locator): Promise<number> {
   return input.evaluate((element) => element.getBoundingClientRect().width);
 }
 
+async function expectCenteredLabels(line: Locator): Promise<void> {
+  const measurements = await line.locator("label").evaluateAll((labels) => labels.map((label) => {
+    const control = label.querySelector("input, select")?.getBoundingClientRect();
+    if (!control) throw new Error("Every quote field needs a control");
+    const walker = document.createTreeWalker(label, NodeFilter.SHOW_TEXT);
+    const rectangles: DOMRect[] = [];
+    while (walker.nextNode()) {
+      if (!walker.currentNode.textContent?.trim() || walker.currentNode.parentElement?.closest("select, [aria-hidden='true']")) continue;
+      const range = document.createRange();
+      range.selectNodeContents(walker.currentNode);
+      rectangles.push(...Array.from(range.getClientRects()));
+    }
+    if (!rectangles.length) throw new Error("Every quote field needs a visible title");
+    return {
+      title: label.textContent,
+      titleCenter: (Math.min(...rectangles.map((box) => box.left)) + Math.max(...rectangles.map((box) => box.right))) / 2,
+      controlCenter: control.x + control.width / 2,
+    };
+  }));
+  expect(measurements).toHaveLength(4);
+  for (const field of measurements) {
+    expect(Math.abs(field.titleCenter - field.controlCenter), `${field.title} must be centered over its control`).toBeLessThanOrEqual(1);
+  }
+}
+
 async function expectControlsContained(page: Page, line: Locator): Promise<void> {
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   expect(await line.evaluate((element) => {
@@ -106,6 +131,7 @@ test("aligns customer, Sales Proposal and New Order while keeping quote controls
   const cardBox = await line.boundingBox();
   if (!cardBox) throw new Error("The quote card must be visible");
   await expectBillingFitsText(billing);
+  await expectCenteredLabels(line);
   for (const [name, maximum] of [["Quantity", 60], ["Price", 80], ["Profit rate", 85]] as const) {
     const field = line.getByRole("textbox", { name, exact: true });
     const bounds = await field.boundingBox();
@@ -128,6 +154,7 @@ test("aligns customer, Sales Proposal and New Order while keeping quote controls
     await billing.selectOption(value);
     await expect(billing).toHaveValue(value);
     await expectBillingFitsText(billing);
+    await expectCenteredLabels(line);
     await line.getByRole("textbox", { name: "Price", exact: true }).fill("22");
     await expect(profit).toHaveText("$7.04");
     await expect(line.getByLabel("Business Basic line total", { exact: true })).toHaveText("$29.04");
@@ -142,14 +169,26 @@ test("aligns customer, Sales Proposal and New Order while keeping quote controls
     const cardProfit = card.getByLabel(/ profit per license$/);
     await expect(cardProfit).toHaveText("$6.40");
     await expectSingleProfitRow(card.getByLabel("Internal price calculation", { exact: true }), cardProfit, "$20.00 × 32% =");
-    const fields = await card.locator("input").evaluateAll((inputs) => inputs.map((input) => {
-      const bounds = input.closest("label")?.getBoundingClientRect();
-      if (!bounds) throw new Error("Every numeric control needs a label");
-      return { x: bounds.x, y: bounds.y, width: bounds.width };
-    }));
-    expect(fields).toHaveLength(3);
-    expect(Math.max(...fields.map((field) => field.y)) - Math.min(...fields.map((field) => field.y))).toBeLessThan(1);
-    expect(fields[1].x - fields[0].x - fields[0].width).toBeCloseTo(fields[2].x - fields[1].x - fields[1].width, 0);
+    await expectCenteredLabels(card);
+    const [cardBounds, billingBox, rateBox, quantityBox, priceBox] = await Promise.all([
+      card,
+      card.getByRole("combobox", { name: "Billing Option", exact: true }),
+      ...["Profit rate", "Quantity", "Price"].map((name) => card.getByRole("textbox", { name, exact: true })),
+    ].map((control) => control.boundingBox()));
+    if (!cardBounds || !billingBox || !rateBox || !quantityBox || !priceBox) throw new Error("All four quote fields must be visible");
+    expect(billingBox.y, "Billing Option and Profit rate must share the first row").toBeCloseTo(rateBox.y, 0);
+    expect(billingBox.x + billingBox.width).toBeLessThanOrEqual(rateBox.x);
+    expect(Math.max(billingBox.y + billingBox.height, rateBox.y + rateBox.height)).toBeLessThan(quantityBox.y);
+    expect(quantityBox.y, "Quantity and Price must share the second row").toBeCloseTo(priceBox.y, 0);
+    expect(quantityBox.x + quantityBox.width).toBeLessThanOrEqual(priceBox.x);
+    const [quantityField, priceField] = await Promise.all(["Quantity", "Price"].map((name) =>
+      card.getByRole("textbox", { name, exact: true }).evaluate((element) => {
+        const box = element.closest("label")?.getBoundingClientRect();
+        if (!box) throw new Error("Quantity and Price must have visible labels");
+        return { left: box.left, right: box.right };
+      })));
+    expect((quantityField.left + priceField.right) / 2, "Quantity and Price must be centered together")
+      .toBeCloseTo(cardBounds.x + cardBounds.width / 2, 0);
   }
   await expect(page.getByLabel("Monthly payments", { exact: true })).toHaveText("$79.20");
   for (const theme of ["Aurora Ice", "Aurora Ocean"]) {
@@ -269,7 +308,7 @@ test("fits English and Hebrew controls and the profit formula at 320px and 150% 
   await page.getByRole("combobox", { name: "Text size", exact: true }).selectOption("150");
   await page.getByRole("button", { name: "Browse themes", exact: true }).click();
   const gallery = page.getByRole("dialog", { name: "Choose your theme", exact: true });
-  await gallery.getByRole("button", { name: "Aurora", exact: true }).click();
+  await gallery.getByRole("button", { name: "Aurora Ocean", exact: true }).click();
   await gallery.getByRole("button", { name: "Done", exact: true }).click();
   await closeSettings(page);
   for (const locale of [
@@ -290,6 +329,7 @@ test("fits English and Hebrew controls and the profit formula at 320px and 150% 
       await price.fill("22");
       await expect(line.getByLabel(locale.total, { exact: true })).toHaveText("$29.04");
       await expectControlsContained(page, line);
+      await expectCenteredLabels(line);
     }
     await expect(line.getByText(locale.oldLabel, { exact: true })).toHaveCount(0);
     for (const [name, invalid, valid] of [[locale.quantity, "99999", "1"], [locale.price, "1000001", "22"], [locale.rate, "101", "32"]]) {

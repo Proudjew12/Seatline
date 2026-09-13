@@ -30,7 +30,7 @@
   label { display: grid; gap: 8px; font-size: var(--font-size-body); min-width: 0; }
   input { field-sizing: content; width: auto; min-width: min(100%, 6ch); max-width: 100%; justify-self: start; height: 48px; padding: 0 10px; border: 1px solid var(--color-border); border-radius: var(--radius-control); color: var(--color-text); background: var(--color-surface); box-shadow: var(--shadow-control); font-size: var(--font-size-body); &:hover { border-color: var(--color-border-strong); } &:focus-visible { @include mixins.focus-ring; } }
 }
-.items { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 19rem), 1fr)); gap: 12px; border-radius: 8px; transition: background-color var(--motion-fast); }
+.items { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 18.5rem), 1fr)); gap: 12px; border-radius: 8px; transition: background-color var(--motion-fast); }
 .over { background: color-mix(in srgb, var(--color-accent) 9%, transparent); outline: 2px solid var(--color-accent); outline-offset: 4px; .empty { border-color: var(--color-accent); } }
 .empty {
   grid-column: 1 / -1; border: 1px dashed var(--color-border-strong); border-radius: var(--radius-card); min-height: 230px;

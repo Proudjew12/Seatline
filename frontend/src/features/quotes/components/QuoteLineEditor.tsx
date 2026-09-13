@@ -40,11 +40,23 @@ export function QuoteLineEditor({ line, onChange, onRemove }: Props) {
         </button>
       </div>
       <div className={styles.fields}>
-        <label className={styles.billing}>{t("Billing Option")}
-          <BillingSelect value={line.billing} onChange={(billing) => onChange({ billing })} />
-        </label>
+        <div className={styles.terms}>
+          <label><span>{t("Billing Option")}</span>
+            <BillingSelect value={line.billing} onChange={(billing) => onChange({ billing })} />
+          </label>
+          <label><span id={markupLabelId}>{t("Profit rate")}</span>
+            <span className={styles.percentage} dir="ltr">
+              <input type="text" inputMode="decimal" value={markup} maxLength={8} size={Math.max(1, markup.length)}
+                aria-labelledby={markupLabelId}
+                aria-invalid={parseMarkupBasisPoints(markup) === null}
+                aria-describedby={showError ? errorId : undefined}
+                onChange={(event) => onChange({ markupPercent: event.target.value })} />
+              <span aria-hidden="true">%</span>
+            </span>
+          </label>
+        </div>
         <div className={styles.amounts}>
-          <label>{t("Quantity")}
+          <label><span>{t("Quantity")}</span>
             <input type="text" inputMode="numeric" dir="ltr" value={line.quantity} maxLength={5} size={Math.max(1, line.quantity.length)}
               aria-invalid={parseQuantity(line.quantity) === null}
               aria-describedby={showError ? errorId : undefined}
@@ -57,16 +69,6 @@ export function QuoteLineEditor({ line, onChange, onRemove }: Props) {
                 aria-invalid={Boolean(line.unitPrice && parsePriceCents(line.unitPrice) === null)}
                 aria-describedby={`${priceUnitId}${showError ? ` ${errorId}` : ""}`}
                 onChange={(event) => onChange({ unitPrice: event.target.value })} />
-            </span>
-          </label>
-          <label><span id={markupLabelId}>{t("Profit rate")}</span>
-            <span className={styles.percentage} dir="ltr">
-              <input type="text" inputMode="decimal" value={markup} maxLength={8} size={Math.max(1, markup.length)}
-                aria-labelledby={markupLabelId}
-                aria-invalid={parseMarkupBasisPoints(markup) === null}
-                aria-describedby={showError ? errorId : undefined}
-                onChange={(event) => onChange({ markupPercent: event.target.value })} />
-              <span aria-hidden="true">%</span>
             </span>
           </label>
         </div>

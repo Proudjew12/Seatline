@@ -12,7 +12,7 @@ async function expectNoHorizontalOverflow(page: Page): Promise<void> {
   await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
 }
 
-test("fits four, three and two cards across wide, desktop and tablet screens without stretching a lone card", async ({ page }, testInfo) => {
+test("fits five, three and two cards across wide, desktop and tablet screens without stretching a lone card", async ({ page }, testInfo) => {
   await page.setViewportSize({ width: 1867, height: 1000 });
   await page.goto("/");
   await expectTextSize(page, "100");
@@ -21,31 +21,119 @@ test("fits four, three and two cards across wide, desktop and tablet screens wit
   }
   const cards = page.getByTestId("quote-line");
   await expect(cards).toHaveCount(5);
+  for (const card of await cards.all()) {
+    await card.getByRole("textbox", { name: "Price", exact: true }).fill("20");
+    await card.getByRole("textbox", { name: "Profit rate", exact: true }).fill("32");
+  }
+  await openSettings(page);
+  await page.getByRole("button", { name: "Browse themes", exact: true }).click();
+  const gallery = page.getByRole("dialog", { name: "Choose your theme", exact: true });
+  await gallery.getByRole("button", { name: "Aurora Ocean", exact: true }).click();
+  await gallery.getByRole("button", { name: "Done", exact: true }).click();
+  await closeSettings(page);
   const positions = () => cards.evaluateAll((elements) => elements.map((element) => {
     const { x, y, width } = element.getBoundingClientRect();
     return { x, y, width };
   }));
-  for (const viewport of [
-    { width: 1867, height: 1000, columns: 4 },
+  const viewports = [
+    { width: 1867, height: 1000, columns: 5 },
     { width: 1440, height: 900, columns: 3 },
     { width: 1180, height: 820, columns: 2 },
-  ]) {
+  ];
+  const cardWidths = new Map<number, number>();
+  for (const viewport of viewports) {
     await page.setViewportSize(viewport);
     await expect.poll(async () => {
       const boxes = await positions();
       const firstRow = boxes.filter((box) => Math.abs(box.y - boxes[0].y) < 1);
       return firstRow.length === viewport.columns
         && firstRow.every((box, index) => index === 0 || firstRow[index - 1].x + firstRow[index - 1].width <= box.x)
-        && boxes[viewport.columns].y > boxes[0].y
+        && (boxes.length === viewport.columns || boxes[viewport.columns].y > boxes[0].y)
         && boxes.every((box) => Math.abs(box.width - boxes[0].width) < 1);
     }).toBe(true);
+    const width = (await positions())[0].width;
+    cardWidths.set(viewport.width, width);
+    if (viewport.width === 1867) expect(width, "Five desktop cards must each stay below 280px").toBeLessThan(280);
+    for (const card of await cards.all()) {
+      const [cardBox, headingBox] = await Promise.all([card, card.getByRole("heading", { level: 2 })].map((element) => element.boundingBox()));
+      if (!cardBox || !headingBox) throw new Error("Each quote card must have a visible heading");
+      expect(headingBox.x + headingBox.width / 2, "The title must be centered in the entire card")
+        .toBeCloseTo(cardBox.x + cardBox.width / 2, 0);
+      const [billingBox, rateBox] = await Promise.all([
+        card.getByRole("combobox", { name: "Billing Option", exact: true }),
+        card.getByRole("textbox", { name: "Profit rate", exact: true }),
+      ].map((control) => control.boundingBox()));
+      if (!billingBox || !rateBox) throw new Error("Billing Option and Profit rate must be visible");
+      expect(billingBox.y, "Billing Option and Profit rate must remain together even with five cards per row").toBeCloseTo(rateBox.y, 0);
+      expect(billingBox.x + billingBox.width).toBeLessThanOrEqual(rateBox.x);
+    }
+    await expect(page.getByLabel("Monthly payments", { exact: true })).toHaveText("$132.00");
     await expectNoHorizontalOverflow(page);
-    await page.screenshot({ path: testInfo.outputPath(`balanced-grid-${viewport.width}.png`) });
+    await page.screenshot({ path: testInfo.outputPath(`compact-five-cards-aurora-ocean-${viewport.width}.png`) });
   }
-  await page.setViewportSize({ width: 1440, height: 900 });
-  const multipleWidth = (await positions())[0].width;
   while (await cards.count() > 1) await cards.last().getByRole("button", { name: /^Remove / }).click();
-  expect((await positions())[0].width, "Removing neighbors must not turn the remaining card into a full-width panel").toBeCloseTo(multipleWidth, 1);
+  for (const viewport of viewports) {
+    await page.setViewportSize(viewport);
+    const multipleWidth = cardWidths.get(viewport.width);
+    if (multipleWidth === undefined) throw new Error("Each viewport needs a measured multi-card width");
+    expect((await positions())[0].width, "Removing neighbors must not turn the remaining card into a full-width panel").toBeCloseTo(multipleWidth, 1);
+  }
+});
+
+test("keeps every billing option beside two-digit and decimal profit rates in five-card rows", async ({ page }) => {
+  await page.setViewportSize({ width: 1854, height: 1000 });
+  await page.goto("/");
+  for (let index = 0; index < 5; index += 1) {
+    await page.getByRole("button", { name: "Add Business Basic to quote", exact: true }).press("Enter");
+  }
+  const cards = page.getByTestId("quote-line");
+  await expect(cards).toHaveCount(5);
+  const line = cards.first();
+  const billing = line.getByRole("combobox", { name: "Billing Option", exact: true });
+  const price = line.getByRole("textbox", { name: "Price", exact: true });
+  const profit = line.getByRole("textbox", { name: "Profit rate", exact: true });
+  for (const width of [1854, 1867]) {
+    await page.setViewportSize({ width, height: 1000 });
+    await expect.poll(() => cards.evaluateAll((elements) => {
+      const boxes = elements.map((element) => element.getBoundingClientRect());
+      return boxes.filter((box) => Math.abs(box.y - boxes[0].y) < 1).length;
+    })).toBe(5);
+    for (const option of ["monthly", "annual-upfront", "annual-monthly"]) {
+      await billing.selectOption(option);
+      await expect(billing).toHaveValue(option);
+      await expect(price).toHaveValue("");
+      await price.fill("20");
+      for (const rate of ["32", "99.99"]) {
+        await profit.fill(rate);
+        await expect(line.getByLabel("Business Basic line total", { exact: true })).toHaveText(rate === "32" ? "$26.40" : "$40.00");
+        const geometry = await line.evaluate((element) => {
+          const bounds = element.getBoundingClientRect();
+          const fields = Array.from(element.querySelectorAll("label")).map((label) => {
+            const control = label.querySelector("input, select")?.getBoundingClientRect();
+            const title = label.querySelector(":scope > span");
+            if (!control || !title) throw new Error("Quote controls must retain their visible labels");
+            const range = document.createRange();
+            range.selectNodeContents(title);
+            const text = range.getBoundingClientRect();
+            return { x: control.x, y: control.y, right: control.right,
+              centerOffset: Math.abs(text.x + text.width / 2 - control.x - control.width / 2) };
+          });
+          return { left: bounds.left, right: bounds.right, width: bounds.width, fields };
+        });
+        expect(geometry.width).toBeLessThan(280);
+        expect(geometry.fields).toHaveLength(4);
+        const [billingBox, profitBox] = geometry.fields;
+        expect(billingBox.y, `${option} and ${rate}% must share a row at ${width}px`).toBeCloseTo(profitBox.y, 0);
+        expect(billingBox.right).toBeLessThanOrEqual(profitBox.x);
+        for (const field of geometry.fields) {
+          expect(field.x).toBeGreaterThanOrEqual(geometry.left);
+          expect(field.right).toBeLessThanOrEqual(geometry.right);
+          expect(field.centerOffset, "Every field label must remain centered above its control").toBeLessThanOrEqual(1);
+        }
+        await expectNoHorizontalOverflow(page);
+      }
+    }
+  }
 });
 
 test("keeps billing readable and numeric fields contained at 150% on portrait tablets and narrow phones", async ({ page }, testInfo) => {
@@ -75,9 +163,9 @@ test("keeps billing readable and numeric fields contained at 150% on portrait ta
         [line, billing, quantity, price, markup].map((control) => control.boundingBox()),
       );
       if (!cardBox || !billingBox || !quantityBox || !priceBox || !markupBox) return false;
-      return billingBox.y + billingBox.height <= quantityBox.y && billingBox.y + billingBox.height <= priceBox.y
-        && quantityBox.x + quantityBox.width <= priceBox.x
-        && (priceBox.x + priceBox.width <= markupBox.x || priceBox.y + priceBox.height <= markupBox.y)
+      return Math.max(billingBox.y + billingBox.height, markupBox.y + markupBox.height) <= Math.min(quantityBox.y, priceBox.y)
+        && (billingBox.x + billingBox.width <= markupBox.x || billingBox.y + billingBox.height <= markupBox.y)
+        && (quantityBox.x + quantityBox.width <= priceBox.x || quantityBox.y + quantityBox.height <= priceBox.y)
         && [billingBox, quantityBox, priceBox, markupBox].every((box) => box.x >= cardBox.x && box.x + box.width <= cardBox.x + cardBox.width);
     }).toBe(true);
     await expect.poll(() => line.locator("label").evaluateAll((labels) =>
@@ -116,6 +204,7 @@ test("keeps separate product and license headings complete for long English and 
       const card = page.getByTestId("quote-line").nth(index);
       const heading = card.getByRole("heading", { level: 2 });
       await expect(heading).toHaveAccessibleName(`${name.product} ${name.license}`);
+      await expect(heading).toHaveCSS("text-align", "center");
       const product = await heading.getByText(name.product, { exact: true }).boundingBox();
       const license = await heading.getByText(name.license, { exact: true }).boundingBox();
       if (!product || !license) throw new Error("Complete product and license names must remain in the card");
@@ -124,6 +213,7 @@ test("keeps separate product and license headings complete for long English and 
         const heading = element.getBoundingClientRect();
         const card = element.closest("fieldset")?.getBoundingClientRect();
         if (!card) return false;
+        if (Math.abs(heading.x + heading.width / 2 - card.x - card.width / 2) > 1) return false;
         const walker = document.createTreeWalker(element, NodeFilter.SHOW_TEXT);
         const rectangles: DOMRect[] = [];
         while (walker.nextNode()) {

@@ -202,12 +202,13 @@ and tablet requirement without a native app or Expo. Revisit persistence and API
 shared accounts or durable quote history become requirements.
 
 The interface uses soft gray surfaces, navy text, blue accents, and a compact product rail and license
-list. Narrower order cards fit four per row at a 1867px desktop width, three at 1440px and two at
+list. Narrower order cards fit five per row at a 1867px desktop width, three at 1440px and two at
 1180px at the default text size, adapting to fewer columns as text grows. Empty grid tracks retain
 the same card width when an order has only one item. Compact fields retain larger touch targets
-on tablets. Each card separates a smaller product caption from its prominent license title,
-with evenly spaced quantity, price and profit controls and the
-billing period beside the line total. Catalog cards compare Monthly, Annual · Monthly, and
+on tablets. Each card centers a smaller product caption above its prominent license title.
+Billing Option and Profit rate share the first row, with Quantity and Price centered underneath.
+Every label is centered above its content-sized control; rows wrap when larger text needs more room.
+The billing period sits beside the centered line total. Catalog cards compare Monthly, Annual · Monthly, and
 Annual · Yearly rates, distinguishing unset prices from zero. The drag instruction appears only
 while the order has no licenses.
 Customer, Sales Proposal and New Order share a desktop row; New Order is a text-only button.

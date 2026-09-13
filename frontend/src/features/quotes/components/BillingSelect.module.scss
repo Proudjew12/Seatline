@@ -15,7 +15,7 @@
   max-width: 100%;
   padding: 4px;
   width: auto;
-  justify-self: start;
+  justify-self: center;
 
   &:hover { border-color: var(--color-border-strong); }
   &:focus-visible { @include mixins.focus-ring; }

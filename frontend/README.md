@@ -18,8 +18,10 @@ selling prices. Customer, Sales Proposal and New Order share a desktop row. Bill
 their selected text, and numeric/customer/proposal inputs size around their contents, with bounded
 widths and editable minimums. The subtotal shows its amount and billing period without a caption.
 Notes dock above payments while cards scroll.
-Quote cards use narrower columns, a separate product caption and license title, evenly spaced
-compact inputs, and a centered formula/result group. More cards fit per desktop row without
+Quote cards fit five columns at a 1867px viewport and default text size, with centered product and
+license headings. Billing Option and Profit rate share a row above Quantity and Price, and each
+label is centered over its compact control. The formula/result group and subtotal are centered.
+More cards fit per desktop row without
 stretching a single item across the workspace; large text and narrow screens reduce the columns.
 On narrow screens Notes follow the cards before the payment summary. The settings gear contains Edit Mode, text size, a Theme gallery,
 and Light/Dark appearance for the Default theme. Studio, Midnight, Dune, Forest and Plum each have
