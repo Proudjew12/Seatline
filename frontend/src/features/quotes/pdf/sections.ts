@@ -9,42 +9,44 @@ function quoteDate(value: string, locale: QuotePdfLayout["locale"]): string {
 
 export function writeQuoteHeading(layout: QuotePdfLayout, draft: QuoteDraft): void {
   layout.logoAt(PDF_PAGE.left - 0.75, 14, 54);
-  layout.headerText(layout.t("SALES PROPOSAL"), 102, 18, 90, 7, "bold", PDF_COLORS.muted);
-  const references = layout.wrap(cleanPdfField(draft.reference), 90, 11.5, "bold");
-  references.forEach((reference, index) => layout.headerText(reference, 102, 24 + index * 5.3, 90, 11.5, "bold"));
-  const dateY = 25 + references.length * 5.3;
-  layout.headerText(layout.t("ISSUED"), 102, dateY, 90, 7, "bold", PDF_COLORS.muted);
-  layout.headerText(quoteDate(draft.date, layout.locale), 102, dateY + 5, 90, 9);
-  const ruleY = Math.max(36, dateY + 10);
-  layout.rule(ruleY, PDF_PAGE.left, PDF_PAGE.width, true);
+  layout.headerText(quoteDate(draft.date, layout.locale), 102, 24, 90, 9);
+  layout.rule(36, PDF_PAGE.left, PDF_PAGE.width, true);
 
-  layout.text(layout.t("PREPARED FOR"), PDF_PAGE.left, ruleY + 7, PDF_PAGE.width, 7.5, "bold", PDF_COLORS.muted);
-  const customers = layout.wrap(cleanPdfField(draft.customer), PDF_PAGE.width, 11.5, "bold");
-  const customerY = ruleY + 13;
-  customers.forEach((name, index) => layout.text(name, PDF_PAGE.left, customerY + index * 5.5, PDF_PAGE.width, 11.5, "bold"));
-  layout.y = customerY + (customers.length - 1) * 5.5 + 9;
+  const companyLabel = layout.t("Company:");
+  layout.font(9);
+  const labelWidth = layout.document.getTextWidth(companyLabel) + 3.5;
+  const customerX = PDF_PAGE.left + labelWidth;
+  const customerWidth = 118 - labelWidth;
+  layout.text(companyLabel, PDF_PAGE.left, 44, labelWidth, 9, "normal", PDF_COLORS.muted);
+  const customers = layout.wrap(cleanPdfField(draft.customer), customerWidth, 11, "bold");
+  customers.forEach((name, index) => layout.text(name, customerX, 44 + index * 5.3, customerWidth, 11, "bold"));
+  const references = layout.wrap(cleanPdfField(draft.reference), 48, 10, "bold");
+  references.forEach((reference, index) => layout.end(reference, 144, 44 + index * 5.3, 48, 10, "bold"));
+  layout.y = 44 + (Math.max(customers.length, references.length) - 1) * 5.3 + 8;
 }
 
 export function writeQuoteSummary(layout: QuotePdfLayout, draft: QuoteDraft): void {
   const totals = calculateQuote(draft.lines);
-  layout.ensureSpace(22);
+  layout.ensureSpace(43);
   const top = layout.y;
-  const columnWidth = PDF_PAGE.width / 4;
-  const payments = [
-    { label: "Monthly payments", amount: totals.monthlyCents },
-    { label: "Yearly payments", amount: totals.annualUpfrontCents },
-    { label: "DUE AT START", amount: totals.dueNowCents },
-    { label: "12-month estimate", amount: totals.yearEstimateCents },
+  const x = 88;
+  const width = 104;
+  const recurringPayments = [
+    { label: "Monthly payment", amount: totals.monthlyCents },
+    { label: "Yearly payment (upfront)", amount: totals.annualUpfrontCents },
   ];
-  layout.fill(PDF_PAGE.left, top, PDF_PAGE.width, 22);
-  payments.forEach(({ label, amount }, index) => {
-    const x = PDF_PAGE.left + index * columnWidth;
-    const dueNow = label === "DUE AT START";
-    if (dueNow) layout.fill(x, top, 0.8, 22, PDF_COLORS.accent);
-    layout.text(layout.t(label), x + 4, top + 6, columnWidth - 8, 7, "normal", PDF_COLORS.muted);
-    layout.text(formatMoney(amount), x + 4, top + 15, columnWidth - 8, dueNow ? 12 : 11, "bold");
+  recurringPayments.forEach(({ label, amount }, index) => {
+    const y = top + 5 + index * 8;
+    layout.text(layout.t(label), x + 4, y, 56, 8.5);
+    layout.right(formatMoney(amount), x + 65, y, 35, 9.5, "bold");
   });
-  layout.y = top + 28;
+  layout.rule(top + 18, x, width);
+  layout.fill(x, top + 21, width, 12);
+  layout.text(layout.t("Due at start"), x + 4, top + 29, 56, 9, "bold");
+  layout.right(formatMoney(totals.dueNowCents), x + 65, top + 29, 35, 13, "bold");
+  layout.text(layout.t("12-month estimate"), x + 4, top + 41, 56, 8.5, "normal", PDF_COLORS.muted);
+  layout.right(formatMoney(totals.yearEstimateCents), x + 65, top + 41, 35, 9.5, "bold");
+  layout.y = top + 48;
 }
 
 export function writeQuoteNotes(layout: QuotePdfLayout, notes: string): void {

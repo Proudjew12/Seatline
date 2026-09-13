@@ -9,6 +9,8 @@ interface PdfText {
   text: string;
   x: number;
   y: number;
+  width: number;
+  fontSize: number;
   page: number;
 }
 
@@ -42,10 +44,19 @@ function readPdfContent(pdf: Buffer): PdfContent {
     return (/\/FlateDecode/.test(object) ? inflateSync(data) : data).toString("latin1");
   };
   const fonts = new Map<string, Map<string, string>>();
+  const fontWidths = new Map<string, Map<number, number>>();
   for (const object of objects.values()) {
     for (const font of object.matchAll(/\/(F\d+) (\d+) 0 R/g)) {
-      const unicodeId = objects.get(Number(font[2]))?.match(/\/ToUnicode (\d+) 0 R/)?.[1];
+      const fontObject = objects.get(Number(font[2]));
+      const unicodeId = fontObject?.match(/\/ToUnicode (\d+) 0 R/)?.[1];
       if (!unicodeId) continue;
+      const descendantId = Number(fontObject?.match(/\/DescendantFonts\s*\[(\d+) 0 R\]/)?.[1]);
+      const widthData = objects.get(descendantId)?.match(/\/W\s*\[([\s\S]*?)\]\s*\/CIDToGIDMap/)?.[1] ?? "";
+      const widths = new Map<number, number>();
+      for (const group of widthData.matchAll(/(\d+)\s*\[([\d.\s]+)\]/g)) {
+        group[2].trim().split(/\s+/).forEach((width, index) => widths.set(Number(group[1]) + index, Number(width)));
+      }
+      fontWidths.set(font[1], widths);
       const glyphs = new Map<string, string>();
       for (const block of stream(Number(unicodeId)).matchAll(/beginbfchar([\s\S]*?)endbfchar/g)) {
         for (const pair of block[1].matchAll(/<([\da-f]+)>\s*<([\da-f]+)>/gi)) {
@@ -68,12 +79,17 @@ function readPdfContent(pdf: Buffer): PdfContent {
       logos.push({ width: Number(image[1]), height: Number(image[2]), x: Number(image[3]), y: Number(image[4]), page });
     }
     for (const block of content.matchAll(/BT\s*([\s\S]*?)\s*ET/g)) {
-      const font = block[1].match(/\/(F\d+) [\d.]+ Tf/)?.[1] ?? "";
+      const fontInfo = block[1].match(/\/(F\d+) ([\d.]+) Tf/);
+      const font = fontInfo?.[1] ?? "";
       const position = block[1].match(/([\d.-]+) ([\d.-]+) Td/);
       const encoded = block[1].match(/<([\da-f]+)> Tj/i)?.[1];
       if (!encoded || !position) continue;
-      const text = (encoded.match(/.{4}/g) ?? []).map((glyph) => fonts.get(font)?.get(glyph.toLowerCase()) ?? "�").join("");
-      texts.push({ text, x: Number(position[1]), y: Number(position[2]), page });
+      const glyphs = encoded.match(/.{4}/g) ?? [];
+      const text = glyphs.map((glyph) => fonts.get(font)?.get(glyph.toLowerCase()) ?? "�").join("");
+      const fontSize = Number(fontInfo?.[2]);
+      const width = glyphs.reduce((sum, glyph) => sum + (fontWidths.get(font)?.get(Number.parseInt(glyph, 16)) ?? Number.NaN), 0) * fontSize / 1000;
+      expect(Number.isFinite(width), `Embedded font contains widths for ${text}`).toBe(true);
+      texts.push({ text, x: Number(position[1]), y: Number(position[2]), width, fontSize, page });
     }
   }
   expect(texts.length).toBeGreaterThan(20);
@@ -92,7 +108,8 @@ function expectLeftLogos({ text, logos }: PdfContent): void {
     expect(logo.x).toBeCloseTo((page === 1 ? 17.25 : 17.5) * pointsPerMm, 3);
     expect(logo.width).toBeCloseTo((page === 1 ? 54 : 34) * pointsPerMm, 3);
     const headerText = text.filter((item) => item.page === page && item.y >= logo.y && item.y <= logo.y + logo.height);
-    expect(headerText.length).toBeGreaterThanOrEqual(page === 1 ? 2 : 1);
+    if (page === 1) expect(headerText).toHaveLength(1);
+    else expect(headerText.length).toBeGreaterThanOrEqual(1);
     for (const item of headerText) {
       expect(item.x, `Header "${item.text}" stays clear of the left logo`).toBeGreaterThan(logo.x + logo.width);
     }
@@ -103,36 +120,75 @@ function expectCompactCaptions(text: PdfText[]): void {
   const values = text.map((item) => item.text);
   for (const caption of [
     "QUOTATION", "Software licenses", "SOFTWARE LICENSE QUOTATION", "All amounts in USD", "PAYMENT SUMMARY",
+    "ISSUED", "SALES PROPOSAL", "PREPARED FOR", "LICENSE DETAILS", "Monthly payments", "Yearly payments",
     "ריחמ תעצה", "הנכות תונוישיר", "הנכות תונוישירל ריחמ תעצה", "ב״הרא רלודב םימוכסה לכ", "םימולשת םוכיס",
+    "הקפה ךיראת", "הריכמ תעצה", "דובכל", "תונוישיר טוריפ",
   ]) expect(values).not.toContain(caption);
   expect(values.join(" ")).not.toMatch(/Prices are in USD|exclude taxes|Annual subscriptions carry|Amount due at start includes|estimate assumes|םיסמ|תובייחתה|ןושארה|וכשמיי/);
 }
 
-function expectCompactHeader(content: PdfContent, locale: "en" | "he", reference = "SEAT-2026-001"): void {
+function expectCompactHeader(content: PdfContent, locale: "en" | "he", reference = "SEAT-2026-001") {
   expectLeftLogos(content);
   expectCompactCaptions(content.text);
+  const pointsPerMm = 72 / 25.4;
   const page = content.text.filter((item) => item.page === 1);
-  const proposal = page.find((item) => item.text === (locale === "en" ? "SALES PROPOSAL" : "הריכמ תעצה"));
-  const issued = page.find((item) => item.text === (locale === "en" ? "ISSUED" : "הקפה ךיראת"));
-  const customer = page.find((item) => item.text === (locale === "en" ? "PREPARED FOR" : "דובכל"));
+  const company = page.find((item) => item.text === (locale === "en" ? "Company:" : ":הרבח"));
+  const table = page.find((item) => item.text === (locale === "en" ? "PRODUCT / LICENSE" : "ןוישיר / רצומ"));
   const date = page.find((item) => item.text.includes(locale === "en" ? "September" : "רבמטפס"));
   const logo = content.logos[0];
-  expect(proposal).toBeDefined();
-  expect(issued).toBeDefined();
-  expect(customer).toBeDefined();
+  expect(company).toBeDefined();
+  expect(table).toBeDefined();
   expect(date).toBeDefined();
-  if (!proposal || !issued || !customer || !date || !logo) throw new Error("Complete header metadata is required");
-  const references = page.filter((item) => item.y < proposal.y && item.y > issued.y);
+  if (!company || !table || !date || !logo) throw new Error("Company, date, and license table are required");
+  const row = page.filter((item) => item.y <= company.y + 0.01 && item.y > table.y);
+  const references = row.filter((item) => item.x >= (locale === "en" ? 144 : 18) * pointsPerMm - 0.1
+    && item.x + item.width <= (locale === "en" ? 192 : 66) * pointsPerMm + 0.1);
+  const customers = row.filter((item) => item !== company && !references.includes(item));
   expect(references.map((item) => item.text).join("")).toBe(reference);
-  for (const item of [proposal, ...references, issued, date]) {
-    expect(item.x, `${item.text} belongs in the physical right header`).toBeGreaterThanOrEqual(102 * 72 / 25.4 - 0.1);
-    expect(item.x).toBeGreaterThan(logo.x + logo.width);
+  expect(customers.length).toBeGreaterThan(0);
+  expect(customers[0].y).toBeCloseTo(company.y, 3);
+  expect(references[0].y).toBeCloseTo(company.y, 3);
+  expect(company.y).toBeCloseTo((297 - 44) * pointsPerMm, 3);
+  expect(date.y).toBeCloseTo((297 - 24) * pointsPerMm, 3);
+  expect(date.x).toBeGreaterThanOrEqual(102 * pointsPerMm);
+  expect(page.filter((item) => item.y > company.y + 0.01)).toEqual([date]);
+  const labelGap = locale === "en" ? customers[0].x - company.x - company.width : company.x - customers[0].x - customers[0].width;
+  expect(labelGap).toBeGreaterThan(3 * pointsPerMm);
+  expect(labelGap).toBeLessThan(4 * pointsPerMm);
+  for (const item of customers) {
+    expect(item.x).toBeGreaterThanOrEqual((locale === "en" ? 18 : 74) * pointsPerMm - 0.1);
+    expect(item.x + item.width).toBeLessThanOrEqual((locale === "en" ? 136 : 192) * pointsPerMm + 0.1);
   }
+  expect(table.y).toBeLessThan(Math.min(...row.map((item) => item.y)));
   expect(date.text).toContain("2026");
   expect(date.text).toContain("11");
-  expect(issued.y).toBeLessThan(proposal.y);
-  expect(date.y).toBeLessThan(issued.y);
-  expect(customer.y).toBeLessThan(Math.min(date.y, logo.y));
+  return { company, customers, references, table };
+}
+
+function expectPaymentLedger(content: PdfContent, locale: "en" | "he", expectedAmounts: readonly string[]): void {
+  const patterns = locale === "en"
+    ? ["Monthly payment", "Yearly payment (upfront)", "Due at start", "12-month estimate"]
+    : [/^ישדוח םולשת$/, /^\(שארמ\) יתנש םולשת$/, /^הפוקתה תליחתב םולשתל$/, /ןדמוא/];
+  const labels = patterns.map((pattern) => {
+    const label = content.text.find((item) => typeof pattern === "string" ? item.text === pattern : pattern.test(item.text));
+    if (!label) throw new Error(`Missing payment label: ${String(pattern)}`);
+    return label;
+  });
+  if (locale === "he") expect(labels[1].text).toContain("שארמ");
+  expect(new Set(labels.map((item) => item.page)).size).toBe(1);
+  const amounts = labels.map((label, index) => {
+    const amount = content.text.find((item) => item.page === label.page && Math.abs(item.y - label.y) < 0.01 && item.text.startsWith("$"));
+    if (!amount) throw new Error(`Missing amount beside ${label.text}`);
+    expect(amount.text).toBe(expectedAmounts[index]);
+    expect(amount.x + amount.width).toBeCloseTo((locale === "en" ? 188 : 57) * 72 / 25.4, 0);
+    if (locale === "en") expect(amount.x).toBeGreaterThan(label.x + label.width);
+    else expect(label.x).toBeGreaterThan(amount.x + amount.width);
+    if (index > 0) expect(label.y).toBeLessThan(labels[index - 1].y - 4 * 72 / 25.4);
+    return amount;
+  });
+  const rightEdges = amounts.map((item) => item.x + item.width);
+  expect(Math.max(...rightEdges) - Math.min(...rightEdges)).toBeLessThan(0.25);
+  expect(amounts[2].fontSize).toBeGreaterThan(amounts[0].fontSize);
 }
 
 interface QuoteScenario {
@@ -175,7 +231,9 @@ async function renderQuote(page: Page, testInfo: TestInfo, locale: "en" | "he", 
 
 for (const locale of ["en", "he"] as const) {
   test(`exports ${locale} selling prices above 100% profit without exposing cost or rate`, async ({ page }, testInfo) => {
-    const { text } = await renderQuote(page, testInfo, locale, { markupPercent: "150" });
+    const content = await renderQuote(page, testInfo, locale, { markupPercent: "150" });
+    expectPaymentLedger(content, locale, ["$125.00", "$0.00", "$125.00", "$1,500.00"]);
+    const { text } = content;
     const values = text.map((item) => item.text);
     expect(values).toContain("$62.50");
     expect(values).toContain("$125.00");
@@ -188,7 +246,9 @@ for (const locale of ["en", "he"] as const) {
   });
 
   test(`exports ${locale} discounted customer prices without exposing cost or profit`, async ({ page }, testInfo) => {
-    const { text } = await renderQuote(page, testInfo, locale, { markupPercent: "20", discountPercent: "10" });
+    const content = await renderQuote(page, testInfo, locale, { markupPercent: "20", discountPercent: "10" });
+    expectPaymentLedger(content, locale, ["$54.00", "$0.00", "$54.00", "$648.00"]);
+    const { text } = content;
     const values = text.map((item) => item.text);
     expect(values).toContain("$27.00");
     expect(values).toContain("$54.00");
@@ -201,7 +261,8 @@ for (const locale of ["en", "he"] as const) {
 
   test(`exports ${locale} customer prices and mixed-script details with a fixed left logo`, async ({ page }, testInfo) => {
     const content = await renderQuote(page, testInfo, locale);
-    expectCompactHeader(content, locale);
+    const header = expectCompactHeader(content, locale);
+    expectPaymentLedger(content, locale, ["$58.50", "$0.00", "$58.50", "$702.00"]);
     const { text } = content;
     const values = text.map((item) => item.text);
     expect(values).toContain("$29.25");
@@ -217,14 +278,12 @@ for (const locale of ["en", "he"] as const) {
     const customer = text.find((item) => item.text === "ןהכ דוד");
     expect(customer).toBeDefined();
     if (locale === "en") {
-      expect(customer?.x).toBeCloseTo(18 * 72 / 25.4, 3);
-      expect(values).toContain("PREPARED FOR");
-      expect(values).toContain("SALES PROPOSAL");
+      expect(customer?.x).toBeGreaterThan(header.company.x + header.company.width);
+      expect(values).toContain("Company:");
       expect(values).not.toContain("QUOTE REFERENCE");
     } else {
-      expect(customer?.x).toBeGreaterThan(150 * 72 / 25.4);
-      expect(values).toContain("דובכל");
-      expect(values).toContain("הריכמ תעצה");
+      expect(customer?.x).toBeLessThan(header.company.x);
+      expect(values).toContain(":הרבח");
       expect(values).not.toContain("QUOTATION");
       expect(values).not.toContain("Monthly payments");
       const license = text.find((item) => item.text === "Business Basic");
@@ -240,6 +299,7 @@ for (const locale of ["en", "he"] as const) {
       lineCount: 8, notes: "Please confirm this proposal.", markupPercent: "20", discountPercent: "10",
     });
     expectCompactHeader(content, locale);
+    expectPaymentLedger(content, locale, ["$216.00", "$216.00", "$432.00", "$2,808.00"]);
     expect(content.logos).toHaveLength(1);
     expect(new Set(content.text.map((item) => item.page))).toEqual(new Set([1]));
     const values = content.text.map((item) => item.text);
@@ -261,14 +321,11 @@ for (const locale of ["en", "he"] as const) {
     const customer = `${"Northwind Enterprise Services ".repeat(6)}Customer End`;
     const reference = `PROPOSAL-${"ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789".repeat(2)}`.slice(0, 64);
     const content = await renderQuote(page, testInfo, locale, { customer, reference, notes: "Final note 98765." });
-    expectCompactHeader(content, locale, reference);
-    const prepared = content.text.find((item) => item.text === (locale === "en" ? "PREPARED FOR" : "דובכל"));
-    const details = content.text.find((item) => item.text === (locale === "en" ? "LICENSE DETAILS" : "תונוישיר טוריפ"));
-    if (!prepared || !details) throw new Error("Customer and license sections must be present");
-    const customers = content.text.filter((item) => item.page === 1 && item.y < prepared.y && item.y > details.y);
+    const { customers, references, table } = expectCompactHeader(content, locale, reference);
     expect(customers.length).toBeGreaterThan(1);
+    expect(references.length).toBeGreaterThan(1);
     expect(customers.map((item) => item.text).join(" ")).toBe(customer);
-    expect(details.y).toBeLessThan(Math.min(...customers.map((item) => item.y)));
+    expect(table.y).toBeLessThan(Math.min(...[...customers, ...references].map((item) => item.y)));
     expect(content.text.map((item) => item.text)).toContain("Business Basic");
     expect(content.text.map((item) => item.text)).toContain("Final note 98765.");
   });
@@ -276,6 +333,7 @@ for (const locale of ["en", "he"] as const) {
   test(`paginates ${locale} license details and notes with repeated left logos and localized headers and footers`, async ({ page }, testInfo) => {
     const content = await renderQuote(page, testInfo, locale, { long: true });
     expectCompactHeader(content, locale);
+    expectPaymentLedger(content, locale, ["$702.00", "$702.00", "$1,404.00", "$9,126.00"]);
     const { text } = content;
     const pageCount = Math.max(...text.map((item) => item.page));
     expect(pageCount).toBeGreaterThan(2);

@@ -295,9 +295,12 @@ catalog and display keys and writes new `seatline.*` keys, leaving the old value
 recovery. Only those compatibility keys and migration tests retain the previous name.
 Customer PDFs use Logi branding, an original
 transparent logo, embedded regular/bold fonts, a license table with repeated column headers, a compact
-four-column payment totals strip, and numbered pages. The first header places Sales Proposal and
-issue date at the top right beside the left logo, followed by customer details. It omits the generic
-document title/subtitle, currency caption, payment-summary heading and explanatory terms. Short quotes
+payment ledger, and numbered pages. The first header places the date alone beside the left logo,
+then an inline **Company: name** and proposal reference on the same row. The ledger aligns each label
+with its amount, identifies the yearly payment as upfront, and highlights the amount due at the start.
+The 12-month estimate appears separately beneath it. PDFs omit the generic document title/subtitle,
+Sales Proposal, Issued, Prepared For and License Details labels, currency caption, payment-summary
+heading and explanatory terms. Short quotes
 fit one page with readable body text; long names and notes wrap across pages, and monthly versus annual
 prices remain explicit. The document language follows settings; its print theme stays light.
 Hebrew customer names in English documents remain aligned with the left customer block. Hebrew

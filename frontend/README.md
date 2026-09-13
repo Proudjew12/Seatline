@@ -169,9 +169,12 @@ the bilingual message catalogs and locale context, shared with PDF generation. N
 service receives customer data. `health` owns the operational API connection check. Heavy PDF code
 loads only on export; its regular/bold fonts and license are in `public/fonts/`. Customer quotations
 use the original Logi logo in `public/branding/`, with the source recorded beside the asset. The
-PDF has a compact item table, four-column payment totals, repeated table headers, and page numbers.
-Sales Proposal and issue date sit beside the fixed-left logo in the first-page header. The generic
-document title/subtitle, currency caption, payment-summary heading and terms are omitted. Continuation
+PDF has a compact item table, an aligned payment ledger, repeated table headers, and page numbers.
+The date sits alone beside the fixed-left logo. An inline Company/name and proposal reference share
+the following row, mirrored for Hebrew. Totals use label/amount rows, clearly identify the yearly
+upfront payment, highlight the amount due at the start, and separate the 12-month estimate below it.
+The generic title/subtitle, Sales Proposal, Issued, Prepared For, License Details, currency caption,
+payment-summary heading and terms are omitted. Continuation
 pages keep just a small left logo and right-side proposal reference, while Hebrew content keeps RTL.
 Eight short license rows and a brief note fit on one page; long names and notes remain fully printable.
 It bundles its assets locally and does not contact Logi's website during export.

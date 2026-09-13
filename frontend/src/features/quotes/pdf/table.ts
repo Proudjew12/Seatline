@@ -52,9 +52,7 @@ function writeRow(layout: QuotePdfLayout, line: QuoteLine): void {
 }
 
 export function writeQuoteTable(layout: QuotePdfLayout, lines: QuoteLine[]): void {
-  layout.ensureSpace(13 + (lines[0] ? rowHeight(layout, lines[0]) : 16));
-  layout.text(layout.t("LICENSE DETAILS"), PDF_PAGE.left, layout.y, 100, 8, "bold");
-  layout.y += 5;
+  layout.ensureSpace(8 + (lines[0] ? rowHeight(layout, lines[0]) : 16));
   tableHeader(layout);
   lines.forEach((line) => writeRow(layout, line));
   layout.y += 4;
