@@ -101,7 +101,8 @@ to a server.
 Acceptance checks cover disabled dragging in Edit Mode, desktop mouse drag, immediate tablet drag,
 ignored clicks/taps, keyboard addition, product/license profit inheritance and explicit overrides,
 per-line profit/discount rounding, net earnings and customer-only PDF amounts, compact header/card controls and docked Notes,
-Hebrew/English layout and PDF text/coordinates/pagination, theme gallery selection and persistence,
+Hebrew/English layout and PDF text/coordinates/pagination, compact one-page quotes with eight short
+license rows and a note, theme gallery selection and persistence,
 Default-only Light/Dark controls, nested-dialog keyboard focus, readable narrow-screen previews,
 all three billing schedules, invalid input, local persistence, PDF download and retry, responsive
 layout, saved text-size preferences, empty-product creation, searchable/persistent icons, catalog
@@ -233,7 +234,7 @@ The private profit strip centers the formula and result together with a small fi
 the calculation on one line, with compact typography for unusually long amounts on
 narrow cards. Notes stay docked immediately above payments while desktop/tablet quote cards scroll;
 on narrow screens, notes remain after the cards and before the summary in normal page flow.
-The website summary omits the redundant USD/tax caption; PDF terms and USD formatting remain explicit.
+The website summary omits the redundant USD/tax caption; PDF prices retain their USD formatting.
 The header displays only the Seatline name at the top left, with a settings gear at the top right.
 Theme previews use the same wordmark-only header. The accessible settings
 dialog contains the Edit Mode switch, text size from 50% to 150% in 10% steps, a Theme row with a
@@ -293,13 +294,17 @@ with the old storage entry retained for recovery. The Seatline rename reads prev
 catalog and display keys and writes new `seatline.*` keys, leaving the old values intact for
 recovery. Only those compatibility keys and migration tests retain the previous name.
 Customer PDFs use Logi branding, an original
-transparent logo, embedded regular/bold fonts, a license table with repeated headers, a payment
-summary, and numbered pages. Long names and notes wrap across pages, and monthly versus annual
+transparent logo, embedded regular/bold fonts, a license table with repeated column headers, a compact
+four-column payment totals strip, and numbered pages. The first header places Sales Proposal and
+issue date at the top right beside the left logo, followed by customer details. It omits the generic
+document title/subtitle, currency caption, payment-summary heading and explanatory terms. Short quotes
+fit one page with readable body text; long names and notes wrap across pages, and monthly versus annual
 prices remain explicit. The document language follows settings; its print theme stays light.
 Hebrew customer names in English documents remain aligned with the left customer block. Hebrew
 documents mirror the sections and columns while preserving English product/license names and
-USD amounts. The Logi logo stays physically left on every page in both languages, with the
-translated document heading and continuation reference on the right. Markup percentages, base
+USD amounts. The Logi logo stays physically left on every page in both languages. Continuation pages
+keep only a small logo and proposal reference above the content, without repeating the top title.
+Markup percentages, base
 prices, and company earnings are never written to the PDF; discounted final prices remain customer-facing.
 PDF filenames use `Logi-<reference>.pdf`; the app itself remains Seatline.
 

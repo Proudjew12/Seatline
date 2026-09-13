@@ -8,54 +8,43 @@ function quoteDate(value: string, locale: QuotePdfLayout["locale"]): string {
 }
 
 export function writeQuoteHeading(layout: QuotePdfLayout, draft: QuoteDraft): void {
-  layout.logoAt(PDF_PAGE.left - 0.75, 16, 54);
-  layout.headerText(layout.t("QUOTATION"), 102, 26, 90, 21, "bold");
-  layout.headerText(layout.t("Software licenses"), 102, 33, 90, 9, "normal", PDF_COLORS.muted);
-  layout.rule(45, PDF_PAGE.left, PDF_PAGE.width, true);
+  layout.logoAt(PDF_PAGE.left - 0.75, 14, 54);
+  layout.headerText(layout.t("SALES PROPOSAL"), 102, 18, 90, 7, "bold", PDF_COLORS.muted);
+  const references = layout.wrap(cleanPdfField(draft.reference), 90, 11.5, "bold");
+  references.forEach((reference, index) => layout.headerText(reference, 102, 24 + index * 5.3, 90, 11.5, "bold"));
+  const dateY = 25 + references.length * 5.3;
+  layout.headerText(layout.t("ISSUED"), 102, dateY, 90, 7, "bold", PDF_COLORS.muted);
+  layout.headerText(quoteDate(draft.date, layout.locale), 102, dateY + 5, 90, 9);
+  const ruleY = Math.max(36, dateY + 10);
+  layout.rule(ruleY, PDF_PAGE.left, PDF_PAGE.width, true);
 
-  layout.text(layout.t("PREPARED FOR"), PDF_PAGE.left, 57, 92, 7.5, "bold", PDF_COLORS.muted);
-  const customers = layout.wrap(cleanPdfField(draft.customer), 95, 12, "bold");
-  customers.forEach((name, index) => layout.text(name, PDF_PAGE.left, 65 + index * 5.8, 95, 12, "bold"));
-  layout.text(layout.t("SALES PROPOSAL"), 126, 57, 66, 7, "bold", PDF_COLORS.muted);
-  const references = layout.wrap(cleanPdfField(draft.reference), 66, 9.5);
-  references.forEach((reference, index) => layout.text(reference, 126, 64 + index * 4.6, 66, 9.5));
-  const dateY = 69 + references.length * 4.6;
-  layout.text(layout.t("ISSUED"), 126, dateY, 66, 7, "bold", PDF_COLORS.muted);
-  layout.text(quoteDate(draft.date, layout.locale), 126, dateY + 6, 66, 9);
-  layout.y = Math.max(65 + customers.length * 5.8, dateY + 6) + 14;
+  layout.text(layout.t("PREPARED FOR"), PDF_PAGE.left, ruleY + 7, PDF_PAGE.width, 7.5, "bold", PDF_COLORS.muted);
+  const customers = layout.wrap(cleanPdfField(draft.customer), PDF_PAGE.width, 11.5, "bold");
+  const customerY = ruleY + 13;
+  customers.forEach((name, index) => layout.text(name, PDF_PAGE.left, customerY + index * 5.5, PDF_PAGE.width, 11.5, "bold"));
+  layout.y = customerY + (customers.length - 1) * 5.5 + 9;
 }
 
 export function writeQuoteSummary(layout: QuotePdfLayout, draft: QuoteDraft): void {
   const totals = calculateQuote(draft.lines);
-  layout.ensureSpace(65);
+  layout.ensureSpace(22);
   const top = layout.y;
-  layout.text(layout.t("PAYMENT SUMMARY"), PDF_PAGE.left, top + 4, 75, 8, "bold");
-  const terms = [
-    "Prices are in USD and exclude taxes.",
-    "Annual subscriptions carry a 12-month commitment.",
-    "Amount due at start includes the first monthly payment and each yearly payment in full.",
-    "The 12-month estimate assumes monthly subscriptions continue for 12 months.",
+  const columnWidth = PDF_PAGE.width / 4;
+  const payments = [
+    { label: "Monthly payments", amount: totals.monthlyCents },
+    { label: "Yearly payments", amount: totals.annualUpfrontCents },
+    { label: "DUE AT START", amount: totals.dueNowCents },
+    { label: "12-month estimate", amount: totals.yearEstimateCents },
   ];
-  let termsY = top + 12;
-  for (const term of terms) {
-    const lines = layout.wrap(layout.t(term), 70, 7.5);
-    lines.forEach((line, index) => layout.text(line, PDF_PAGE.left, termsY + index * 3.8, 70, 7.5, "normal", PDF_COLORS.muted));
-    termsY += lines.length * 3.8 + 2.5;
-  }
-
-  const summaryX = 101;
-  layout.text(layout.t("Monthly payments"), summaryX, top + 4, 51, 8);
-  layout.right(formatMoney(totals.monthlyCents), 153, top + 4, 39, 9, "bold");
-  layout.text(layout.t("Yearly payments"), summaryX, top + 12, 51, 8);
-  layout.right(formatMoney(totals.annualUpfrontCents), 153, top + 12, 39, 9, "bold");
-  layout.rule(top + 17, summaryX, 91);
-  layout.fill(summaryX, top + 21, 91, 20);
-  layout.fill(summaryX, top + 21, 1, 20, PDF_COLORS.accent);
-  layout.text(layout.t("DUE AT START"), summaryX + 5, top + 27, 81, 7, "bold", PDF_COLORS.muted);
-  layout.right(formatMoney(totals.dueNowCents), summaryX + 5, top + 36, 81, 16, "bold");
-  layout.text(layout.t("12-month estimate"), summaryX, top + 49, 47, 8);
-  layout.right(formatMoney(totals.yearEstimateCents), 148, top + 49, 44, 9, "bold");
-  layout.y = Math.max(top + 57, termsY) + 8;
+  layout.fill(PDF_PAGE.left, top, PDF_PAGE.width, 22);
+  payments.forEach(({ label, amount }, index) => {
+    const x = PDF_PAGE.left + index * columnWidth;
+    const dueNow = label === "DUE AT START";
+    if (dueNow) layout.fill(x, top, 0.8, 22, PDF_COLORS.accent);
+    layout.text(layout.t(label), x + 4, top + 6, columnWidth - 8, 7, "normal", PDF_COLORS.muted);
+    layout.text(formatMoney(amount), x + 4, top + 15, columnWidth - 8, dueNow ? 12 : 11, "bold");
+  });
+  layout.y = top + 28;
 }
 
 export function writeQuoteNotes(layout: QuotePdfLayout, notes: string): void {

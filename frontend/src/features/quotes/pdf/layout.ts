@@ -125,16 +125,15 @@ export class QuotePdfLayout {
     if (this.y + height <= PDF_PAGE.bottom) return false;
     this.document.addPage();
     this.logoAt(PDF_PAGE.left - 0.5, 12, 34);
-    this.headerText(this.t("SOFTWARE LICENSE QUOTATION"), 97, 17, 95, 8, "bold");
     const references = this.wrap(this.reference, 85, 7.5);
-    references.forEach((line, index) => this.headerText(line, 107, 23 + index * 4, 85, 7.5, "normal", PDF_COLORS.muted));
-    this.y = Math.max(34, 29 + references.length * 4);
+    references.forEach((line, index) => this.headerText(line, 107, 19 + index * 4, 85, 7.5, "normal", PDF_COLORS.muted));
+    this.y = Math.max(32, 25 + references.length * 4);
     this.rule(this.y - 4);
     return true;
   }
 
   paragraph(value: string, size = 9, color = PDF_COLORS.ink): void {
-    const height = size * 0.3528 * 1.5;
+    const height = size * 0.3528 * 1.4;
     for (const paragraph of cleanPdfText(value).split("\n")) {
       const rtl = isRtl(paragraph);
       for (const line of this.wrap(paragraph, PDF_PAGE.width, size)) {
@@ -148,9 +147,9 @@ export class QuotePdfLayout {
   }
 
   label(value: string): void {
-    this.ensureSpace(13);
+    this.ensureSpace(11);
     this.text(this.t(value).toUpperCase(), PDF_PAGE.left, this.y, PDF_PAGE.width, 7.5, "bold", PDF_COLORS.muted);
-    this.y += 7;
+    this.y += 5;
   }
 
   finish(): void {
