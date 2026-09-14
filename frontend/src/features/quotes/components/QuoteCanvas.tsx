@@ -2,6 +2,7 @@ import { pointerIntersection } from "@dnd-kit/collision";
 import { useDroppable } from "@dnd-kit/react";
 
 import { useI18n } from "@/shared/i18n/context";
+import { SeatlineMark } from "@/components/branding/SeatlineMark";
 import { Icon } from "@/components/ui/Icon";
 import { QuoteLineEditor } from "@/features/quotes/components/QuoteLineEditor";
 import { QuoteSummary } from "@/features/quotes/components/QuoteSummary";
@@ -42,7 +43,7 @@ export function QuoteCanvas({ quote, exporting, onExport, onNewOrder, catalogWar
           {draft.lines.map((line) => <QuoteLineEditor key={line.id} line={line} onChange={(patch) => quote.editLine(line.id, patch)}
             onRemove={() => quote.removeLine(line.id)} />)}
           {draft.lines.length === 0 ? <div className={styles.empty}>
-            <span className={styles.dropIcon}><Icon name="documentPlus" size={32} strokeWidth={1.5} /></span>
+            <span className={styles.dropIcon}><SeatlineMark /></span>
             <p>{t(editing ? "Catalog editing is on. Return to Normal Mode to drag licenses." : "Drag a license card here to add it")}</p>
           </div> : null}
         </section>

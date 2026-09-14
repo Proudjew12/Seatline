@@ -265,7 +265,7 @@ for (const group of themeGroups) {
     await page.goto("/");
     await expect(page).toHaveTitle("Seatline");
     const banner = page.getByRole("banner");
-    await expect(banner.getByText("Seatline", { exact: true })).toBeVisible();
+    await expect(banner.getByRole("img", { name: "Seatline", exact: true })).toBeVisible();
     await expect(banner.getByText("S", { exact: true })).toHaveCount(0);
     await page.getByLabel("Customer", { exact: true }).fill("Icon theme customer");
     await page.getByRole("button", { name: "Add Business Basic to quote", exact: true }).press("Enter");
@@ -295,7 +295,7 @@ for (const group of themeGroups) {
       }
       await expect(page.getByLabel("Customer", { exact: true })).toHaveValue("Icon theme customer");
       await expect(page.getByLabel("Monthly payments", { exact: true })).toHaveText("$22.00");
-      await expect(banner.getByText("Seatline", { exact: true })).toBeVisible();
+      await expect(banner.getByRole("img", { name: "Seatline", exact: true })).toBeVisible();
       await page.screenshot({ path: testInfo.outputPath(`product-icons-${name.toLowerCase().replaceAll(" ", "-")}.png`) });
       if (name === "Aurora Ocean") {
         const creation = await addProductDialog(page);

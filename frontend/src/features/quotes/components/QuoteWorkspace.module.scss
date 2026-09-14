@@ -11,8 +11,7 @@
   box-shadow: var(--shadow-header); position: relative; z-index: 1;
 }
 .brand {
-  display: inline-flex; align-items: center; color: var(--color-text); flex-shrink: 0;
-  font-size: 20px; letter-spacing: -.02em; font-weight: 600; min-height: 44px;
+  display: inline-flex; align-items: center; flex-shrink: 0; min-height: 44px;
 }
 .newOrder {
   display: flex; align-items: center; gap: 8px; justify-content: center;
@@ -89,6 +88,5 @@
 }
 @media (max-width: 420px) {
   .header { gap: 6px; padding-inline: 10px; }
-  .brand { font-size: 18px; }
   .toolbar { gap: 6px; }
 }

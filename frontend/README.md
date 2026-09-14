@@ -9,7 +9,11 @@ symbols from product names, supports manual choices and preserves selections aft
 the picker and product rail. Shared brand artwork appears once, with Google / Workspace and
 Microsoft / Windows searchable under either name; older saved icon choices continue to resolve.
 Sources and licensing are documented in `src/features/catalog/icons/`.
-The top-left header and theme previews show only the Seatline name.
+The top-left header and theme previews use the owner's outlined Seatline wordmark, without a
+separate symbol. The empty quote uses the matching stacked-seat mark. These locally bundled Penpot
+assets keep their original proportions and adapt to the active theme; the wordmark stays LTR in
+Hebrew. Browser tabs and home-screen shortcuts use the original blue-and-white app icon.
+Source/export details are documented in `public/branding/`.
 Each product has a default Profit rate, with optional per-license overrides.
 Rates support 0–1,000,000% with up to two decimal places, including rates above 100%.
 A blank license rate inherits its product, while zero is an explicit override. New quote lines

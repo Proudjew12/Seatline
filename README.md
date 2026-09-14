@@ -1,5 +1,7 @@
 # Seatline
 
+<img src="frontend/public/branding/seatline-logo.svg" alt="Seatline — more seats, less sheets." width="400" />
+
 Seatline builds customer quotes for software licenses using your own USD prices. Its React + Vite
 frontend runs independently on GitHub Pages, including PDF export. The separate FastAPI backend
 provides the operational health API and remains available for future server features.
@@ -214,7 +216,12 @@ and tablet requirement without a native app or Expo. Revisit persistence and API
 shared accounts or durable quote history become requirements.
 
 The interface uses soft gray surfaces, navy text, blue accents, and a compact product rail and license
-list. Narrower order cards fit five per row at a 1867px desktop width, three at 1440px and two at
+list. The owner's Penpot brand kit supplies the outlined Seatline wordmark, stacked-seat symbol,
+and blue app icon. Headers and theme previews use the wordmark without a separate symbol; the empty
+quote uses the seat mark. Both adapt to the active theme and keep their original proportions in
+English and Hebrew. The browser favicon and home-screen icon use the original blue-and-white tile.
+Artwork is bundled locally, with source/export details in `frontend/public/branding/`.
+Narrower order cards fit five per row at a 1867px desktop width, three at 1440px and two at
 1180px at the default text size, adapting to fewer columns as text grows. Empty grid tracks retain
 the same card width when an order has only one item. Compact fields retain larger touch targets
 on tablets. Each card centers a smaller product caption above its prominent license title.

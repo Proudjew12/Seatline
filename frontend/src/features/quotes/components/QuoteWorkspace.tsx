@@ -1,6 +1,7 @@
 import { DragDropProvider } from "@dnd-kit/react";
 import { useState } from "react";
 
+import { SeatlineWordmark } from "@/components/branding/SeatlineWordmark";
 import { CatalogDialog } from "@/features/catalog/components/CatalogDialog";
 import type { CatalogDialogTarget, CatalogEditorInput } from "@/features/catalog/components/CatalogDialog";
 import { CatalogPanel } from "@/features/catalog/components/CatalogPanel";
@@ -83,7 +84,7 @@ export function QuoteWorkspace() {
         event.preventDefault(); document.getElementById("quote-content")?.focus();
       }}>{t("Skip to main content")}</a>
       <header className={styles.header}>
-        <div className={styles.brand} dir="ltr">Seatline</div>
+        <div className={styles.brand} dir="ltr"><SeatlineWordmark /></div>
         <div className={styles.toolbar}>
           <SettingsControl editing={editing} onEditingChange={setEditing} />
         </div>

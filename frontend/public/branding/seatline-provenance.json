@@ -1,0 +1,72 @@
+{
+  "source": "Owner-supplied Seatline brand kit in Penpot",
+  "exported_on": "2026-09-14",
+  "penpot_file_id": "d8ac01df-6646-81d2-8008-a3a422bfe2cc",
+  "penpot_page_id": "d8ac01df-6646-81d2-8008-a3a422bfe2cd",
+  "license_note": "Provided by the project owner for use in Seatline. No third-party icon license is asserted.",
+  "assets": [
+    {
+      "file": "branding/seatline-wordmark.svg",
+      "source_nodes": [
+        "a98c3f79-ccc4-8044-8008-a3a43ca42b66",
+        "a98c3f79-ccc4-8044-8008-a3a43ca42b67"
+      ],
+      "source_svg_sha256": "20c4339ea8da717a523e2da26872e00b1ed9dbcdd86360b73da06ab28341e2ca",
+      "sha256": "20c4339ea8da717a523e2da26872e00b1ed9dbcdd86360b73da06ab28341e2ca",
+      "treatment": "Unchanged Penpot SVG export. Two original outlined wordmark paths; transparent background."
+    },
+    {
+      "file": "branding/seatline-mark.svg",
+      "source_nodes": [
+        "a98c3f79-ccc4-8044-8008-a3a43ca6a05d",
+        "a98c3f79-ccc4-8044-8008-a3a43ca6a05e",
+        "a98c3f79-ccc4-8044-8008-a3a43ca6a05f"
+      ],
+      "source_svg_sha256": "2eab545cdae3e5568aef66f04f2cb8e1a009e83a219411bd64e2c77145ef9550",
+      "sha256": "2eab545cdae3e5568aef66f04f2cb8e1a009e83a219411bd64e2c77145ef9550",
+      "treatment": "Unchanged Penpot SVG export. Three original seat symbol paths; transparent background."
+    },
+    {
+      "file": "branding/seatline-wordmark-accent.svg",
+      "source_nodes": [
+        "a98c3f79-ccc4-8044-8008-a3a43ca42b66",
+        "a98c3f79-ccc4-8044-8008-a3a43ca42b67"
+      ],
+      "source_svg_sha256": "20c4339ea8da717a523e2da26872e00b1ed9dbcdd86360b73da06ab28341e2ca",
+      "sha256": "95278517fbe3d460e8fdd3fd0d56d5aa0ab3ef1630ecef522015b47d35e5fc8b",
+      "treatment": "Removed the seat group, preserving the original line path and full wordmark viewBox for a theme-colored overlay. No path geometry changed."
+    },
+    {
+      "file": "favicon.svg",
+      "source_nodes": [
+        "a98c3f79-ccc4-8044-8008-a3a43ca60b8a"
+      ],
+      "source_svg_sha256": "d7590d033f927b412923341cfc115df89fe544fbdc0848bf67ecc7adfd4f6bc3",
+      "sha256": "d7590d033f927b412923341cfc115df89fe544fbdc0848bf67ecc7adfd4f6bc3",
+      "treatment": "Unchanged blue app icon SVG export, including original white mark, rounded tile, and shadow."
+    },
+    {
+      "file": "branding/seatline-touch-icon.png",
+      "source_nodes": [
+        "a98c3f79-ccc4-8044-8008-a3a43ca60b8a"
+      ],
+      "source_svg_sha256": "d7590d033f927b412923341cfc115df89fe544fbdc0848bf67ecc7adfd4f6bc3",
+      "sha256": "6d4d4a5a1fd898a1e2a7634fdd1781e906cb1a03522a17306a0f3f092b193c48",
+      "treatment": "Unchanged 223 by 223 PNG exported from the same blue app icon node."
+    },
+    {
+      "file": "branding/seatline-logo.svg",
+      "source_nodes": [
+        "a98c3f79-ccc4-8044-8008-a3a43ca42b66",
+        "a98c3f79-ccc4-8044-8008-a3a43ca42b67",
+        "a98c3f79-ccc4-8044-8008-a3a43ca6a05d",
+        "a98c3f79-ccc4-8044-8008-a3a43ca6a05e",
+        "a98c3f79-ccc4-8044-8008-a3a43ca6a05f",
+        "a98c3f79-ccc4-8044-8008-a3a43ca549e0"
+      ],
+      "source_svg_sha256": "20ba233f58f9412640ed341c2eaa6a8b965c00e5e2fbb76746c9059a0306f228",
+      "sha256": "360f2d9b68f432c7a5dd4f3cb180a44b284b8621fd1656604d8ed87f001c1842",
+      "treatment": "Original symbol, wordmark and outlined tagline, with a white backdrop and 36-unit clear space for documentation on light or dark pages. No path geometry changed."
+    }
+  ]
+}

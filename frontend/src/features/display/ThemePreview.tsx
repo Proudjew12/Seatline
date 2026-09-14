@@ -1,3 +1,4 @@
+import { SeatlineWordmark } from "@/components/branding/SeatlineWordmark";
 import { Icon } from "@/components/ui/Icon";
 import { useI18n } from "@/shared/i18n/context";
 
@@ -11,7 +12,7 @@ export function ThemePreview({ palette }: ThemePreviewProps) {
   return (
     <span className={styles.preview} data-theme={palette} dir={dir} aria-hidden="true">
       <span className={styles.frame}>
-        <span className={styles.header} dir="ltr">Seatline<Icon name="settings" size={11} /></span>
+        <span className={styles.header} dir="ltr"><SeatlineWordmark size="preview" /><Icon name="settings" size={11} /></span>
         <span className={styles.body}>
           <span className={styles.rail}><span className={styles.active}><Icon name="grid" size={12} /></span><Icon name="monitor" size={11} /><Icon name="documentPlus" size={11} /></span>
           <span className={styles.catalog}>
