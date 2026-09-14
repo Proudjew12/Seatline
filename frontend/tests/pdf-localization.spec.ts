@@ -1,101 +1,10 @@
 import { writeFile } from "node:fs/promises";
-import { inflateSync } from "node:zlib";
 
 import type { Page, TestInfo } from "@playwright/test";
 
 import { expect, test } from "./fixtures";
-
-interface PdfText {
-  text: string;
-  x: number;
-  y: number;
-  width: number;
-  fontSize: number;
-  page: number;
-}
-
-interface PdfLogo {
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-  page: number;
-}
-
-interface PdfContent {
-  text: PdfText[];
-  logos: PdfLogo[];
-}
-
-// Decode the actual embedded Unicode glyphs and page coordinates with Node's built-in
-// zlib. This keeps PDF assertions portable without a system PDF reader or test dependency.
-function readPdfContent(pdf: Buffer): PdfContent {
-  const objects = new Map<number, string>();
-  for (const match of pdf.toString("latin1").matchAll(/(\d+) 0 obj\s*([\s\S]*?)\s*endobj/g)) {
-    objects.set(Number(match[1]), match[2]);
-  }
-  const stream = (id: number): string => {
-    const object = objects.get(id) ?? "";
-    const start = object.indexOf("stream\n") + 7;
-    const length = Number(object.match(/\/Length\s+(\d+)/)?.[1]);
-    expect(start).toBeGreaterThan(6);
-    expect(length).toBeGreaterThan(0);
-    const data = Buffer.from(object.slice(start, start + length), "latin1");
-    return (/\/FlateDecode/.test(object) ? inflateSync(data) : data).toString("latin1");
-  };
-  const fonts = new Map<string, Map<string, string>>();
-  const fontWidths = new Map<string, Map<number, number>>();
-  for (const object of objects.values()) {
-    for (const font of object.matchAll(/\/(F\d+) (\d+) 0 R/g)) {
-      const fontObject = objects.get(Number(font[2]));
-      const unicodeId = fontObject?.match(/\/ToUnicode (\d+) 0 R/)?.[1];
-      if (!unicodeId) continue;
-      const descendantId = Number(fontObject?.match(/\/DescendantFonts\s*\[(\d+) 0 R\]/)?.[1]);
-      const widthData = objects.get(descendantId)?.match(/\/W\s*\[([\s\S]*?)\]\s*\/CIDToGIDMap/)?.[1] ?? "";
-      const widths = new Map<number, number>();
-      for (const group of widthData.matchAll(/(\d+)\s*\[([\d.\s]+)\]/g)) {
-        group[2].trim().split(/\s+/).forEach((width, index) => widths.set(Number(group[1]) + index, Number(width)));
-      }
-      fontWidths.set(font[1], widths);
-      const glyphs = new Map<string, string>();
-      for (const block of stream(Number(unicodeId)).matchAll(/beginbfchar([\s\S]*?)endbfchar/g)) {
-        for (const pair of block[1].matchAll(/<([\da-f]+)>\s*<([\da-f]+)>/gi)) {
-          const unicode = pair[2].match(/.{4}/g) ?? [];
-          glyphs.set(pair[1].toLowerCase(), unicode.map((code) => String.fromCharCode(Number.parseInt(code, 16))).join(""));
-        }
-      }
-      fonts.set(font[1], glyphs);
-    }
-  }
-  const texts: PdfText[] = [];
-  const logos: PdfLogo[] = [];
-  let page = 0;
-  for (const object of objects.values()) {
-    if (!/\/Type \/Page\b/.test(object)) continue;
-    page += 1;
-    const contentId = Number(object.match(/\/Contents (\d+) 0 R/)?.[1]);
-    const content = stream(contentId);
-    for (const image of content.matchAll(/([\d.-]+) 0 0 ([\d.-]+) ([\d.-]+) ([\d.-]+) cm\s*\/I\d+ Do/g)) {
-      logos.push({ width: Number(image[1]), height: Number(image[2]), x: Number(image[3]), y: Number(image[4]), page });
-    }
-    for (const block of content.matchAll(/BT\s*([\s\S]*?)\s*ET/g)) {
-      const fontInfo = block[1].match(/\/(F\d+) ([\d.]+) Tf/);
-      const font = fontInfo?.[1] ?? "";
-      const position = block[1].match(/([\d.-]+) ([\d.-]+) Td/);
-      const encoded = block[1].match(/<([\da-f]+)> Tj/i)?.[1];
-      if (!encoded || !position) continue;
-      const glyphs = encoded.match(/.{4}/g) ?? [];
-      const text = glyphs.map((glyph) => fonts.get(font)?.get(glyph.toLowerCase()) ?? "�").join("");
-      const fontSize = Number(fontInfo?.[2]);
-      const width = glyphs.reduce((sum, glyph) => sum + (fontWidths.get(font)?.get(Number.parseInt(glyph, 16)) ?? Number.NaN), 0) * fontSize / 1000;
-      expect(Number.isFinite(width), `Embedded font contains widths for ${text}`).toBe(true);
-      texts.push({ text, x: Number(position[1]), y: Number(position[2]), width, fontSize, page });
-    }
-  }
-  expect(texts.length).toBeGreaterThan(20);
-  expect(texts.map((item) => item.text).join("\n")).not.toContain("�");
-  return { text: texts, logos };
-}
+import { readPdfContent } from "./pdf-content";
+import type { PdfContent, PdfText } from "./pdf-content";
 
 function expectLeftLogos({ text, logos }: PdfContent): void {
   const pointsPerMm = 72 / 25.4;
@@ -123,8 +32,10 @@ function expectCompactCaptions(text: PdfText[]): void {
     "ISSUED", "SALES PROPOSAL", "PREPARED FOR", "LICENSE DETAILS", "Monthly payments", "Yearly payments",
     "ריחמ תעצה", "הנכות תונוישיר", "הנכות תונוישירל ריחמ תעצה", "ב״הרא רלודב םימוכסה לכ", "םימולשת םוכיס",
     "הקפה ךיראת", "הריכמ תעצה", "דובכל", "תונוישיר טוריפ",
+    "Due at start", "DUE AT START", "Monthly payment", "Yearly payment (upfront)", "12-month estimate",
+    "Monthly subscription", "Annual subscription", "הפוקתה תליחתב םולשתל", "ישדוח יונימ", "יתנש יונימ",
   ]) expect(values).not.toContain(caption);
-  expect(values.join(" ")).not.toMatch(/Prices are in USD|exclude taxes|Annual subscriptions carry|Amount due at start includes|estimate assumes|םיסמ|תובייחתה|ןושארה|וכשמיי/);
+  expect(values.join(" ")).not.toMatch(/Prices are in USD|exclude taxes|Annual subscriptions carry|Amount due at start includes|estimate assumes|םיסמ|תובייחתה|ןושארה|וכשמיי|upfront|שארמ/);
 }
 
 function expectCompactHeader(content: PdfContent, locale: "en" | "he", reference = "SEAT-2026-001") {
@@ -165,35 +76,89 @@ function expectCompactHeader(content: PdfContent, locale: "en" | "he", reference
   return { company, customers, references, table };
 }
 
-function expectPaymentLedger(content: PdfContent, locale: "en" | "he", expectedAmounts: readonly string[]): void {
-  const patterns = locale === "en"
-    ? ["Monthly payment", "Yearly payment (upfront)", "Due at start", "12-month estimate"]
-    : [/^ישדוח םולשת$/, /^\(שארמ\) יתנש םולשת$/, /^הפוקתה תליחתב םולשתל$/, /ןדמוא/];
-  const labels = patterns.map((pattern) => {
-    const label = content.text.find((item) => typeof pattern === "string" ? item.text === pattern : pattern.test(item.text));
-    if (!label) throw new Error(`Missing payment label: ${String(pattern)}`);
-    return label;
+function inColumn(item: PdfText, locale: "en" | "he", x: number, width: number): boolean {
+  const start = locale === "en" ? x : 210 - x - width;
+  return item.x >= start * 72 / 25.4 - 0.1 && item.x + item.width <= (start + width) * 72 / 25.4 + 0.1;
+}
+
+function paymentLabel(locale: "en" | "he", yearly: boolean): string {
+  return locale === "en" ? yearly ? "Paid yearly" : "Paid monthly" : yearly ? "יתנש םולשתב" : "ישדוח םולשתב";
+}
+
+interface PaymentGroup { yearly: boolean; payment: string; cost: string }
+
+function expectPaymentBreakdown(content: PdfContent, locale: "en" | "he", groups: PaymentGroup[], total: string): void {
+  expectCompactCaptions(content.text);
+  const header = content.text.find((item) => item.text === (locale === "en" ? "Payment calculation" : "םימולשתה בושיח"));
+  const label = content.text.find((item) => locale === "en" ? item.text === "Estimated total for 12 months" : item.text.includes("רעושמ") && item.text.includes("12"));
+  if (!header || !label) throw new Error("A payment breakdown and estimated annual total are required");
+  expect(header.page).toBe(label.page);
+  const headers = content.text.filter((item) => item.page === header.page && Math.abs(item.y - header.y) < 0.01);
+  expect(headers).toHaveLength(3);
+  expect(headers.some((item) => item.text === (locale === "en" ? "Billing schedule" : "םולשת תורידת"))).toBe(true);
+  expect(headers.some((item) => locale === "en" ? item.text === "12-month cost" : item.text.includes("תולע") && item.text.includes("12"))).toBe(true);
+  const rows = content.text.filter((item) => item.page === header.page && item.y < header.y && item.y > label.y);
+  expect(rows).toHaveLength(groups.length * 3);
+  groups.forEach((group, index) => {
+    const billing = rows.find((item) => item.text === paymentLabel(locale, group.yearly));
+    if (!billing) throw new Error(`Missing billing category: ${paymentLabel(locale, group.yearly)}`);
+    const row = rows.filter((item) => Math.abs(item.y - billing.y) < 0.01);
+    const formula = row.find((item) => inColumn(item, locale, 78, 67));
+    const cost = row.find((item) => inColumn(item, locale, 151, 37));
+    if (!formula || !cost) throw new Error("Each payment category needs its calculation and annualized cost");
+    expect(inColumn(billing, locale, 22, 48)).toBe(true);
+    if (locale === "en") expect(formula.text).toBe(`${group.payment} × ${group.yearly ? "1 payment" : "12 payments"}`);
+    else {
+      expect(formula.text).toContain(group.payment);
+      expect(formula.text).toContain("×");
+      expect(formula.text).toContain(group.yearly ? "דחא םולשת" : "םימולשת 12");
+    }
+    expect(cost.text).toBe(group.cost);
+    expect(cost.x + cost.width).toBeCloseTo((locale === "en" ? 188 : 59) * 72 / 25.4, 0);
+    expect(header.y - billing.y).toBeCloseTo((8.6 + index * 9) * 72 / 25.4, 3);
   });
-  if (locale === "he") expect(labels[1].text).toContain("שארמ");
-  expect(new Set(labels.map((item) => item.page)).size).toBe(1);
-  const amounts = labels.map((label, index) => {
-    const amount = content.text.find((item) => item.page === label.page && Math.abs(item.y - label.y) < 0.01 && item.text.startsWith("$"));
-    if (!amount) throw new Error(`Missing amount beside ${label.text}`);
-    expect(amount.text).toBe(expectedAmounts[index]);
-    expect(amount.x + amount.width).toBeCloseTo((locale === "en" ? 188 : 57) * 72 / 25.4, 0);
-    if (locale === "en") expect(amount.x).toBeGreaterThan(label.x + label.width);
-    else expect(label.x).toBeGreaterThan(amount.x + amount.width);
-    if (index > 0) expect(label.y).toBeLessThan(labels[index - 1].y - 4 * 72 / 25.4);
-    return amount;
+  const amount = content.text.find((item) => item.page === label.page && Math.abs(item.y - label.y) < 0.01 && inColumn(item, locale, 136, 52));
+  expect(amount?.text).toBe(total);
+  expect(amount?.fontSize).toBeGreaterThan(12);
+}
+
+function expectLicenseRows(content: PdfContent, locale: "en" | "he", periods: boolean[], unit: string, amount: string): void {
+  const products = content.text.filter((item) => item.text === "Microsoft 365");
+  expect(products).toHaveLength(periods.length);
+  const company = content.text.find((item) => item.text === (locale === "en" ? "Company:" : ":הרבח"));
+  const title = content.text.find((item) => item.text === (locale === "en" ? "PRODUCT / LICENSE" : "ןוישיר / רצומ"));
+  if (!company || !title) throw new Error("Company and product headings must be present");
+  products.forEach((product, index) => {
+    const license = content.text[content.text.indexOf(product) + 1];
+    expect(product.fontSize).toBe(9);
+    expect(product.font).toBe(title.font);
+    expect(license.text).toContain("Business Basic");
+    expect(license.fontSize).toBe(8);
+    expect(license.font).toBe(company.font);
+    expect(license.y).toBeLessThan(product.y);
+    const row = content.text.filter((item) => item.page === product.page && Math.abs(item.y - product.y) < 0.01);
+    const billing = row.find((item) => inColumn(item, locale, 80, 26));
+    expect(billing?.text).toBe(paymentLabel(locale, periods[index]));
+    expect(billing?.font).toBe(product.font);
+    for (const [x, price] of [[122, unit], [157, amount]] as const) {
+      const cells = row.filter((item) => inColumn(item, locale, x, 31));
+      expect(cells).toHaveLength(1);
+      const period = locale === "en" ? periods[index] ? "/ year" : "/ month" : periods[index] ? "הנשל" : "שדוחל";
+      expect(cells[0].text).toContain(price);
+      expect(cells[0].text).toContain(period);
+      expect(cells[0].font).toBe(x === 122 ? company.font : product.font);
+      if (locale === "en") expect(cells[0].text).toBe(`${price} ${period}`);
+    }
   });
-  const rightEdges = amounts.map((item) => item.x + item.width);
-  expect(Math.max(...rightEdges) - Math.min(...rightEdges)).toBeLessThan(0.25);
-  expect(amounts[2].fontSize).toBeGreaterThan(amounts[0].fontSize);
 }
 
 interface QuoteScenario {
   long?: boolean;
   lineCount?: number;
+  billings?: ("monthly" | "annual-monthly" | "annual-upfront")[];
+  unitPrice?: string;
+  productName?: string;
+  licenseName?: string;
   customer?: string;
   reference?: string;
   notes?: string;
@@ -214,10 +179,11 @@ async function renderQuote(page: Page, testInfo: TestInfo, locale: "en" | "he", 
       customer: scenario.customer ?? "דוד כהן",
       notes: scenario.notes ?? (long ? `${"הערות עבור Microsoft 365 ומספר 12345. ".repeat(70)}\nEnd of notes 98765.` : "שירות עבור (Microsoft 365) ומספר 12345.\nContact: Example 365 (12345)."),
       lines: Array.from({ length: scenario.lineCount ?? (long ? 24 : 1) }, (_, index) => ({
-        id: `line-${index}`, productId: "microsoft-365", productName: "Microsoft 365",
-        licenseName: long ? `Business Basic ${index + 1} with a long license description for wrapping across several lines`
-          : scenario.lineCount ? `Business Basic ${index + 1}` : "Business Basic",
-        billing: index % 2 ? "annual-upfront" : "annual-monthly", quantity: "2", unitPrice: "25", markupPercent, discountPercent,
+        id: `line-${index}`, productId: "microsoft-365", productName: scenario.productName ?? "Microsoft 365",
+        licenseName: scenario.licenseName ?? (long ? `Business Basic ${index + 1} with a long license description for wrapping across several lines`
+          : scenario.lineCount ? `Business Basic ${index + 1}` : "Business Basic"),
+        billing: scenario.billings?.[index] ?? (index % 2 ? "annual-upfront" : "annual-monthly"),
+        quantity: "2", unitPrice: scenario.unitPrice ?? "25", markupPercent, discountPercent,
       })),
     }, locale);
     return document.output("datauristring").split(",")[1];
@@ -232,14 +198,13 @@ async function renderQuote(page: Page, testInfo: TestInfo, locale: "en" | "he", 
 for (const locale of ["en", "he"] as const) {
   test(`exports ${locale} selling prices above 100% profit without exposing cost or rate`, async ({ page }, testInfo) => {
     const content = await renderQuote(page, testInfo, locale, { markupPercent: "150" });
-    expectPaymentLedger(content, locale, ["$125.00", "$0.00", "$125.00", "$1,500.00"]);
+    expectPaymentBreakdown(content, locale, [{ yearly: false, payment: "$125.00", cost: "$1,500.00" }], "$1,500.00");
+    expectLicenseRows(content, locale, [false], "$62.50", "$125.00");
     const { text } = content;
     const values = text.map((item) => item.text);
-    expect(values).toContain("$62.50");
-    expect(values).toContain("$125.00");
     expect(values).toContain("$1,500.00");
-    expect(values).not.toContain("$25.00");
-    expect(values).not.toContain("$37.50");
+    expect(values.join("\n")).not.toContain("$25.00");
+    expect(values.join("\n")).not.toContain("$37.50");
     expect(values.join("\n")).not.toMatch(/150%|markup|profit rate|profit per license|base price|company earnings|שיעור רווח|חוור רועיש/i);
     expect(values).toContain("Microsoft 365");
     expect(values).toContain("Business Basic");
@@ -247,29 +212,27 @@ for (const locale of ["en", "he"] as const) {
 
   test(`exports ${locale} discounted customer prices without exposing cost or profit`, async ({ page }, testInfo) => {
     const content = await renderQuote(page, testInfo, locale, { markupPercent: "20", discountPercent: "10" });
-    expectPaymentLedger(content, locale, ["$54.00", "$0.00", "$54.00", "$648.00"]);
+    expectPaymentBreakdown(content, locale, [{ yearly: false, payment: "$54.00", cost: "$648.00" }], "$648.00");
+    expectLicenseRows(content, locale, [false], "$27.00", "$54.00");
     const { text } = content;
     const values = text.map((item) => item.text);
-    expect(values).toContain("$27.00");
-    expect(values).toContain("$54.00");
     expect(values).toContain("$648.00");
-    expect(values).not.toContain("$25.00");
-    expect(values).not.toContain("$30.00");
-    expect(values).not.toContain("$2.00");
+    expect(values.join("\n")).not.toContain("$25.00");
+    expect(values.join("\n")).not.toContain("$30.00");
+    expect(values.join("\n")).not.toContain("$2.00");
     expect(values.join("\n")).not.toMatch(/20%|profit rate|base price|שיעור רווח|חוור רועיש/i);
   });
 
   test(`exports ${locale} customer prices and mixed-script details with a fixed left logo`, async ({ page }, testInfo) => {
     const content = await renderQuote(page, testInfo, locale);
     const header = expectCompactHeader(content, locale);
-    expectPaymentLedger(content, locale, ["$58.50", "$0.00", "$58.50", "$702.00"]);
+    expectPaymentBreakdown(content, locale, [{ yearly: false, payment: "$58.50", cost: "$702.00" }], "$702.00");
+    expectLicenseRows(content, locale, [false], "$29.25", "$58.50");
     const { text } = content;
     const values = text.map((item) => item.text);
-    expect(values).toContain("$29.25");
-    expect(values).toContain("$58.50");
     expect(values).toContain("$702.00");
-    expect(values).not.toContain("$25.00");
-    expect(values).not.toContain("$4.25");
+    expect(values.join("\n")).not.toContain("$25.00");
+    expect(values.join("\n")).not.toContain("$4.25");
     expect(values.join("\n")).not.toMatch(/17%|markup|profit rate|profit per license|base price|company earnings/i);
     expect(values).toContain("Microsoft 365");
     expect(values).toContain("Business Basic");
@@ -287,27 +250,28 @@ for (const locale of ["en", "he"] as const) {
       expect(values).not.toContain("QUOTATION");
       expect(values).not.toContain("Monthly payments");
       const license = text.find((item) => item.text === "Business Basic");
-      const amount = text.find((item) => item.text === "$29.25");
+      const amount = text.find((item) => item.text.includes("$29.25"));
       expect(license?.x).toBeGreaterThan(amount?.x ?? Number.POSITIVE_INFINITY);
     }
   });
 }
 
 for (const locale of ["en", "he"] as const) {
-  test(`fits eight short ${locale} licenses, all four customer totals, and notes on one page`, async ({ page }, testInfo) => {
+  test(`fits eight short ${locale} licenses, the annual cost breakdown, and notes on one page`, async ({ page }, testInfo) => {
     const content = await renderQuote(page, testInfo, locale, {
       lineCount: 8, notes: "Please confirm this proposal.", markupPercent: "20", discountPercent: "10",
     });
     expectCompactHeader(content, locale);
-    expectPaymentLedger(content, locale, ["$216.00", "$216.00", "$432.00", "$2,808.00"]);
+    expectPaymentBreakdown(content, locale, [
+      { yearly: false, payment: "$216.00", cost: "$2,592.00" }, { yearly: true, payment: "$216.00", cost: "$216.00" },
+    ], "$2,808.00");
+    expectLicenseRows(content, locale, Array.from({ length: 8 }, (_, index) => Boolean(index % 2)), "$27.00", "$54.00");
     expect(content.logos).toHaveLength(1);
     expect(new Set(content.text.map((item) => item.page))).toEqual(new Set([1]));
     const values = content.text.map((item) => item.text);
     for (let index = 1; index <= 8; index += 1) expect(values).toContain(`Business Basic ${index}`);
-    expect(values.filter((value) => value === "$27.00")).toHaveLength(8);
-    expect(values.filter((value) => value === "$54.00")).toHaveLength(8);
-    expect(values.filter((value) => value === "$216.00")).toHaveLength(2);
-    expect(values).toContain("$432.00");
+    expect(values).toContain("$2,592.00");
+    expect(values).not.toContain("$432.00");
     expect(values).toContain("$2,808.00");
     const note = content.text.find((item) => item.text === "Please confirm this proposal.");
     const lastLicense = content.text.find((item) => item.text === "Business Basic 8");
@@ -317,27 +281,42 @@ for (const locale of ["en", "he"] as const) {
     expect(note?.y).toBeGreaterThan((297 - 273) * 72 / 25.4);
   });
 
-  test(`wraps a long ${locale} customer and proposal reference without losing header or license details`, async ({ page }, testInfo) => {
+  test(`wraps long ${locale} customer, reference, product, and license text without overlap`, async ({ page }, testInfo) => {
     const customer = `${"Northwind Enterprise Services ".repeat(6)}Customer End`;
     const reference = `PROPOSAL-${"ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789".repeat(2)}`.slice(0, 64);
-    const content = await renderQuote(page, testInfo, locale, { customer, reference, notes: "Final note 98765." });
-    const { customers, references, table } = expectCompactHeader(content, locale, reference);
+    const productName = "Northwind Productivity and Security Suite ".repeat(4).trim();
+    const licenseName = "Business Basic with advanced management and enterprise services ".repeat(3).trim();
+    const content = await renderQuote(page, testInfo, locale, { customer, reference, productName, licenseName, notes: "Final note 98765." });
+    const { company, customers, references, table } = expectCompactHeader(content, locale, reference);
     expect(customers.length).toBeGreaterThan(1);
     expect(references.length).toBeGreaterThan(1);
     expect(customers.map((item) => item.text).join(" ")).toBe(customer);
     expect(table.y).toBeLessThan(Math.min(...[...customers, ...references].map((item) => item.y)));
-    expect(content.text.map((item) => item.text)).toContain("Business Basic");
+    const breakdown = content.text.find((item) => item.text === (locale === "en" ? "Payment calculation" : "םימולשתה בושיח"));
+    if (!breakdown) throw new Error("The complete license row must precede its payment breakdown");
+    const nameCell = content.text.filter((item) => item.page === table.page && item.y < table.y && item.y > breakdown.y && inColumn(item, locale, 22, 54));
+    const products = nameCell.filter((item) => item.font === table.font);
+    const licenses = nameCell.filter((item) => item.font === company.font);
+    expect(products.length).toBeGreaterThan(1);
+    expect(licenses.length).toBeGreaterThan(1);
+    expect(products.map((item) => item.text).join(" ")).toBe(productName);
+    expect(licenses.map((item) => item.text).join(" ")).toBe(licenseName);
+    expect(Math.min(...products.map((item) => item.y))).toBeGreaterThan(Math.max(...licenses.map((item) => item.y)));
     expect(content.text.map((item) => item.text)).toContain("Final note 98765.");
   });
 
   test(`paginates ${locale} license details and notes with repeated left logos and localized headers and footers`, async ({ page }, testInfo) => {
     const content = await renderQuote(page, testInfo, locale, { long: true });
     expectCompactHeader(content, locale);
-    expectPaymentLedger(content, locale, ["$702.00", "$702.00", "$1,404.00", "$9,126.00"]);
+    expectPaymentBreakdown(content, locale, [
+      { yearly: false, payment: "$702.00", cost: "$8,424.00" }, { yearly: true, payment: "$702.00", cost: "$702.00" },
+    ], "$9,126.00");
+    expectLicenseRows(content, locale, Array.from({ length: 24 }, (_, index) => Boolean(index % 2)), "$29.25", "$58.50");
     const { text } = content;
     const pageCount = Math.max(...text.map((item) => item.page));
     expect(pageCount).toBeGreaterThan(2);
     const values = text.map((item) => item.text);
+    expect(values).not.toContain("$1,404.00");
     for (let index = 1; index <= 24; index += 1) {
       expect(values.join(" ")).toContain(`Business Basic ${index} with a long license description for wrapping across several lines`);
     }
@@ -360,4 +339,29 @@ for (const locale of ["en", "he"] as const) {
       expect(contents.every((item) => item.x >= 18 * 72 / 25.4 - 0.1 && item.x < 192 * 72 / 25.4)).toBe(true);
     }
   });
+}
+
+for (const locale of ["en", "he"] as const) {
+  const cases: { name: string; billings: NonNullable<QuoteScenario["billings"]>; price: string; discount: string; groups: PaymentGroup[]; total: string; unit: string; amount: string }[] = [
+    { name: "monthly schedules only", billings: ["monthly", "annual-monthly"], price: "25", discount: "10",
+      groups: [{ yearly: false, payment: "$108.00", cost: "$1,296.00" }], total: "$1,296.00", unit: "$27.00", amount: "$54.00" },
+    { name: "yearly billing only", billings: ["annual-upfront", "annual-upfront"], price: "25", discount: "10",
+      groups: [{ yearly: true, payment: "$108.00", cost: "$108.00" }], total: "$108.00", unit: "$27.00", amount: "$54.00" },
+    { name: "both zero-priced billing groups", billings: ["monthly", "annual-upfront"], price: "0", discount: "0",
+      groups: [{ yearly: false, payment: "$0.00", cost: "$0.00" }, { yearly: true, payment: "$0.00", cost: "$0.00" }],
+      total: "$0.00", unit: "$0.00", amount: "$0.00" },
+    { name: "a fully discounted yearly group", billings: ["annual-upfront"], price: "25", discount: "100",
+      groups: [{ yearly: true, payment: "$0.00", cost: "$0.00" }], total: "$0.00", unit: "$0.00", amount: "$0.00" },
+  ];
+  for (const sample of cases) {
+    test(`exports ${locale} ${sample.name} without inventing or omitting billing categories`, async ({ page }, testInfo) => {
+      const content = await renderQuote(page, testInfo, locale, {
+        lineCount: sample.billings.length, billings: sample.billings, unitPrice: sample.price,
+        markupPercent: "20", discountPercent: sample.discount,
+      });
+      expectCompactHeader(content, locale);
+      expectPaymentBreakdown(content, locale, sample.groups, sample.total);
+      expectLicenseRows(content, locale, sample.billings.map((billing) => billing === "annual-upfront"), sample.unit, sample.amount);
+    });
+  }
 }

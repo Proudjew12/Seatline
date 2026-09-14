@@ -295,10 +295,15 @@ catalog and display keys and writes new `seatline.*` keys, leaving the old value
 recovery. Only those compatibility keys and migration tests retain the previous name.
 Customer PDFs use Logi branding, an original
 transparent logo, embedded regular/bold fonts, a license table with repeated column headers, a compact
-payment ledger, and numbered pages. The first header places the date alone beside the left logo,
-then an inline **Company: name** and proposal reference on the same row. The ledger aligns each label
-with its amount, identifies the yearly payment as upfront, and highlights the amount due at the start.
-The 12-month estimate appears separately beneath it. PDFs omit the generic document title/subtitle,
+cost breakdown, and numbered pages. The first header places the date alone beside the left logo,
+then an inline **Company: name** and proposal reference on the same row. Each item shows the product
+in bold above its license, a bold **Paid monthly/yearly** label, and prices with their billing period
+on the same line. The cost breakdown groups monthly and yearly billing, shows the payment amount
+multiplied by 12 or 1 and each group's 12-month cost, then highlights the **Estimated total for
+12 months**. Only billing groups present in the quote appear, including zero-priced groups.
+This PDF estimate assumes all monthly licenses continue for 12 months; it does not present a payment
+due now. The website's payment totals and calculations are unchanged. PDFs omit subscription
+commitment captions, the upfront qualifier, the initial-payment total, the generic document title/subtitle,
 Sales Proposal, Issued, Prepared For and License Details labels, currency caption, payment-summary
 heading and explanatory terms. Short quotes
 fit one page with readable body text; long names and notes wrap across pages, and monthly versus annual

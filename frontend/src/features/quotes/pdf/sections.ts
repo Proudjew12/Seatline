@@ -27,26 +27,40 @@ export function writeQuoteHeading(layout: QuotePdfLayout, draft: QuoteDraft): vo
 
 export function writeQuoteSummary(layout: QuotePdfLayout, draft: QuoteDraft): void {
   const totals = calculateQuote(draft.lines);
-  layout.ensureSpace(43);
+  const payments: { label: string; calculation: string; amount: number }[] = [];
+  if (draft.lines.some((line) => line.billing !== "annual-upfront")) {
+    payments.push({
+      label: "Paid monthly",
+      calculation: layout.t("{amount} × 12 payments", { amount: formatMoney(totals.monthlyCents) }),
+      amount: totals.yearEstimateCents - totals.annualUpfrontCents,
+    });
+  }
+  if (draft.lines.some((line) => line.billing === "annual-upfront")) {
+    payments.push({
+      label: "Paid yearly",
+      calculation: layout.t("{amount} × 1 payment", { amount: formatMoney(totals.annualUpfrontCents) }),
+      amount: totals.annualUpfrontCents,
+    });
+  }
+  const height = 8 + payments.length * 9 + 18;
+  layout.ensureSpace(height);
   const top = layout.y;
-  const x = 88;
-  const width = 104;
-  const recurringPayments = [
-    { label: "Monthly payment", amount: totals.monthlyCents },
-    { label: "Yearly payment (upfront)", amount: totals.annualUpfrontCents },
-  ];
-  recurringPayments.forEach(({ label, amount }, index) => {
-    const y = top + 5 + index * 8;
-    layout.text(layout.t(label), x + 4, y, 56, 8.5);
-    layout.right(formatMoney(amount), x + 65, y, 35, 9.5, "bold");
+  layout.fill(PDF_PAGE.left, top, PDF_PAGE.width, 8);
+  layout.text(layout.t("Billing schedule"), 22, top + 5.4, 48, 7.5, "bold", PDF_COLORS.muted);
+  layout.text(layout.t("Payment calculation"), 78, top + 5.4, 67, 7.5, "bold", PDF_COLORS.muted);
+  layout.right(layout.t("12-month cost"), 151, top + 5.4, 37, 7.5, "bold", PDF_COLORS.muted);
+  payments.forEach(({ label, calculation, amount }, index) => {
+    const y = top + 14 + index * 9;
+    layout.text(layout.t(label), 22, y, 48, 8.5, "bold");
+    layout.text(calculation, 78, y, 67, 8.5);
+    layout.right(formatMoney(amount), 151, y, 37, 9, "bold");
   });
-  layout.rule(top + 18, x, width);
-  layout.fill(x, top + 21, width, 12);
-  layout.text(layout.t("Due at start"), x + 4, top + 29, 56, 9, "bold");
-  layout.right(formatMoney(totals.dueNowCents), x + 65, top + 29, 35, 13, "bold");
-  layout.text(layout.t("12-month estimate"), x + 4, top + 41, 56, 8.5, "normal", PDF_COLORS.muted);
-  layout.right(formatMoney(totals.yearEstimateCents), x + 65, top + 41, 35, 9.5, "bold");
-  layout.y = top + 48;
+  const totalY = top + 8 + payments.length * 9 + 4;
+  layout.fill(PDF_PAGE.left, totalY, PDF_PAGE.width, 14);
+  layout.fill(PDF_PAGE.left, totalY, 0.8, 14, PDF_COLORS.accent);
+  layout.text(layout.t("Estimated total for 12 months"), 22, totalY + 9, 106, 10, "bold");
+  layout.right(formatMoney(totals.yearEstimateCents), 136, totalY + 9, 52, 14, "bold");
+  layout.y = top + height + 7;
 }
 
 export function writeQuoteNotes(layout: QuotePdfLayout, notes: string): void {

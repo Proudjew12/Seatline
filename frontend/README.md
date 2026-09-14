@@ -169,10 +169,14 @@ the bilingual message catalogs and locale context, shared with PDF generation. N
 service receives customer data. `health` owns the operational API connection check. Heavy PDF code
 loads only on export; its regular/bold fonts and license are in `public/fonts/`. Customer quotations
 use the original Logi logo in `public/branding/`, with the source recorded beside the asset. The
-PDF has a compact item table, an aligned payment ledger, repeated table headers, and page numbers.
+PDF has a compact item table, a billing-based cost breakdown, repeated table headers, and page numbers.
 The date sits alone beside the fixed-left logo. An inline Company/name and proposal reference share
-the following row, mirrored for Hebrew. Totals use label/amount rows, clearly identify the yearly
-upfront payment, highlight the amount due at the start, and separate the 12-month estimate below it.
+the following row, mirrored for Hebrew. Each item puts the bold product above its license and shows
+only bold Paid monthly/yearly billing, with each price and period together on one line. The footer
+shows each present billing group's payment amount × 12 monthly or 1 yearly payment, its 12-month
+cost, and one highlighted Estimated total for 12 months. Zero-priced groups remain visible; absent
+groups are omitted. Monthly costs are estimated over 12 months. The initial-payment total and
+upfront qualifier are omitted from the PDF; website totals and pricing rules remain unchanged.
 The generic title/subtitle, Sales Proposal, Issued, Prepared For, License Details, currency caption,
 payment-summary heading and terms are omitted. Continuation
 pages keep just a small left logo and right-side proposal reference, while Hebrew content keeps RTL.
