@@ -13,6 +13,9 @@ was exported on 2026-09-14; no symbol or lettering was redrawn, and no font is r
   silhouette, matching the kit's monochrome treatment.
 - `../favicon.svg` and `seatline-touch-icon.png` are the original blue-and-white app icon, exported
   as SVG and 223 × 223 PNG. The PNG has not been resampled.
+  Browser tabs use a versioned SVG URL, with the PNG as a fallback, so the former S favicon has a
+  different cache key. When replacing the SVG, update its `v` query in `index.html` to the first
+  12 characters of the new file's SHA-256 digest. Reload an existing tab to pick up the new link.
 - `seatline-logo.svg` contains the original symbol, wordmark and outlined **more seats, less sheets.**
   tagline. A white backdrop and clear space keep it readable in documentation on light/dark pages.
 

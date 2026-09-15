@@ -125,7 +125,7 @@ def validate_github_pages_configuration(root: Path, errors: list[str]) -> None:
     required_snippets = {
         "frontend/config/vite.config.ts": ('base: "./"',),
         "frontend/src/app/router.tsx": ("createHashRouter",),
-        "frontend/index.html": ('href="%BASE_URL%favicon.svg"',),
+        "frontend/index.html": ('href="%BASE_URL%favicon.svg?v=',),
         ".github/workflows/deploy-pages.yml": (
             "VITE_STATIC_DEPLOYMENT:",
             "path: frontend/dist",
