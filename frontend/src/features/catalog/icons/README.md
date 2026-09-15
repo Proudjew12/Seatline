@@ -97,7 +97,11 @@ white keyhole cutouts as transparent areas through an even-odd compound path. Pr
 the favicon background, preserving the letter's paths. WatchGuard's source transform is flattened
 without changing its geometry. Duo omits the Cisco endorsement lettering. MSP360 uses the first
 four paths of `symbol#icon-logo-colored` from its official icon sprite, excluding its tagline.
-ConnectWise retains its wordmark. Commvault's source digest records the downloaded HTML because
+ConnectWise uses the compact owl's four original contours from the vendor's
+[footer logo](https://www.connectwise.com/contentassets/e36fd0ee28e24c94a94d040210d9db81/logo.svg),
+linked on its [press-kit page](https://www.connectwise.com/press-kit). The wordmark and trademark
+lettering are omitted; the owl is uniformly scaled and centered without changing its proportions.
+Commvault's source digest records the downloaded HTML because
 the mark is an inline header SVG. Freshworks retains the original transparent 82 × 82 WebP bytes;
 its alpha channel works with the same CSS mask as the other choices.
 
@@ -114,7 +118,7 @@ external references, fonts or embedded raster images. Their transparent silhouet
 catalog's CSS-mask rendering without a fixed rectangular background.
 Compact symbols occupy a 24px square. Wider wordmarks use the existing `wordmark` flag to request
 36px of width and uniform scaling within the same 24px-high control. This includes Veeam, VMware,
-Datto, Synology, QNAP, Splunk, ESET, Duo, ConnectWise and MSP360. All geometry keeps its proportions.
+Datto, Synology, QNAP, Splunk, ESET, Duo and MSP360. All geometry keeps its proportions.
 
 Keep the same ID when replacing a symbol so saved catalogs continue to resolve. When consolidating
 duplicate artwork, retain the old IDs as lookup aliases and include every name in search keywords.

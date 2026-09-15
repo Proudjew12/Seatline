@@ -219,7 +219,7 @@ export const PRODUCT_ICONS = [
   { id: "duo", name: "Duo", category: "security", keywords: "duo cisco duo mfa authentication דואו דואו סיסקו", src: iconDuo, wordmark: true },
   { id: "keeper", name: "Keeper", category: "security", keywords: "keeper keeper security password manager vault קיפר", src: iconKeeper },
   { id: "sharegate", name: "ShareGate", category: "backup", keywords: "sharegate share gate migration microsoft 365 sharepoint שיירגייט שייר גייט", src: iconSharegate },
-  { id: "connectwise", name: "ConnectWise", category: "infrastructure", keywords: "connectwise connect wise screenconnect automate rmm psa קונקטווייז קונקט ווייז", src: iconConnectwise, wordmark: true },
+  { id: "connectwise", name: "ConnectWise", category: "infrastructure", keywords: "connectwise connect wise screenconnect automate rmm psa קונקטווייז קונקט ווייז", src: iconConnectwise },
   { id: "jamf", name: "Jamf", category: "infrastructure", keywords: "jamf apple mdm device management ג׳אמף גאמף", src: iconJamf },
   { id: "watchguard", name: "WatchGuard", category: "security", keywords: "watchguard watch guard firewall firebox וואטשגארד ווטשגארד", src: iconWatchguard },
   { id: "commvault", name: "Commvault", category: "backup", keywords: "commvault backup recovery cyber resilience קומוולט קום וולט", src: iconCommvault },

@@ -925,14 +925,17 @@
     "adaptation": "Preserved circular symbol and keyhole paths as an even-odd compound path; white cutouts remain transparent under monochrome CSS-mask rendering. Uniform scale and centering only."
   },
   "connectwise": {
-    "download": "https://www.connectwise.com/contentassets/e1148326d037464c91694a86d5381fee/logo-mobile-dark.svg",
-    "sha256": "fca17ab2f4028a2d6fa735ad6e9776837c386eb26ffdb96f4d273a416d4b1d1a",
+    "download": "https://www.connectwise.com/contentassets/e36fd0ee28e24c94a94d040210d9db81/logo.svg",
+    "sha256": "cdae1b5f7d255fbbd55ad47f31edabf6659f0892c4feca0b620d32024163547d",
     "upstream": {
-      "title": "ConnectWise",
-      "source": "https://www.connectwise.com/",
+      "title": "ConnectWise owl symbol",
+      "source": "https://www.connectwise.com/press-kit",
+      "guidelines": "https://www.connectwise.com/Corporate-Brand-Guidelines",
       "license": "Vendor trademark asset; not covered by the Simple Icons CC0 dedication."
     },
-    "adaptation": "Preserved selected logo paths with uniform scale and centering; omitted backgrounds, wordmarks or taglines outside the symbol where applicable. Fill geometry is rendered as a local monochrome CSS mask."
+    "sourceElement": "Footer logo.svg, owl contours 12–15 (zero-based) from the single compound path; wordmark and trademark lettering omitted.",
+    "adaptation": "Preserved the four original owl contours and their relative geometry. Uniform scale and centering in a 24-unit viewBox; unneeded fill and clipping wrapper omitted for CSS-mask rendering.",
+    "retrieved": "2026-09-15"
   },
   "jamf": {
     "download": "https://media.jamf.com/images/logos/jamf-one-color-dark-for-print-css.svg",
