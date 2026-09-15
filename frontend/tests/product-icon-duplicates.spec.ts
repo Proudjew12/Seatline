@@ -12,11 +12,22 @@ async function openPicker(page: Page): Promise<Locator> {
   return dialog;
 }
 
-test("offers sixty-two distinct rendered icon silhouettes without duplicate brand choices", async ({ page }, testInfo) => {
+test("offers the expanded registry as distinct rendered icon silhouettes without duplicate brand choices", async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== "desktop", "One exhaustive asset audit covers the shared icon registry");
   await page.goto("/");
   const dialog = await openPicker(page);
   const choices = dialog.getByRole("group", { name: "Available icons", exact: true });
-  await expect(choices.getByRole("radio")).toHaveCount(62);
+  const registeredIds = await page.evaluate(async () => {
+    // Import through Vite so the registry's locally bundled SVG/PNG URLs resolve normally.
+    const modulePath = "/src/features/catalog/icons/productIcons.ts";
+    const { PRODUCT_ICONS } = await import(modulePath) as {
+      PRODUCT_ICONS: ReadonlyArray<{ id: string }>;
+    };
+    return PRODUCT_ICONS.map(({ id }) => id);
+  });
+  expect(registeredIds.length).toBeGreaterThanOrEqual(97);
+  expect(new Set(registeredIds).size).toBe(registeredIds.length);
+  await expect(choices.getByRole("radio")).toHaveCount(registeredIds.length);
   const audit = await choices.locator("[data-product-icon]").evaluateAll(async (elements) => {
     const silhouettes = await Promise.all(elements.map(async (element) => {
       const mask = getComputedStyle(element).maskImage;
@@ -51,8 +62,9 @@ test("offers sixty-two distinct rendered icon silhouettes without duplicate bran
     }
     return { ids: silhouettes.map(({ id }) => id), pairs: pairs.sort((a, b) => b.similarity - a.similarity) };
   });
-  expect(audit.ids).toHaveLength(62);
-  expect(new Set(audit.ids).size).toBe(62);
+  expect(audit.ids).toHaveLength(registeredIds.length);
+  expect(new Set(audit.ids).size).toBe(registeredIds.length);
+  expect([...audit.ids].sort()).toEqual([...registeredIds].sort());
   // Alpha overlap catches the original shared Google G and matching Microsoft/Windows squares,
   // including near-identical exports with small antialiasing differences.
   expect(audit.pairs.filter(({ similarity }) => similarity >= 0.98), "Indistinguishable icon silhouettes").toEqual([]);

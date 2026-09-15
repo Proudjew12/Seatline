@@ -234,6 +234,12 @@ test("searches and chooses icons by keyboard in Hebrew at 320px and 150%", async
   await search.fill("Figma");
   const choice = dialog.getByRole("radio", { name: "Figma", exact: true });
   await search.press("Tab");
+  const category = dialog.getByRole("combobox", { name: "קטגוריית סמלים", exact: true });
+  await expect(category).toBeFocused();
+  await category.press("Tab");
+  const clearFilters = dialog.getByRole("button", { name: "ניקוי מסננים", exact: true });
+  await expect(clearFilters).toBeFocused();
+  await clearFilters.press("Tab");
   await expect(choice).toBeFocused();
   await choice.press("Space");
   await expect(choice).toBeChecked();
@@ -273,9 +279,15 @@ for (const group of themeGroups) {
     await setEditMode(page, true);
     const dialog = await addProductDialog(page);
     await dialog.getByRole("button", { name: "Choose icon", exact: true }).click();
-    await expect(dialog.getByRole("radio")).toHaveCount(62);
+    const registryCount = await page.evaluate(async () => {
+      const modulePath = "/src/features/catalog/icons/productIcons.ts";
+      const registry = await import(modulePath) as { PRODUCT_ICONS: readonly { id: string }[] };
+      return registry.PRODUCT_ICONS.length;
+    });
+    expect(registryCount).toBeGreaterThanOrEqual(97);
+    await expect(dialog.getByRole("radio")).toHaveCount(registryCount);
     const icons = dialog.getByRole("group", { name: "Available icons", exact: true }).locator("[data-product-icon]");
-    await expect(icons).toHaveCount(62);
+    await expect(icons).toHaveCount(registryCount);
     await expectLocalIconsLoaded(icons);
     await page.screenshot({ path: testInfo.outputPath("product-icon-library.png") });
     await dialog.getByRole("button", { name: "Cancel", exact: true }).click();
@@ -297,13 +309,20 @@ for (const group of themeGroups) {
       await expect(page.getByLabel("Monthly payments", { exact: true })).toHaveText("$22.00");
       await expect(banner.getByRole("img", { name: "Seatline", exact: true })).toBeVisible();
       await page.screenshot({ path: testInfo.outputPath(`product-icons-${name.toLowerCase().replaceAll(" ", "-")}.png`) });
-      if (name === "Aurora Ocean") {
-        const creation = await addProductDialog(page);
-        await page.screenshot({ path: testInfo.outputPath("add-product-ocean-collapsed.png") });
-        await creation.getByRole("button", { name: "Choose icon", exact: true }).click();
-        await page.screenshot({ path: testInfo.outputPath("add-product-ocean-library.png") });
-        await creation.getByRole("button", { name: "Cancel", exact: true }).click();
-      }
+      const creation = await addProductDialog(page);
+      await creation.getByRole("button", { name: "Choose icon", exact: true }).click();
+      const category = creation.getByRole("combobox", { name: "Icon category", exact: true });
+      await category.selectOption("security");
+      await expect(creation.getByRole("heading", { name: "Security & Identity", exact: true })).toBeVisible();
+      const securityIcon = creation.getByRole("radio", { name: "SentinelOne", exact: true });
+      await securityIcon.press("Space");
+      await expect(securityIcon).toBeChecked();
+      const symbol = securityIcon.locator("xpath=ancestor::label[1]").locator("[data-product-icon]");
+      await expectLocalIconsLoaded(symbol);
+      expect(await iconContrast(symbol), `${name}: the selected picker icon must remain legible`).toBeGreaterThanOrEqual(3);
+      expect(await iconContrast(category), `${name}: the category control must remain legible`).toBeGreaterThanOrEqual(4.5);
+      await page.screenshot({ path: testInfo.outputPath(`icon-category-${name.toLowerCase().replaceAll(" ", "-")}.png`) });
+      await creation.getByRole("button", { name: "Cancel", exact: true }).click();
     }
   });
 }

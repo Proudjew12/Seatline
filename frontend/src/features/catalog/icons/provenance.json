@@ -552,5 +552,438 @@
       "license": "Vendor trademark asset; not covered by the Simple Icons CC0 dedication."
     },
     "adaptation": "Unmodified transparent PNG; its alpha channel is used as the CSS mask."
+  },
+  "trendmicro": {
+    "download": "https://raw.githubusercontent.com/simple-icons/simple-icons/11.15.0/icons/trendmicro.svg",
+    "sha256": "38e6ce7b6f011d1ecb37c3eb24c0668fabd0a27fef3e549317e0e42fe7ccd4d0",
+    "upstream": {
+      "title": "Trend Micro",
+      "hex": "D71921",
+      "source": "https://www.trendmicro.com"
+    }
+  },
+  "paloaltonetworks": {
+    "download": "https://raw.githubusercontent.com/simple-icons/simple-icons/11.15.0/icons/paloaltonetworks.svg",
+    "sha256": "47b46a688d2117b938251c0a36568593562a07c221493f9d04bd1e0e536b1456",
+    "upstream": {
+      "title": "Palo Alto Networks",
+      "hex": "F04E23",
+      "source": "https://www.paloaltonetworks.com",
+      "guidelines": "https://www.paloaltonetworks.com/company/brand"
+    }
+  },
+  "bitwarden": {
+    "download": "https://raw.githubusercontent.com/simple-icons/simple-icons/11.15.0/icons/bitwarden.svg",
+    "sha256": "1e9511fc9da6c94fc2c836d916145e758136fa0ccd246c82b43cd54605bbfad3",
+    "upstream": {
+      "title": "Bitwarden",
+      "hex": "175DDC",
+      "source": "https://github.com/bitwarden/brand/blob/6182cd64321d810c6f6255db08c2a17804d2b724/icons/icon.svg"
+    }
+  },
+  "datto": {
+    "download": "https://raw.githubusercontent.com/simple-icons/simple-icons/11.15.0/icons/datto.svg",
+    "sha256": "1c47f5841d8b824d598fa81008e66afaa70f8d8d438d491fe33e384074dc9e0e",
+    "upstream": {
+      "title": "Datto",
+      "hex": "199ED9",
+      "source": "https://www.datto.com/brand/logos",
+      "guidelines": "https://www.datto.com/brand"
+    }
+  },
+  "backblaze": {
+    "download": "https://raw.githubusercontent.com/simple-icons/simple-icons/11.15.0/icons/backblaze.svg",
+    "sha256": "6d14c7226eafd00abf0b9eb633fd106dbfad2eae7d69faf48562a3676d71c734",
+    "upstream": {
+      "title": "Backblaze",
+      "hex": "E21E29",
+      "source": "https://www.backblaze.com/company/news.html",
+      "guidelines": "https://www.backblaze.com/company/news.html"
+    }
+  },
+  "wasabi": {
+    "download": "https://raw.githubusercontent.com/simple-icons/simple-icons/11.15.0/icons/wasabi.svg",
+    "sha256": "0b1208ddc17a1c9641a51f0af6ffb0374536b828f1135993eb4aee39a1a891d9",
+    "upstream": {
+      "title": "Wasabi",
+      "hex": "01CD3E",
+      "source": "https://wasabi.com"
+    }
+  },
+  "anydesk": {
+    "download": "https://raw.githubusercontent.com/simple-icons/simple-icons/11.15.0/icons/anydesk.svg",
+    "sha256": "5c89266ad04316558389823413f4e78ed5ec9bd826ecd3d55314207ca1e36dac",
+    "upstream": {
+      "title": "AnyDesk",
+      "hex": "EF443B",
+      "source": "https://anydesk.com"
+    }
+  },
+  "proxmox": {
+    "download": "https://raw.githubusercontent.com/simple-icons/simple-icons/11.15.0/icons/proxmox.svg",
+    "sha256": "95b5f2bce5447030acfc03c326c396c6b768b5c95b64e53c17f8a6910e6b3df7",
+    "upstream": {
+      "title": "Proxmox",
+      "hex": "E57000",
+      "source": "https://www.proxmox.com/en/news/media-kit",
+      "guidelines": "https://www.proxmox.com/en/news/media-kit"
+    }
+  },
+  "nutanix": {
+    "download": "https://raw.githubusercontent.com/simple-icons/simple-icons/11.15.0/icons/nutanix.svg",
+    "sha256": "b24c39e47756d099832a3cff5cc23d3fa21e4aff38410af6062abb06c672a0d3",
+    "upstream": {
+      "title": "Nutanix",
+      "hex": "024DA1",
+      "source": "https://www.nutanix.com/content/dam/nutanix/en/cmn/documents/nutanix-brandbook.pdf"
+    }
+  },
+  "synology": {
+    "download": "https://raw.githubusercontent.com/simple-icons/simple-icons/11.15.0/icons/synology.svg",
+    "sha256": "2b11f3cb29f858a3a28b2094a668f5700ff279051ffc475c4509333b7365db02",
+    "upstream": {
+      "title": "Synology",
+      "hex": "B5B5B6",
+      "source": "https://www.synology.com/en-global/company/branding",
+      "guidelines": "https://www.synology.com/en-global/company/branding"
+    }
+  },
+  "qnap": {
+    "download": "https://raw.githubusercontent.com/simple-icons/simple-icons/11.15.0/icons/qnap.svg",
+    "sha256": "fbe27f4ca447ffe8ef388bdfb6edc501623581484465551f18babeee5db614be",
+    "upstream": {
+      "title": "QNAP",
+      "hex": "0C2E82",
+      "source": "https://marketing.qnap.com/resource/qnap-logo-k100",
+      "guidelines": "https://marketing.qnap.com/resource/qnap-brand-logo-guideline",
+      "aliases": {
+        "aka": [
+          "Quality Network Appliance Provider"
+        ]
+      }
+    }
+  },
+  "ubiquiti": {
+    "download": "https://raw.githubusercontent.com/simple-icons/simple-icons/11.15.0/icons/ubiquiti.svg",
+    "sha256": "7082e9be5c0b167c30c3de6903ec7e497574b845a33415a572d4d1468f40e810",
+    "upstream": {
+      "title": "Ubiquiti",
+      "hex": "0559C9",
+      "source": "https://www.ui.com"
+    }
+  },
+  "redhat": {
+    "download": "https://raw.githubusercontent.com/simple-icons/simple-icons/11.15.0/icons/redhat.svg",
+    "sha256": "3d0e1854a9dad1a8ad11132843f522f948197ec0e0ee49b7a51d5fdf44230568",
+    "upstream": {
+      "title": "Red Hat",
+      "hex": "EE0000",
+      "source": "https://www.redhat.com/en/about/brand/new-brand/details"
+    }
+  },
+  "ubuntu": {
+    "download": "https://raw.githubusercontent.com/simple-icons/simple-icons/11.15.0/icons/ubuntu.svg",
+    "sha256": "b0aca674c881a07bb60b26afbcee07093ae419e29ee38e376f938817fa66ae03",
+    "upstream": {
+      "title": "Ubuntu",
+      "hex": "E95420",
+      "source": "https://design.ubuntu.com/resources",
+      "guidelines": "https://design.ubuntu.com/brand"
+    }
+  },
+  "digitalocean": {
+    "download": "https://raw.githubusercontent.com/simple-icons/simple-icons/11.15.0/icons/digitalocean.svg",
+    "sha256": "21c374a43a70f8a833ea6c84c904e64f5a20586714b1e0a16b34cb1d9cf29998",
+    "upstream": {
+      "title": "DigitalOcean",
+      "hex": "0080FF",
+      "source": "https://www.digitalocean.com/press/",
+      "guidelines": "https://www.digitalocean.com/press/"
+    }
+  },
+  "zoho": {
+    "download": "https://raw.githubusercontent.com/simple-icons/simple-icons/11.15.0/icons/zoho.svg",
+    "sha256": "6571537c1ebb1c0cbea06d94c403d7e4e0685499c963996b559485d5aa013b9b",
+    "upstream": {
+      "title": "Zoho",
+      "hex": "E42527",
+      "source": "https://www.zoho.com/branding"
+    }
+  },
+  "jetbrains": {
+    "download": "https://raw.githubusercontent.com/simple-icons/simple-icons/11.15.0/icons/jetbrains.svg",
+    "sha256": "7f6274cbe3e20314e756621812cf6129ef6c9d02d3b1218fc41bc3c606b5bda6",
+    "upstream": {
+      "title": "JetBrains",
+      "hex": "000000",
+      "source": "https://www.jetbrains.com/company/brand/logos/",
+      "guidelines": "https://www.jetbrains.com/company/brand/"
+    }
+  },
+  "postman": {
+    "download": "https://raw.githubusercontent.com/simple-icons/simple-icons/11.15.0/icons/postman.svg",
+    "sha256": "ffa713180d8a0dc42d69fb219fda548293b25438288b6abc5ccb4e381463778f",
+    "upstream": {
+      "title": "Postman",
+      "hex": "FF6C37",
+      "source": "https://www.getpostman.com/resources/media-assets/"
+    }
+  },
+  "datadog": {
+    "download": "https://raw.githubusercontent.com/simple-icons/simple-icons/11.15.0/icons/datadog.svg",
+    "sha256": "2dae0a9ddf090ec01626d9d0f73b1740a70ad280de92e2c27136bc81151fd1ff",
+    "upstream": {
+      "title": "Datadog",
+      "hex": "632CA6",
+      "source": "https://www.datadoghq.com/about/resources",
+      "guidelines": "https://www.datadoghq.com/about/resources/"
+    }
+  },
+  "sentry": {
+    "download": "https://raw.githubusercontent.com/simple-icons/simple-icons/11.15.0/icons/sentry.svg",
+    "sha256": "8ba32902ffbac503784607374f57df5e3cbcf57a99d0adff03e735575500adc6",
+    "upstream": {
+      "title": "Sentry",
+      "hex": "362D59",
+      "source": "https://sentry.io/branding/"
+    }
+  },
+  "avast": {
+    "download": "https://raw.githubusercontent.com/simple-icons/simple-icons/11.15.0/icons/avast.svg",
+    "sha256": "71eddad858b255223a196ef07c4b5744e74f95d21ca2b7413ff915aa0d2c9173",
+    "upstream": {
+      "title": "Avast",
+      "hex": "FF7800",
+      "source": "https://press.avast.com/media-materials#logos-and-brand-guidelines",
+      "guidelines": "https://press.avast.com/media-materials#logos-and-brand-guidelines"
+    }
+  },
+  "avira": {
+    "download": "https://raw.githubusercontent.com/simple-icons/simple-icons/11.15.0/icons/avira.svg",
+    "sha256": "95c29ea657ddebd4a5d90428a11d6bfe277636d7a347ca7137cb799ad06cc6f2",
+    "upstream": {
+      "title": "Avira",
+      "hex": "E02027",
+      "source": "https://www.avira.com/en/media-library",
+      "guidelines": "https://www.avira.com/en/media-library"
+    }
+  },
+  "nordvpn": {
+    "download": "https://raw.githubusercontent.com/simple-icons/simple-icons/11.15.0/icons/nordvpn.svg",
+    "sha256": "67b6ef11503f19d465d2e4534baddb79fabaa083e01945675b5a9faba7fce3a1",
+    "upstream": {
+      "title": "NordVPN",
+      "hex": "4687FF",
+      "source": "https://nordvpn.com/press-area/",
+      "guidelines": "https://nordvpn.com/press-area/"
+    }
+  },
+  "openvpn": {
+    "download": "https://raw.githubusercontent.com/simple-icons/simple-icons/11.15.0/icons/openvpn.svg",
+    "sha256": "c886ea057184fafe08342bbc18b10006f403ad21d5665a2c9f97f94df941eb30",
+    "upstream": {
+      "title": "OpenVPN",
+      "hex": "EA7E20",
+      "source": "https://openvpn.net",
+      "guidelines": "https://openvpn.net/legal"
+    }
+  },
+  "wireguard": {
+    "download": "https://raw.githubusercontent.com/simple-icons/simple-icons/11.15.0/icons/wireguard.svg",
+    "sha256": "687151a9d0fc75f0fbc214f73a2edc96d89ff5df7a6c3451127ab386b9c941e0",
+    "upstream": {
+      "title": "WireGuard",
+      "hex": "88171A",
+      "source": "https://www.wireguard.com",
+      "guidelines": "https://www.wireguard.com/trademark-policy"
+    }
+  },
+  "tailscale": {
+    "download": "https://raw.githubusercontent.com/simple-icons/simple-icons/11.15.0/icons/tailscale.svg",
+    "sha256": "80ecdde08c2a4cddaa64447fcbfafab81326864671cd33b7fc3d40c4c8661dfc",
+    "upstream": {
+      "title": "Tailscale",
+      "hex": "242424",
+      "source": "https://tailscale.com/press"
+    }
+  },
+  "snyk": {
+    "download": "https://raw.githubusercontent.com/simple-icons/simple-icons/11.15.0/icons/snyk.svg",
+    "sha256": "244614f41c69a083a40b69dbc2505b7098c0e00af44a0de032278e5819cd91e6",
+    "upstream": {
+      "title": "Snyk",
+      "hex": "4C4A73",
+      "source": "https://snyk.io/press-kit"
+    }
+  },
+  "splunk": {
+    "download": "https://raw.githubusercontent.com/simple-icons/simple-icons/11.15.0/icons/splunk.svg",
+    "sha256": "dcd1f7c9559d6d6b7c1f4f454e4d23b6beb24f5b51d5c48b7c53d5900a0dfdb1",
+    "upstream": {
+      "title": "Splunk",
+      "hex": "000000",
+      "source": "https://www.splunk.com"
+    }
+  },
+  "newrelic": {
+    "download": "https://raw.githubusercontent.com/simple-icons/simple-icons/11.15.0/icons/newrelic.svg",
+    "sha256": "4fbf9fa18cc17767df797bd6f8e4f60f87d6df407f15fa816ccdfa6bb6cb04ec",
+    "upstream": {
+      "title": "New Relic",
+      "hex": "1CE783",
+      "source": "https://newrelic.com/about/media-assets",
+      "guidelines": "https://newrelic.com/about/media-assets#guidelines"
+    }
+  },
+  "grafana": {
+    "download": "https://raw.githubusercontent.com/simple-icons/simple-icons/11.15.0/icons/grafana.svg",
+    "sha256": "e6da4ab998d25d509e27ce8a1f1afcb2d549907569b6fb1e4065890877cffefa",
+    "upstream": {
+      "title": "Grafana",
+      "hex": "F46800",
+      "source": "https://grafana.com"
+    }
+  },
+  "eset": {
+    "download": "https://web-assets.eset.com/typo3conf/ext/eset_base/Resources/Public/img/svg/eset-logo-print.svg",
+    "sha256": "6f7c8fbec88753d71033104b6f4b5e17fd34670f7a167d1bfa8430f3b88e426e",
+    "upstream": {
+      "title": "ESET",
+      "source": "https://www.eset.com/int/",
+      "license": "Vendor trademark asset; not covered by the Simple Icons CC0 dedication."
+    },
+    "adaptation": "Preserved selected logo paths with uniform scale and centering; omitted backgrounds, wordmarks or taglines outside the symbol where applicable. Fill geometry is rendered as a local monochrome CSS mask."
+  },
+  "crowdstrike": {
+    "download": "https://assets.crowdstrike.com/is/content/crowdstrikeinc/CS_Logo_Falcon",
+    "sha256": "67be3ec55ca58d0c712e8bfd57e9e068fc35b80bfabaed36d0aa98500b2a37f6",
+    "upstream": {
+      "title": "CrowdStrike",
+      "source": "https://www.crowdstrike.com/en-us/",
+      "license": "Vendor trademark asset; not covered by the Simple Icons CC0 dedication."
+    },
+    "adaptation": "Preserved selected logo paths with uniform scale and centering; omitted backgrounds, wordmarks or taglines outside the symbol where applicable. Fill geometry is rendered as a local monochrome CSS mask."
+  },
+  "checkpoint": {
+    "download": "https://www.checkpoint.com/wp-content/themes/checkpoint-theme-v2/images/checkpoint-logo.svg",
+    "sha256": "481d88bbaba507b5bb1163df19c0019a94ad3abefd0a6726bad566ab94f9e7c8",
+    "upstream": {
+      "title": "Check Point",
+      "source": "https://www.checkpoint.com/",
+      "license": "Vendor trademark asset; not covered by the Simple Icons CC0 dedication."
+    },
+    "adaptation": "Preserved selected logo paths with uniform scale and centering; omitted backgrounds, wordmarks or taglines outside the symbol where applicable. Fill geometry is rendered as a local monochrome CSS mask."
+  },
+  "zscaler": {
+    "download": "https://www.zscaler.com/favicons/safari-pinned-tab.svg",
+    "sha256": "38b55f71893c2978c736f231f58a8c242f6514f75a8e4b40c8aebfbbeafdb809",
+    "upstream": {
+      "title": "Zscaler",
+      "source": "https://www.zscaler.com/",
+      "license": "Vendor trademark asset; not covered by the Simple Icons CC0 dedication."
+    },
+    "adaptation": "Preserved selected logo paths with uniform scale and centering; omitted backgrounds, wordmarks or taglines outside the symbol where applicable. Fill geometry is rendered as a local monochrome CSS mask."
+  },
+  "proofpoint": {
+    "download": "https://www.proofpoint.com/themes/custom/proofpoint/apps/drupal/images/favicons/favicon.svg",
+    "sha256": "b72392f999f501187afb1842cf02e0beb5c124e21aa8fb86bd31758bd875b704",
+    "upstream": {
+      "title": "Proofpoint",
+      "source": "https://www.proofpoint.com/us",
+      "license": "Vendor trademark asset; not covered by the Simple Icons CC0 dedication."
+    },
+    "adaptation": "Preserved selected logo paths with uniform scale and centering; omitted backgrounds, wordmarks or taglines outside the symbol where applicable. Fill geometry is rendered as a local monochrome CSS mask."
+  },
+  "duo": {
+    "download": "https://duo.com/images/duo-logo.svg",
+    "sha256": "a98d16bbe04c7454fafe4eeba17997a27fbd7444bc76de0e095d44479fb54a3b",
+    "upstream": {
+      "title": "Duo",
+      "source": "https://duo.com/",
+      "license": "Vendor trademark asset; not covered by the Simple Icons CC0 dedication."
+    },
+    "adaptation": "Preserved selected logo paths with uniform scale and centering; omitted backgrounds, wordmarks or taglines outside the symbol where applicable. Fill geometry is rendered as a local monochrome CSS mask."
+  },
+  "keeper": {
+    "download": "https://www.keepersecurity.com/assets/branding/keeper-logo-light.svg",
+    "sha256": "71f69a9d862876f1ca6f0b108a95bc8abeffbdaba6230fb70e7dec30cc2be962",
+    "upstream": {
+      "title": "Keeper",
+      "source": "https://www.keepersecurity.com/",
+      "license": "Vendor trademark asset; not covered by the Simple Icons CC0 dedication."
+    },
+    "adaptation": "Preserved selected logo paths with uniform scale and centering; omitted backgrounds, wordmarks or taglines outside the symbol where applicable. Fill geometry is rendered as a local monochrome CSS mask."
+  },
+  "sharegate": {
+    "download": "https://cdn.prod.website-files.com/6842ed397b02520afd3c47e8/6842ed397b02520afd3c505c_logo_icon.svg",
+    "sha256": "a7d8f9af7b083fb4f929b3fbf061dbe7ae5fbc4542e616fb8304e46e89d9348e",
+    "upstream": {
+      "title": "ShareGate",
+      "source": "https://sharegate.com/",
+      "license": "Vendor trademark asset; not covered by the Simple Icons CC0 dedication."
+    },
+    "adaptation": "Preserved circular symbol and keyhole paths as an even-odd compound path; white cutouts remain transparent under monochrome CSS-mask rendering. Uniform scale and centering only."
+  },
+  "connectwise": {
+    "download": "https://www.connectwise.com/contentassets/e1148326d037464c91694a86d5381fee/logo-mobile-dark.svg",
+    "sha256": "fca17ab2f4028a2d6fa735ad6e9776837c386eb26ffdb96f4d273a416d4b1d1a",
+    "upstream": {
+      "title": "ConnectWise",
+      "source": "https://www.connectwise.com/",
+      "license": "Vendor trademark asset; not covered by the Simple Icons CC0 dedication."
+    },
+    "adaptation": "Preserved selected logo paths with uniform scale and centering; omitted backgrounds, wordmarks or taglines outside the symbol where applicable. Fill geometry is rendered as a local monochrome CSS mask."
+  },
+  "jamf": {
+    "download": "https://media.jamf.com/images/logos/jamf-one-color-dark-for-print-css.svg",
+    "sha256": "41ab5fe54178008304401cafcbd15e7028bc7bacd8d35bdc4426a825383f48db",
+    "upstream": {
+      "title": "Jamf",
+      "source": "https://www.jamf.com/",
+      "license": "Vendor trademark asset; not covered by the Simple Icons CC0 dedication."
+    },
+    "adaptation": "Preserved selected logo paths with uniform scale and centering; omitted backgrounds, wordmarks or taglines outside the symbol where applicable. Fill geometry is rendered as a local monochrome CSS mask."
+  },
+  "watchguard": {
+    "download": "https://www.watchguard.com/sites/default/files/favicons/safari-pinned-tab.svg",
+    "sha256": "28e44910f3d2b9e30b7aff6af2c58dafea948dca9a09ba82634ae39535d7ca02",
+    "upstream": {
+      "title": "WatchGuard",
+      "source": "https://www.watchguard.com/",
+      "license": "Vendor trademark asset; not covered by the Simple Icons CC0 dedication."
+    },
+    "adaptation": "Preserved selected logo paths with uniform scale and centering; omitted backgrounds, wordmarks or taglines outside the symbol where applicable. Fill geometry is rendered as a local monochrome CSS mask."
+  },
+  "commvault": {
+    "download": "https://www.commvault.com/",
+    "sha256": "40f685a67d5730a14b4f3abf2277985e38aa637173d0be7df5399e0d8bddae0f",
+    "upstream": {
+      "title": "Commvault",
+      "source": "https://www.commvault.com/",
+      "license": "Vendor trademark asset; not covered by the Simple Icons CC0 dedication."
+    },
+    "adaptation": "Preserved selected logo paths with uniform scale and centering; omitted backgrounds, wordmarks or taglines outside the symbol where applicable. Fill geometry is rendered as a local monochrome CSS mask.",
+    "sourceElement": "Header SVG, two purple symbol paths without wordmark; digest records source HTML."
+  },
+  "msp360": {
+    "download": "https://www.msp360.com/icons/critical-icons.svg",
+    "sha256": "1d88a22f3f34662cadcca143914ca9d15f2606266f6bf84f8ad065b3f0baa46f",
+    "upstream": {
+      "title": "MSP360",
+      "source": "https://www.msp360.com/",
+      "license": "Vendor trademark asset; not covered by the Simple Icons CC0 dedication."
+    },
+    "adaptation": "Preserved selected logo paths with uniform scale and centering; omitted backgrounds, wordmarks or taglines outside the symbol where applicable. Fill geometry is rendered as a local monochrome CSS mask.",
+    "sourceElement": "symbol#icon-logo-colored, first four paths (wordmark without tagline)"
+  },
+  "freshworks": {
+    "download": "https://dam.freshworks.com/asset/03f3dad1-efb4-418f-8eac-703625be1ae9/Freshworks-Logomark.webp",
+    "sha256": "28b99a2adac27a5ecbb931cff06597499069144b87a2234c5a483411ae8aaa07",
+    "upstream": {
+      "title": "Freshworks",
+      "source": "https://www.freshworks.com/company/",
+      "license": "Vendor trademark asset; not covered by the Simple Icons CC0 dedication."
+    },
+    "adaptation": "Unmodified transparent 82 × 82 WebP from the vendor asset library. Its alpha channel supplies the monochrome CSS mask."
   }
 }

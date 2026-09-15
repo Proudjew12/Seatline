@@ -24,9 +24,10 @@ For sellers quoting licenses from multiple companies:
    Switch to **Edit Mode** to add, rename, or remove products and licenses, including the initial
    entries. Open the top-right gear to switch modes. **Add product** asks only for a product name,
    optional short label and product icon, then creates an empty product. Use **Add license** afterward.
-   Names suggest a matching icon until you make a manual choice; the searchable icon library includes
-   software brands and general symbols. Edit product can change the name, short label, icon and profit
-   default. Icons use the current theme's foreground colors in the picker and product rail.
+   Names suggest a matching icon until you make a manual choice; the searchable icon library groups
+   software brands and general symbols by category. Browse all sections or filter by purpose, then
+   search brand names, aliases or categories in English or Hebrew. Edit product can change the name,
+   short label, icon and profit default. Icons use the current theme's foreground colors in the picker and product rail.
    Pointer dragging is disabled in Edit Mode; deliberate keyboard addition remains available.
 2. Drag a license into the quote. Clicking or tapping a card does not add it.
    New items start with **Annual — Pay Monthly**;
@@ -107,7 +108,8 @@ Hebrew/English layout and PDF text/coordinates/pagination, compact one-page quot
 license rows and a note, theme gallery selection and persistence,
 Default-only Light/Dark controls, nested-dialog keyboard focus, readable narrow-screen previews,
 all three billing schedules, invalid input, local persistence, PDF download and retry, responsive
-layout, saved text-size preferences, empty-product creation, searchable/persistent icons, catalog
+layout, saved text-size preferences, empty-product creation, categorized/searchable/persistent icons,
+category filtering and reset, keyboard selection, distinct icon silhouettes, catalog
 editing/default prices/migration, and production hosting
 from a repository subpath without an API.
 
@@ -264,7 +266,14 @@ names are original to Seatline; no vendor wallpapers are bundled with these them
 Catalog symbols are separate local assets under `frontend/src/features/catalog/icons/`, with
 sources and licensing documented there. They identify catalog products without implying affiliation.
 Their CSS masks use theme colors, keep consistent dimensions and make no external image requests.
-The library includes SentinelOne and BitTitan alongside the existing software brands.
+The picker separates General symbols, Productivity & Email, Collaboration & Projects,
+Security & Identity, Backup & Migration, IT & Cloud, Design & Documents, Development Tools,
+and Business & Analytics. Section headings and counts organize the complete library; the category
+filter narrows it without changing the selected icon. Search matches names, aliases and category
+keywords within the chosen category. Clear filters restores the complete library and keyboard focus
+to search. Hebrew translates categories and controls while brand names retain their English LTR layout.
+The library contains 106 distinct choices, including SentinelOne and BitTitan. The 44 additions
+include CrowdStrike, ESET, Check Point, ShareGate, Commvault, MSP360, ConnectWise, Jamf and Freshworks.
 Brand and product names stay in English; icon search also supports aliases and translated general
 symbols. Shared artwork appears once in the gallery: Google / Workspace and Microsoft / Windows
 each have one searchable choice. Previous icon IDs still resolve to their matching artwork.

@@ -4,8 +4,13 @@ Seatline's React, Vite, TypeScript, and SCSS Modules application builds customer
 quotes. Choose or create catalog entries, drag to add licenses, enter your own USD prices,
 and export a PDF. Add product asks only for its name, short label and icon, then creates an empty
 product. Add its licenses with Add license; product profit defaults remain in Edit product.
-The searchable, locally bundled software-icon library includes SentinelOne and BitTitan, suggests
-symbols from product names, supports manual choices and preserves selections after reload. Icons share theme colors and dimensions across
+The locally bundled library has 106 distinct icons in nine labeled sections, including
+security, backup/migration, IT/cloud, productivity, collaboration, design, development, and business.
+Choose a category or search names, aliases and category terms in English or Hebrew. Clear filters
+restores the complete library without changing the chosen icon. The library includes SentinelOne
+and BitTitan, plus CrowdStrike, ESET, Check Point, ShareGate, MSP360 and other expanded vendor choices.
+It suggests symbols from product names, supports manual choices and preserves selections
+after reload. Icons share theme colors and dimensions across
 the picker and product rail. Shared brand artwork appears once, with Google / Workspace and
 Microsoft / Windows searchable under either name; older saved icon choices continue to resolve.
 Sources and licensing are documented in `src/features/catalog/icons/`.
